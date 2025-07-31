@@ -16,12 +16,13 @@
   ],
   "scripts": {
     "build": "rm -rf dist/ && npx unbuild",
-    "format": "prettier --cache=/tmp/prefab-cloud-node --write \"**/*.+(js|ts|json)\"",
+    "format": "prettier --cache=/tmp/prefab-cloud-node -l \"**/*.+(js|ts|json)\"",
+    "format:fix": "prettier --cache=/tmp/prefab-cloud-node --write \"**/*.+(js|ts|json)\"",
     "lint": "eslint --cache=true --ext .ts .",
+    "lint:fix": "eslint --cache=true --ext --fix .ts .",
     "prep": "npm run lint && npm run format && npm run test && npm run build",
     "regen-proto": "npx pbjs -t json ${PROTO_ROOT:-..}/prefab-cloud/prefab.proto > src/proto.json && protoc --ts_proto_opt=esModuleInterop=true --ts_proto_opt=forceLong=long --ts_proto_opt=onlyTypes=true --ts_proto_opt=env=node --ts_proto_out=./ --ts_proto_opt=importSuffix=.js -I ${PROTO_ROOT:-..}/prefab-cloud/ prefab.proto && mv prefab.ts src/proto.ts",
-    "test": "jest --forceExit",
-    "prepare": "husky install"
+    "test": "jest --forceExit"
   },
   "keywords": [],
   "author": "Jeffrey Chupp",
@@ -38,7 +39,6 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^15.7.0",
     "eslint-plugin-promise": "^6.1.1",
-    "husky": "^8.0.0",
     "jest": "^29.5.0",
     "long": "^5.2.3",
     "prettier": "^2.8.8",
