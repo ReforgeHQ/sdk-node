@@ -1,12 +1,12 @@
-import { Prefab } from "../prefab";
-import type { PrefabInterface } from "../prefab";
+import { Reforge } from "../reforge";
+import type { ReforgeInterface } from "../reforge";
 import type { ResolverAPI } from "../resolver";
 import type { GetValue } from "../unwrap";
 import { tests } from "./integrationHelper";
 import type { InputOutputTest } from "./integrationHelper";
 
 const func = (
-  client: PrefabInterface | ResolverAPI,
+  client: ReforgeInterface | ResolverAPI,
   test: InputOutputTest
 ): any => {
   switch (test.function) {
@@ -21,10 +21,10 @@ const func = (
   }
 };
 
-const apiKey = process.env["PREFAB_INTEGRATION_TEST_API_KEY"];
+const apiKey = process.env["REFORGE_INTEGRATION_TEST_SDK_KEY"];
 
 if (apiKey === undefined || apiKey.length === 0) {
-  throw new Error("PREFAB_INTEGRATION_TEST_API_KEY is not set");
+  throw new Error("REFORGE_INTEGRATION_TEST_SDK_KEY is not set");
 }
 
 const SKIPPED = [
@@ -42,11 +42,11 @@ const defaultOptions = {
   ],
 };
 
-let prefab: Prefab;
+let reforge: Reforge;
 
 afterEach(() => {
-  if (prefab !== undefined && prefab !== null) {
-    prefab.close();
+  if (reforge !== undefined && reforge !== null) {
+    reforge.close();
   }
 });
 
@@ -64,7 +64,7 @@ describe("integration tests", () => {
         jest.spyOn(console, "warn").mockImplementation();
       }
 
-      const options: ConstructorParameters<typeof Prefab>[0] = {
+      const options: ConstructorParameters<typeof Reforge>[0] = {
         ...defaultOptions,
         apiKey,
         contextUploadMode: "none",
@@ -75,16 +75,16 @@ describe("integration tests", () => {
         options.onNoDefault = "ignore";
       }
 
-      prefab = new Prefab({ ...options, collectLoggerCounts: false });
+      reforge = new Reforge({ ...options, collectLoggerCounts: false });
 
-      await prefab.init();
+      await reforge.init();
 
       const evaluate = (): GetValue => {
         if (test.contexts.block !== undefined) {
           let returnValue: GetValue | "returnValue was never set";
 
-          prefab.inContext(test.contexts.block, (prefabWithContext) => {
-            returnValue = func(prefabWithContext, test)(
+          reforge.inContext(test.contexts.block, (reforgeWithContext) => {
+            returnValue = func(reforgeWithContext, test)(
               test.input.key,
               test.contexts.local,
               test.input.default
@@ -93,7 +93,7 @@ describe("integration tests", () => {
 
           return returnValue;
         } else {
-          return func(prefab, test)(
+          return func(reforge, test)(
             test.input.key,
             test.contexts.local,
             test.input.default
@@ -119,7 +119,7 @@ describe("integration tests", () => {
 
   telemetryTests.forEach((test) => {
     it(test.name, async () => {
-      const options: ConstructorParameters<typeof Prefab>[0] = {
+      const options: ConstructorParameters<typeof Reforge>[0] = {
         apiKey,
         sources: [
           "https://belt.staging-prefab.cloud",
@@ -128,17 +128,17 @@ describe("integration tests", () => {
         ...test.customOptions,
       };
 
-      const prefab = new Prefab(options);
+      const reforge = new Reforge(options);
 
-      await prefab.init();
+      await reforge.init();
 
-      const aggregator = prefab.telemetry[test.aggregator];
+      const aggregator = reforge.telemetry[test.aggregator];
 
       if (!aggregator.enabled) {
         throw new Error(`Aggregator ${test.aggregator} is not enabled`);
       }
 
-      test.exercise(aggregator, prefab);
+      test.exercise(aggregator, reforge);
 
       const result = await aggregator.sync();
 
@@ -185,7 +185,7 @@ describe("integration tests", () => {
 
       expect(aggregator.timeout).toBeDefined();
 
-      Object.values(prefab.telemetry).forEach((aggregator) => {
+      Object.values(reforge.telemetry).forEach((aggregator) => {
         clearTimeout(aggregator.timeout);
       });
     });

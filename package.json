@@ -1,14 +1,14 @@
 {
-  "name": "@prefab-cloud/prefab-cloud-node",
+  "name": "@reforge-com/sdk-node",
   "version": "0.4.9-pre.0",
   "description": "Feature Flags, Live Config, and Dynamic Log Levels",
-  "main": "dist/prefab.cjs",
-  "types": "dist/prefab.d.ts",
+  "main": "dist/reforge.cjs",
+  "types": "dist/reforge.d.ts",
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/prefab.mjs",
-      "require": "./dist/prefab.cjs"
+      "import": "./dist/reforge.mjs",
+      "require": "./dist/reforge.cjs"
     }
   },
   "files": [
@@ -16,12 +16,12 @@
   ],
   "scripts": {
     "build": "rm -rf dist/ && npx unbuild",
-    "format": "prettier --cache=/tmp/prefab-cloud-node -l \"**/*.+(js|ts|json)\"",
-    "format:fix": "prettier --cache=/tmp/prefab-cloud-node --write \"**/*.+(js|ts|json)\"",
+    "format": "prettier --cache=/tmp/sdk-node -l \"**/*.+(js|ts|json)\"",
+    "format:fix": "prettier --cache=/tmp/sdk-node --write \"**/*.+(js|ts|json)\"",
     "lint": "eslint --cache=true --ext .ts .",
     "lint:fix": "eslint --cache=true --ext --fix .ts .",
     "prep": "npm run lint && npm run format && npm run test && npm run build",
-    "regen-proto": "npx pbjs -t json ${PROTO_ROOT:-..}/prefab-cloud/prefab.proto > src/proto.json && protoc --ts_proto_opt=esModuleInterop=true --ts_proto_opt=forceLong=long --ts_proto_opt=onlyTypes=true --ts_proto_opt=env=node --ts_proto_out=./ --ts_proto_opt=importSuffix=.js -I ${PROTO_ROOT:-..}/prefab-cloud/ prefab.proto && mv prefab.ts src/proto.ts",
+    "regen-proto": "npx pbjs -t json ${PROTO_ROOT:-..}/reforge/reforge.proto > src/proto.json && protoc --ts_proto_opt=esModuleInterop=true --ts_proto_opt=forceLong=long --ts_proto_opt=onlyTypes=true --ts_proto_opt=env=node --ts_proto_out=./ --ts_proto_opt=importSuffix=.js -I ${PROTO_ROOT:-..}/reforge/ reforge.proto && mv reforge.ts src/proto.ts",
     "test": "jest --forceExit"
   },
   "keywords": [],

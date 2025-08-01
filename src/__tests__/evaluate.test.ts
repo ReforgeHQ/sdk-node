@@ -87,8 +87,8 @@ const ukContexts = new Map([
 ]);
 const frContexts = new Map([["user", new Map([["country", "FR"]])]]);
 
-const prefabEmailContexts = new Map([
-  ["user", new Map([["email", "@prefab.cloud"]])],
+const reforgeEmailContexts = new Map([
+  ["user", new Map([["email", "@reforge.com"]])],
 ]);
 const exampleEmailContexts = new Map([
   ["user", new Map([["email", "@example.com"]])],
@@ -382,7 +382,7 @@ describe("evaluate", () => {
       weightedValueIndex: undefined,
     });
 
-    expect(evaluate(args(prefabEmailContexts))).toStrictEqual({
+    expect(evaluate(args(reforgeEmailContexts))).toStrictEqual({
       configId: propEndsWithOneOf.id,
       configKey: propEndsWithOneOf.key,
       configType: propEndsWithOneOf.configType,
@@ -440,7 +440,7 @@ describe("evaluate", () => {
       weightedValueIndex: undefined,
     });
 
-    expect(evaluate(args(prefabEmailContexts))).toStrictEqual({
+    expect(evaluate(args(reforgeEmailContexts))).toStrictEqual({
       configId: propDoesNotEndWithOneOf.id,
       configKey: propDoesNotEndWithOneOf.key,
       configType: propDoesNotEndWithOneOf.configType,
@@ -702,7 +702,7 @@ describe("evaluate", () => {
       weightedValueIndex: undefined,
     });
 
-    expect(evaluate(args(prefabEmailContexts))).toStrictEqual({
+    expect(evaluate(args(reforgeEmailContexts))).toStrictEqual({
       configId: propIsOneOfAndEndsWith.id,
       configKey: propIsOneOfAndEndsWith.key,
       configType: propIsOneOfAndEndsWith.configType,
@@ -714,16 +714,16 @@ describe("evaluate", () => {
       weightedValueIndex: undefined,
     });
 
-    const frPrefabContexts = new Map([
+    const frReforgeContexts = new Map([
       [
         "user",
         new Map([
           ["country", "FR"],
-          ["email", "test@prefab.cloud"],
+          ["email", "test@reforge.com"],
         ]),
       ],
     ]);
-    expect(evaluate(args(frPrefabContexts))).toStrictEqual({
+    expect(evaluate(args(frReforgeContexts))).toStrictEqual({
       configId: propIsOneOfAndEndsWith.id,
       configKey: propIsOneOfAndEndsWith.key,
       configType: propIsOneOfAndEndsWith.configType,
@@ -735,16 +735,16 @@ describe("evaluate", () => {
       weightedValueIndex: undefined,
     });
 
-    const usPrefabContexts = new Map([
+    const usReforgeContexts = new Map([
       [
         "user",
         new Map([
           ["country", "US"],
-          ["email", "test@prefab.cloud"],
+          ["email", "test@reforge.com"],
         ]),
       ],
     ]);
-    expect(evaluate(args(usPrefabContexts))).toStrictEqual({
+    expect(evaluate(args(usReforgeContexts))).toStrictEqual({
       configId: propIsOneOfAndEndsWith.id,
       configKey: propIsOneOfAndEndsWith.key,
       configType: propIsOneOfAndEndsWith.configType,

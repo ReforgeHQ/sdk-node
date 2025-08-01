@@ -21,7 +21,7 @@ class SSEConnection {
 
   start(resolver: Resolver, startAtId: Long): void {
     const headers = makeHeaders(this.apiKey, {
-      "x-prefab-start-at-id": startAtId.toString(),
+      "x-reforge-start-at-id": startAtId.toString(),
       Accept: "text/event-stream",
     });
 

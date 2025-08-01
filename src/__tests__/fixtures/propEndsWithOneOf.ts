@@ -32,7 +32,7 @@ const config: Config = {
               operator: Criterion_CriterionOperator.PROP_ENDS_WITH_ONE_OF,
               valueToMatch: {
                 stringList: {
-                  values: ["@prefab.cloud", "@example.com"],
+                  values: ["@reforge.com", "@example.com"],
                 },
               },
             },

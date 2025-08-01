@@ -1,12 +1,12 @@
-# prefab-cloud-nodejs
+# @reforge-com/sdk-nodejs
 
-Prefab Node.js client
+Reforge Node.js client
 
 ---
 
 Install the client
 
-`npm install @prefab-cloud/prefab-cloud-node` or `yarn add @prefab-cloud/prefab-cloud-node`
+`npm install @reforge-com/sdk-node` or `yarn add @reforge-com/sdk-node`
 
 ## Required Peer Dependencies
 
@@ -22,31 +22,31 @@ yarn add long
 
 ## Usage
 
-Set up a Prefab client.
+Set up a Reforge Node.js client.
 
 ```js
-import { Prefab } from "@prefab-cloud/prefab-cloud-node";
+import { Reforge } from "@reforge-com/sdk-node";
 
-if (!process.env.PREFAB_API_KEY) {
-  throw new Error("PREFAB_API_KEY is not set");
+if (!process.env.REFORGE_API_KEY) {
+  throw new Error("REFORGE_API_KEY is not set");
 }
 
-const prefab = new Prefab({
-  apiKey: process.env.PREFAB_API_KEY,
+const reforge = new Reforge({
+  apiKey: process.env.REFORGE_API_KEY,
   enableSSE: true,
   enablePolling: true,
 });
 
-await prefab.init();
+await reforge.init();
 ```
 
 After the init completes you can use
 
-- `prefab.get('some.config.name')` returns a raw value
-- `prefab.isFeatureEnabled('some.feature.name')` returns true or false
-- `prefab.shouldLog({loggerName, desiredLevel, defaultLevel, contexts})` returns true or false
+- `reforge.get('some.config.name')` returns a raw value
+- `reforge.isFeatureEnabled('some.feature.name')` returns true or false
+- `reforge.shouldLog({loggerName, desiredLevel, defaultLevel, contexts})` returns true or false
 
-Prefab supports [context](https://docs.prefab.cloud/docs/explanations/concepts/context) for intelligent rule-based evaluation of `get` and `isFeatureEnabled` based on the current request/device/user/etc.
+Reforge supports [context](https://docs.prefab.cloud/docs/explanations/concepts/context) for intelligent rule-based evaluation of `get` and `isFeatureEnabled` based on the current request/device/user/etc.
 
 Given
 
@@ -72,13 +72,13 @@ const context = new Map([
 
 You can pass this in to each call
 
-- `prefab.get('some.config.name', context, defaultValue)`
-- `prefab.isFeatureEnabled('some.feature.name', context, false)`
+- `reforge.get('some.config.name', context, defaultValue)`
+- `reforge.isFeatureEnabled('some.feature.name', context, false)`
 
 Or you can set the context in a block (perhaps surrounding evaluation of a web request)
 
 ```js
-prefab.inContext(context, (pf) => {
+reforge.inContext(context, (pf) => {
   const optionalJustInTimeContext = { ... }
 
   console.log(pf.get("some.config.name", optionalJustInTimeContext, defaultValue))
@@ -103,16 +103,16 @@ Note that you can also provide Context as an object instead of a Map, e.g.:
 
 #### Option Definitions
 
-Besides `apiKey`, you can initialize `new Prefab(...)` with the following options
+Besides `apiKey`, you can initialize `new Reforge(...)` with the following options
 
-| Name                       | Description                                                                                                                           | Default           |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| collectEvaluationSummaries | Send counts of config/flag evaluation results back to Prefab to view in web app                                                       | true              |
-| collectLoggerCounts        | Send counts of logger usage back to Prefab to power log-levels configuration screen                                                   | true              |
-| contextUploadMode          | Upload either context "shapes" (the names and data types your app uses in prefab contexts) or periodically send full example contexts | "periodicExample" |
-| defaultLevel               | Level to be used as the min-verbosity for a `loggerPath` if no value is configured in Prefab                                          | "warn"            |
-| enableSSE                  | Whether or not we should listen for live changes from Prefab                                                                          | true              |
-| enablePolling              | Whether or not we should poll for changes from Prefab                                                                                 | false             |
+| Name                       | Description                                                                                                                            | Default           |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| collectEvaluationSummaries | Send counts of config/flag evaluation results back to Reforge to view in web app                                                       | true              |
+| collectLoggerCounts        | Send counts of logger usage back to Reforge to power log-levels configuration screen                                                   | true              |
+| contextUploadMode          | Upload either context "shapes" (the names and data types your app uses in reforge contexts) or periodically send full example contexts | "periodicExample" |
+| defaultLevel               | Level to be used as the min-verbosity for a `loggerPath` if no value is configured in Reforge                                          | "warn"            |
+| enableSSE                  | Whether or not we should listen for live changes from Reforge                                                                          | true              |
+| enablePolling              | Whether or not we should poll for changes from Reforge                                                                                 | false             |
 
 #### Publishing a new version of the library
 

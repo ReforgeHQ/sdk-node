@@ -9,8 +9,8 @@ import type {
   OnNoDefault,
   ProjectEnvId,
 } from "./types";
-import type { Telemetry } from "./prefab";
-import { PREFAB_DEFAULT_LOG_LEVEL } from "./prefab";
+import type { Telemetry } from "./reforge";
+import { REFORGE_DEFAULT_LOG_LEVEL } from "./reforge";
 
 import { mergeContexts, contextObjToMap } from "./mergeContexts";
 
@@ -319,7 +319,7 @@ class Resolver implements ResolverAPI {
 
     if (numericDesiredLevel === undefined) {
       console.warn(
-        `[prefab]: Invalid desiredLevel \`${desiredLevel}\` provided to shouldLog. Returning \`true\``
+        `[reforge]: Invalid desiredLevel \`${desiredLevel}\` provided to shouldLog. Returning \`true\``
       );
 
       return true;
@@ -333,7 +333,7 @@ class Resolver implements ResolverAPI {
       loggerName,
       desiredLevel: numericDesiredLevel,
       contexts: contexts ?? this.contexts,
-      defaultLevel: parseLevel(defaultLevel) ?? PREFAB_DEFAULT_LOG_LEVEL,
+      defaultLevel: parseLevel(defaultLevel) ?? REFORGE_DEFAULT_LOG_LEVEL,
       resolver: this,
     });
   }

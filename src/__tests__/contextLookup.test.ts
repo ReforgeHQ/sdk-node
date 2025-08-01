@@ -80,8 +80,8 @@ describe("contextLookup", () => {
     expect(result).toBe(true);
   });
 
-  it("should return current timestamp for prefab.current-time", () => {
-    const result = contextLookup(contexts, "prefab.current-time");
+  it("should return current timestamp for reforge.current-time", () => {
+    const result = contextLookup(contexts, "reforge.current-time");
     const now = +new Date();
 
     // Allow for a small time difference (within 100ms) since the test and the function call

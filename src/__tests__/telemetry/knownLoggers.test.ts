@@ -4,7 +4,7 @@ import { mockApiClient } from "../testHelpers";
 
 const telemetrySource = "https://telemetry.example.com";
 
-// NOTE: Integration tests for this function are in the prefab.test.ts file.
+// NOTE: Integration tests for this function are in the reforge.test.ts file.
 describe("knownLoggers", () => {
   it("returns stub if collectLoggerCounts is false", () => {
     expect(

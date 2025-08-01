@@ -15,7 +15,7 @@ const config = (start: number, end: number): Config => ({
         {
           criteria: [
             {
-              propertyName: "prefab.current-time",
+              propertyName: "reforge.current-time",
               operator: Criterion_CriterionOperator.IN_INT_RANGE,
               valueToMatch: {
                 intRange: {

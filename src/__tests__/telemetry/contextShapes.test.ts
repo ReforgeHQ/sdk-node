@@ -1,4 +1,4 @@
-import { Prefab } from "../../prefab";
+import { Reforge } from "../../reforge";
 import { contextShapes, stub } from "../../telemetry/contextShapes";
 import type { Contexts } from "../../types";
 import {
@@ -161,15 +161,15 @@ describe("contextShapes", () => {
     ]);
 
     it("records context shapes when contextUploadMode=shapeOnly", () => {
-      const prefab = new Prefab({
+      const reforge = new Reforge({
         apiKey: irrelevant,
         contextUploadMode: "shapeOnly",
       });
-      prefab.setConfig([basicConfig], projectEnvIdUnderTest, new Map());
+      reforge.setConfig([basicConfig], projectEnvIdUnderTest, new Map());
 
-      prefab.get("basic.value", contexts);
+      reforge.get("basic.value", contexts);
 
-      expect(prefab.telemetry.contextShapes.data).toStrictEqual(
+      expect(reforge.telemetry.contextShapes.data).toStrictEqual(
         new Map(
           Object.entries({
             user: {
@@ -182,18 +182,18 @@ describe("contextShapes", () => {
     });
 
     it("records context shapes by default", () => {
-      const prefabWithoutShapes = new Prefab({
+      const reforgeWithoutShapes = new Reforge({
         apiKey: irrelevant,
       });
-      prefabWithoutShapes.setConfig(
+      reforgeWithoutShapes.setConfig(
         [basicConfig],
         projectEnvIdUnderTest,
         new Map()
       );
 
-      prefabWithoutShapes.get("basic.value", contexts);
+      reforgeWithoutShapes.get("basic.value", contexts);
 
-      expect(prefabWithoutShapes.telemetry.contextShapes.data).toStrictEqual(
+      expect(reforgeWithoutShapes.telemetry.contextShapes.data).toStrictEqual(
         new Map(
           Object.entries({
             user: {

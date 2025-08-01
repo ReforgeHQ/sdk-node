@@ -3,7 +3,7 @@
     "prefab": {
       "options": {
         "java_package": "cloud.prefab.domain",
-        "java_outer_classname": "Prefab",
+        "java_outer_classname": "Reforge",
         "go_package": "github.com/prefab-cloud/prefab-cloud-go/proto"
       },
       "nested": {

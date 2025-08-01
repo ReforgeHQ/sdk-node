@@ -6,7 +6,7 @@ import { irrelevantLong } from "../testHelpers";
 const config: Config = {
   id: new Long(999),
   projectId: irrelevantLong,
-  key: "prefab.secrets.encryption.key",
+  key: "reforge.secrets.encryption.key",
   changedBy: undefined,
   rows: [
     {

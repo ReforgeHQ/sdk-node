@@ -8,8 +8,8 @@ export const contextLookup = (
     return undefined;
   }
 
-  // Special case for "prefab.current-time" to always return the current timestamp
-  if (propertyName === "prefab.current-time") {
+  // Special case for "reforge.current-time" to always return the current timestamp
+  if (propertyName === "reforge.current-time") {
     return +new Date();
   }
 

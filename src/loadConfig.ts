@@ -90,7 +90,7 @@ const loadConfigFromUrl = async ({
 
   if (response.status === 401) {
     throw new Error(
-      `Unauthorized. Check your Prefab SDK API key for ${source}${path}`
+      `Unauthorized. Check your Reforge SDK API key for ${source}${path}`
     );
   }
 
@@ -121,7 +121,7 @@ const parse = (parsed: Configs): Result => {
       !Long.isLong(firstConfig.id)
     ) {
       throw new Error(
-        'Prefab requires the "long" package to be in your project. See https://www.npmjs.com/package/long'
+        'Reforge requires the "long" package to be in your project. See https://www.npmjs.com/package/long'
       );
     }
   }

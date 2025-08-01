@@ -17,7 +17,7 @@ const config = (encryptedValue: string): Config => ({
           value: {
             string: encryptedValue,
             confidential: true,
-            decryptWith: "prefab.secrets.encryption.key",
+            decryptWith: "reforge.secrets.encryption.key",
           },
         },
       ],

@@ -1,5 +1,5 @@
 import Long from "long";
-import { Prefab } from "../../prefab";
+import { Reforge } from "../../reforge";
 import { exampleContexts, stub } from "../../telemetry/exampleContexts";
 import type { Contexts } from "../../types";
 import {
@@ -215,28 +215,28 @@ describe("exampleContexts", () => {
 
   describe("integration tests", () => {
     it("records context examples by default", () => {
-      const prefab = new Prefab({
+      const reforge = new Reforge({
         apiKey: irrelevant,
       });
-      prefab.setConfig([basicConfig], projectEnvIdUnderTest, new Map());
+      reforge.setConfig([basicConfig], projectEnvIdUnderTest, new Map());
 
-      prefab.get("basic.value", contexts);
+      reforge.get("basic.value", contexts);
 
-      expect(prefab.telemetry.exampleContexts.data).toStrictEqual([
+      expect(reforge.telemetry.exampleContexts.data).toStrictEqual([
         [Date.now(), contexts],
       ]);
     });
 
     it("does not record context examples when contextUploadMode is not periodicExample", () => {
-      const prefab = new Prefab({
+      const reforge = new Reforge({
         apiKey: irrelevant,
         contextUploadMode: "none",
       });
-      prefab.setConfig([basicConfig], projectEnvIdUnderTest, new Map());
+      reforge.setConfig([basicConfig], projectEnvIdUnderTest, new Map());
 
-      prefab.get("basic.value", contexts);
+      reforge.get("basic.value", contexts);
 
-      expect(prefab.telemetry.exampleContexts.data).toStrictEqual([]);
+      expect(reforge.telemetry.exampleContexts.data).toStrictEqual([]);
     });
   });
 });

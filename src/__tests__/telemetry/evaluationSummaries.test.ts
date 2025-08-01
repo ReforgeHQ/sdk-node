@@ -1,5 +1,5 @@
 import Long from "long";
-import { Prefab } from "../../prefab";
+import { Reforge } from "../../reforge";
 import { evaluationSummaries, stub } from "../../telemetry/evaluationSummaries";
 import { Resolver } from "../../resolver";
 import type { Config } from "../../proto";
@@ -328,14 +328,14 @@ describe("evaluationSummaries", () => {
 
   describe("integration tests", () => {
     it("records evaluation summaries by default", () => {
-      const prefab = new Prefab({
+      const reforge = new Reforge({
         apiKey: irrelevant,
       });
-      prefab.setConfig([basicConfig], projectEnvIdUnderTest, new Map());
+      reforge.setConfig([basicConfig], projectEnvIdUnderTest, new Map());
 
-      prefab.get("basic.value", usContexts);
+      reforge.get("basic.value", usContexts);
 
-      expect(prefab.telemetry.evaluationSummaries.data).toStrictEqual(
+      expect(reforge.telemetry.evaluationSummaries.data).toStrictEqual(
         new Map([
           ['["basic.value","1"]', new Map([['["999",0,0,"int",42,null]', 1]])],
         ])
@@ -343,15 +343,15 @@ describe("evaluationSummaries", () => {
     });
 
     it("does not record evaluation summaries when collectEvaluationSummaries is false", () => {
-      const prefab = new Prefab({
+      const reforge = new Reforge({
         apiKey: irrelevant,
         collectEvaluationSummaries: false,
       });
-      prefab.setConfig([basicConfig], projectEnvIdUnderTest, new Map());
+      reforge.setConfig([basicConfig], projectEnvIdUnderTest, new Map());
 
-      prefab.get("basic.value", usContexts);
+      reforge.get("basic.value", usContexts);
 
-      expect(prefab.telemetry.evaluationSummaries.data).toStrictEqual(
+      expect(reforge.telemetry.evaluationSummaries.data).toStrictEqual(
         new Map()
       );
     });

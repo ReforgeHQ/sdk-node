@@ -2,18 +2,19 @@
 
 ## 0.4.8 - 2025-04-15
 
-- Implement virtual context `prefab.current-time` for all operators [#102]
+- Implement virtual context `reforge.current-time` for all operators [#102]
 - fix: Declare Long as a peer dependency [#97]
 
 ## 0.4.7 - 2025-04-08
 
-- fix: Telemetry hanging after prefab.close() [#100]
+- fix: Telemetry hanging after reforge.close() [#100]
 
 ## 0.4.6 - 2025-04-08
 
 - Add withContext to get a context-bound resolver [#98]
 
 ## 0.4.5 - 2025-02-24
+
 - Updated protos with schema types [#95]
 
 ## 0.4.4 - 2025-02-20
@@ -24,7 +25,6 @@
 - Adds regex matching operator support [#90]
 - Adds numeric comparison operator support [#88]
 - Adds date comparison operator support [#84] [#86]
-
 
 ## 0.4.3 - 2025-01-28
 
@@ -87,7 +87,7 @@
 - Add `.logger() [#57]
 - Add `.updateNow()` [#56]
 - Fix polling bug [#54]
-- Allow prefab.set [#53]
+- Allow reforge.set [#53]
 
 ## 0.1.14 - 2023-12-14
 

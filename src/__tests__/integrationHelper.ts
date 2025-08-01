@@ -1,6 +1,6 @@
 import type Long from "long";
-import type { Prefab } from "../prefab";
-import { wordLevelToNumber } from "../prefab";
+import type { Reforge } from "../reforge";
+import { wordLevelToNumber } from "../reforge";
 import type { Context, Contexts, ContextValue } from "../types";
 import type { ContextShapes, Logger, Loggers, TelemetryEvents } from "../proto";
 import type { knownLoggers, LoggerLevelName } from "../telemetry/knownLoggers";
@@ -11,14 +11,14 @@ import fs from "fs";
 import { type ValidLogLevelName, PREFIX } from "../logger";
 
 process.env[
-  `PREFAB_INTEGRATION_TEST_ENCRYPTION_KEY`
+  `REFORGE_INTEGRATION_TEST_ENCRYPTION_KEY`
 ] = `c87ba22d8662282abe8a0e4651327b579cb64a454ab0f4c170b45b15f049a221`;
 process.env[`NOT_A_NUMBER`] = `not a number`;
 process.env[`IS_A_NUMBER`] = "1234";
 
 const IGNORED_CLIENT_OVERRIDES_FOR_INPUT_OUTPUT_TESTS = [
   "initialization_timeout_sec",
-  "prefab_api_url",
+  "reforge_api_url",
   "on_init_failure",
 ];
 
@@ -160,7 +160,7 @@ export interface TelemetryTest {
   customOptions: {
     contextUploadMode?: "shapeOnly" | "periodicExample" | "none";
   };
-  exercise: (aggregator: unknown, prefab: Prefab) => void;
+  exercise: (aggregator: unknown, reforge: Reforge) => void;
   massageData: (dataSent: unknown) => unknown;
 }
 
@@ -338,9 +338,9 @@ const aggregatorSpecificLogic = {
   evaluationSummaries(data: TelemetryTest["data"]) {
     const { keys } = data[0] as { keys: string[] };
     return {
-      exercise: (_: unknown, prefab: Prefab) => {
+      exercise: (_: unknown, reforge: Reforge) => {
         keys.forEach((key: unknown) => {
-          prefab.get(key as string);
+          reforge.get(key as string);
         });
       },
       massageData: (dataSent: unknown) => {

@@ -42,19 +42,19 @@ import {
 } from "./configChangeNotifier";
 
 const DEFAULT_POLL_INTERVAL = 60 * 1000;
-export const PREFAB_DEFAULT_LOG_LEVEL = LogLevel.WARN;
+export const REFORGE_DEFAULT_LOG_LEVEL = LogLevel.WARN;
 export const MULTIPLE_INIT_WARNING =
-  "[prefab] init() called multiple times. This is generally not recommended as it can lead to multiple concurrent SSE connections and/or redundant polling. A Prefab instance is typically meant to be long-lived and exist outside of your request/response life-cycle. If you're using `init()` to change context, you're better off using `inContext` or setting per-request context to pass to your `get`/etc. calls.";
+  "[reforge] init() called multiple times. This is generally not recommended as it can lead to multiple concurrent SSE connections and/or redundant polling. A Reforge instance is typically meant to be long-lived and exist outside of your request/response life-cycle. If you're using `init()` to change context, you're better off using `inContext` or setting per-request context to pass to your `get`/etc. calls.";
 
 function requireResolver(
   resolver: Resolver | undefined
 ): asserts resolver is Resolver {
   if (resolver === undefined) {
-    throw new Error("prefab.resolver is undefined. Did you call init()?");
+    throw new Error("reforge.resolver is undefined. Did you call init()?");
   }
 }
 
-export interface PrefabInterface {
+export interface ReforgeInterface {
   get: (
     key: string,
     contexts?: Contexts | ContextObj,
@@ -107,7 +107,7 @@ interface ConstructorProps {
   onUpdate?: (configs: Array<Config | MinimumConfig>) => void;
 }
 
-class Prefab implements PrefabInterface {
+class Reforge implements ReforgeInterface {
   private readonly apiKey: string;
   readonly sources: Sources;
   private readonly datafile?: string;
@@ -143,7 +143,7 @@ class Prefab implements PrefabInterface {
     globalContext,
     pollInterval,
     fetch = globalThis.fetch,
-    defaultLogLevel = PREFAB_DEFAULT_LOG_LEVEL,
+    defaultLogLevel = REFORGE_DEFAULT_LOG_LEVEL,
     collectLoggerCounts = true,
     contextUploadMode = "periodicExample",
     collectEvaluationSummaries = true,
@@ -152,10 +152,10 @@ class Prefab implements PrefabInterface {
     this.apiKey = apiKey;
 
     if (
-      process.env["PREFAB_API_URL_OVERRIDE"] !== undefined &&
-      process.env["PREFAB_API_URL_OVERRIDE"] !== ""
+      process.env["REFORGE_API_URL_OVERRIDE"] !== undefined &&
+      process.env["REFORGE_API_URL_OVERRIDE"] !== ""
     ) {
-      this.sources = new Sources([process.env["PREFAB_API_URL_OVERRIDE"]]);
+      this.sources = new Sources([process.env["REFORGE_API_URL_OVERRIDE"]]);
     } else {
       this.sources = new Sources(sources);
     }
@@ -174,7 +174,7 @@ class Prefab implements PrefabInterface {
 
     if (parsedDefaultLogLevel === undefined) {
       console.warn(
-        `Invalid default log level provided: ${defaultLogLevel}. Defaulting to ${PREFAB_DEFAULT_LOG_LEVEL}.`
+        `Invalid default log level provided: ${defaultLogLevel}. Defaulting to ${REFORGE_DEFAULT_LOG_LEVEL}.`
       );
     }
 
@@ -182,7 +182,7 @@ class Prefab implements PrefabInterface {
       throw new Error("At least one source is required");
     }
 
-    this.defaultLogLevel = parsedDefaultLogLevel ?? PREFAB_DEFAULT_LOG_LEVEL;
+    this.defaultLogLevel = parsedDefaultLogLevel ?? REFORGE_DEFAULT_LOG_LEVEL;
 
     this.apiClient = apiClient(this.apiKey, fetch);
 
@@ -264,7 +264,7 @@ class Prefab implements PrefabInterface {
     }
 
     if (this.resolver !== undefined) {
-      console.warn("Prefab already initialized.");
+      console.warn("Reforge already initialized.");
       return;
     }
 
@@ -298,7 +298,7 @@ class Prefab implements PrefabInterface {
         TelemetryReporter.start(Object.values(this.telemetry));
       });
     } catch (error) {
-      console.error("Error during Prefab initialization:", error);
+      console.error("Error during Reforge initialization:", error);
       throw error;
     }
   }
@@ -393,7 +393,7 @@ class Prefab implements PrefabInterface {
 
   inContext<T>(
     contexts: Contexts | ContextObj,
-    func: (prefab: Resolver) => T
+    func: (reforge: Resolver) => T
   ): T {
     requireResolver(this.resolver);
 
@@ -440,14 +440,14 @@ class Prefab implements PrefabInterface {
 
     if (numericDesiredLevel === undefined) {
       console.warn(
-        `[prefab]: Invalid desiredLevel \`${desiredLevel}\` provided to shouldLog. Returning \`true\``
+        `[reforge]: Invalid desiredLevel \`${desiredLevel}\` provided to shouldLog. Returning \`true\``
       );
 
       return true;
     }
 
     console.warn(
-      `[prefab] Still initializing... Comparing against defaultLogLevel setting: ${this.defaultLogLevel}`
+      `[reforge] Still initializing... Comparing against defaultLogLevel setting: ${this.defaultLogLevel}`
     );
 
     this.telemetry.knownLoggers.push(loggerName, numericDesiredLevel);
@@ -528,7 +528,7 @@ export {
   ConfigType,
   ConfigValueType,
   LogLevel,
-  Prefab,
+  Reforge,
   ProvidedSource,
   encryption,
   type ConditionalValue,

@@ -9,7 +9,7 @@ export const makeHeaders = (
 
   return {
     Authorization: `Basic ${token}`,
-    "X-PrefabCloud-Client-Version": `prefab-cloud-node-${version}`,
+    "X-Reforge-Client-Version": `@reforge-com/sdk-node-${version}`,
     ...(other ?? {}),
   };
 };

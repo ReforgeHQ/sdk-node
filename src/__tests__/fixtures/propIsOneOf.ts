@@ -29,7 +29,7 @@ const config: Config = {
         {
           criteria: [
             {
-              propertyName: "prefab.user-id",
+              propertyName: "reforge.user-id",
               operator: Criterion_CriterionOperator.PROP_IS_ONE_OF,
               valueToMatch: {
                 stringList: {
@@ -88,7 +88,7 @@ const config: Config = {
             },
           ],
           value: {
-            decryptWith: "prefab.secrets.encryption.key",
+            decryptWith: "reforge.secrets.encryption.key",
             string:
               "8933c39f7f73b6e815dfbe--b3f5216809e719efd8803dad--b16761b9418d8145a98f88a631681298",
           },
