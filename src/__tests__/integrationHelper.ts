@@ -31,7 +31,7 @@ const HANDLED_CLIENT_OVERRIDES_FOR_TELEMETRY_TESTS = ["context_upload_mode"];
 
 const YAML = require("yaml");
 
-const testDataPath = `./prefab-cloud-integration-test-data`;
+const testDataPath = `./integration-test-data`;
 
 const testsPath = `${testDataPath}/tests/current`;
 
