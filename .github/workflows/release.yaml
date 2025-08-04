@@ -35,7 +35,7 @@ jobs:
           # Check if this is a pre-release version
           if [[ "$current_version" =~ -(alpha|beta|rc|dev|pre|canary|next) ]]; then
             echo "is-prerelease=true" >> $GITHUB_OUTPUT
-            tag="$current_version"
+            tag="$(echo "$current_version" | cut -d'-' -f2)"
             echo "npm-tag=$tag" >> $GITHUB_OUTPUT
             echo "Detected pre-release version with tag: $tag"
           else
@@ -58,8 +58,8 @@ jobs:
       # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
-          registry-url: "https://registry.npmjs.org"
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
       - run: npm ci
       - run: npm run build
       - name: Publish to npm
@@ -90,7 +90,7 @@ jobs:
           tag_name: v${{ needs.check-version.outputs.current-version }}
           release_name: v${{ needs.check-version.outputs.current-version }}
           body: |
-            See [CHANGELOG](https://github.com/reforgehq/sdk-node/blob/main/CHANGELOG.md) for details.
+            See [CHANGELOG](https://github.com/ReforgeHQ/sdk-node/blob/main/CHANGELOG.md) for details.
 
             Published to npm: [@reforge-com/node@${{ needs.check-version.outputs.current-version }}](https://www.npmjs.com/package/@reforge-com/node/v/${{ needs.check-version.outputs.current-version }})
           draft: false
