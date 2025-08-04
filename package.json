@@ -1,10 +1,18 @@
 {
   "name": "@reforge-com/node",
-  "version": "0.0.0-pre.0",
+  "version": "0.0.0-pre.1",
   "description": "Feature Flags, Live Config, and Dynamic Log Levels",
   "main": "dist/reforge.cjs",
   "types": "dist/reforge.d.ts",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reforgehq/sdk-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/reforgehq/sdk-node/issues"
+  },
+  "homepage": "https://github.com/reforgehq/sdk-node#readme",
   "exports": {
     ".": {
       "import": "./dist/reforge.mjs",

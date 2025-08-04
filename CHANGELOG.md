@@ -1,12 +1,13 @@
 # Changelog
 
-## 0.0.0-pre.0 - 2025-08-03
+## 0.0.0-pre.1 - 2025-08-04
 
 - Reforge rebrand
 
 # @prefab-cloud/prefab-cloud-node
 
-All releases below were released as part of the [@prefab-cloud/prefab-cloud-node](https://github.com/prefab-cloud/prefab-cloud-node) package.
+All releases below were released as part of the
+[@prefab-cloud/prefab-cloud-node](https://github.com/prefab-cloud/prefab-cloud-node) package.
 
 ## @prefab-cloud/prefab-cloud-node - 0.4.8 - 2025-04-15
 
@@ -81,7 +82,8 @@ All releases below were released as part of the [@prefab-cloud/prefab-cloud-node
 
 ## @prefab-cloud/prefab-cloud-node - 0.1.17 - 2024-01-18
 
-- Don't report empty contexts with empty keys. Throw if required environment variable is absent. Throw if we can't parse an environment variable correctly. [#63]
+- Don't report empty contexts with empty keys. Throw if required environment variable is absent.
+  Throw if we can't parse an environment variable correctly. [#63]
 
 ## @prefab-cloud/prefab-cloud-node - 0.1.16 - 2024-01-09
 
