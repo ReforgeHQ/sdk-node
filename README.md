@@ -1,4 +1,4 @@
-# @reforge-com/sdk-nodejs
+# @reforge-com/node
 
 Reforge Node.js client
 
@@ -6,7 +6,7 @@ Reforge Node.js client
 
 Install the client
 
-`npm install @reforge-com/sdk-node` or `yarn add @reforge-com/sdk-node`
+`npm install @reforge-com/node` or `yarn add @reforge-com/node`
 
 ## Required Peer Dependencies
 
@@ -25,7 +25,7 @@ yarn add long
 Set up a Reforge Node.js client.
 
 ```js
-import { Reforge } from "@reforge-com/sdk-node";
+import { Reforge } from "@reforge-com/node";
 
 if (!process.env.REFORGE_API_KEY) {
   throw new Error("REFORGE_API_KEY is not set");

@@ -9,7 +9,7 @@ export const makeHeaders = (
 
   return {
     Authorization: `Basic ${token}`,
-    "X-Reforge-Client-Version": `@reforge-com/sdk-node-${version}`,
+    "X-Reforge-Client-Version": `sdk-node-${version}`,
     ...(other ?? {}),
   };
 };
