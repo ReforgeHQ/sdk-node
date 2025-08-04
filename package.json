@@ -1,6 +1,6 @@
 {
   "name": "@reforge-com/node",
-  "version": "0.0.0-pre.1",
+  "version": "0.0.0-pre.2",
   "description": "Feature Flags, Live Config, and Dynamic Log Levels",
   "main": "dist/reforge.cjs",
   "types": "dist/reforge.d.ts",
