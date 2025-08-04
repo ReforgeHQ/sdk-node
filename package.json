@@ -1,6 +1,6 @@
 {
-  "name": "@reforge-com/sdk-node",
-  "version": "0.4.9-pre.0",
+  "name": "@reforge-com/node",
+  "version": "0.0.0-pre.0",
   "description": "Feature Flags, Live Config, and Dynamic Log Levels",
   "main": "dist/reforge.cjs",
   "types": "dist/reforge.d.ts",
