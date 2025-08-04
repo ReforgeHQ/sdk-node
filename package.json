@@ -7,12 +7,12 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/reforgehq/sdk-node.git"
+    "url": "https://github.com/ReforgeHQ/sdk-node.git"
   },
   "bugs": {
-    "url": "https://github.com/reforgehq/sdk-node/issues"
+    "url": "https://github.com/ReforgeHQ/sdk-node/issues"
   },
-  "homepage": "https://github.com/reforgehq/sdk-node#readme",
+  "homepage": "https://github.com/ReforgeHQ/sdk-node#readme",
   "exports": {
     ".": {
       "import": "./dist/reforge.mjs",
