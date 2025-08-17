@@ -25,8 +25,8 @@
   ],
   "scripts": {
     "build": "rm -rf dist/ && npx unbuild",
-    "format": "prettier --cache=/tmp/sdk-node -l \"**/*.+(js|ts|json)\"",
-    "format:fix": "prettier --cache=/tmp/sdk-node --write \"**/*.+(js|ts|json)\"",
+    "prettier": "prettier --cache=/tmp/sdk-node -l \"**/*.+(js|ts|json)\"",
+    "prettier:fix": "prettier --cache=/tmp/sdk-node --write \"**/*.+(js|ts|json)\"",
     "lint": "eslint --cache=true --ext .ts .",
     "lint:fix": "eslint --cache=true --ext --fix .ts .",
     "prep": "yarn run lint && yarn run format && yarn run test && yarn run build",

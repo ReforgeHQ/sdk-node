@@ -46,7 +46,7 @@ jobs:
 
       - run: yarn lint
 
-      - run: yarn format
+      - run: yarn prettier
 
       - name: Run tests
         run: yarn test
