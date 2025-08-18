@@ -24,6 +24,7 @@ export const decode = <T>(type: string, input: ArrayBuffer | string): T => {
 };
 
 export const encode = (type: string, data: any): ArrayBuffer => {
+  // @ts-expect-error This works as it is + we are removing protos soon, so not investigating
   return root
     .lookupType("prefab." + type)
     .encode(data)

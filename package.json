@@ -1,4 +1,5 @@
 {
+  "packageManager": "yarn@4.9.2",
   "name": "@reforge-com/node",
   "version": "0.0.0-pre.2",
   "description": "Feature Flags, Live Config, and Dynamic Log Levels",
@@ -24,11 +25,11 @@
   ],
   "scripts": {
     "build": "rm -rf dist/ && npx unbuild",
-    "format": "prettier --cache=/tmp/sdk-node -l \"**/*.+(js|ts|json)\"",
-    "format:fix": "prettier --cache=/tmp/sdk-node --write \"**/*.+(js|ts|json)\"",
+    "prettier": "prettier --cache=/tmp/sdk-node -l \"**/*.+(js|ts|json)\"",
+    "prettier:fix": "prettier --cache=/tmp/sdk-node --write \"**/*.+(js|ts|json)\"",
     "lint": "eslint --cache=true --ext .ts .",
     "lint:fix": "eslint --cache=true --ext --fix .ts .",
-    "prep": "npm run lint && npm run format && npm run test && npm run build",
+    "prep": "yarn run lint && yarn run format && yarn run test && yarn run build",
     "regen-proto": "npx pbjs -t json ${PROTO_ROOT:-..}/reforge/reforge.proto > src/proto.json && protoc --ts_proto_opt=esModuleInterop=true --ts_proto_opt=forceLong=long --ts_proto_opt=onlyTypes=true --ts_proto_opt=env=node --ts_proto_out=./ --ts_proto_opt=importSuffix=.js -I ${PROTO_ROOT:-..}/reforge/ reforge.proto && mv reforge.ts src/proto.ts",
     "test": "jest --forceExit"
   },
@@ -36,11 +37,11 @@
   "author": "Jeffrey Chupp",
   "license": "ISC",
   "devDependencies": {
-    "bun": "^1.2.12",
     "@types/jest": "^29.5.1",
     "@types/yaml": "^1.9.7",
     "@typescript-eslint/eslint-plugin": "^5.59.2",
     "@typescript-eslint/parser": "^5.59.2",
+    "bun": "^1.2.12",
     "eslint": "^8.39.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-config-standard-with-typescript": "^34.0.1",

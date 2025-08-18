@@ -113,13 +113,3 @@ Besides `apiKey`, you can initialize `new Reforge(...)` with the following optio
 | defaultLevel               | Level to be used as the min-verbosity for a `loggerPath` if no value is configured in Reforge                                          | "warn"            |
 | enableSSE                  | Whether or not we should listen for live changes from Reforge                                                                          | true              |
 | enablePolling              | Whether or not we should poll for changes from Reforge                                                                                 | false             |
-
-#### Publishing a new version of the library
-
-- Ensure you have the latest on the `main` branch
-- Update the changelog and commit
-- Run `npm run prep` to build the new version
-- Run `npm version patch` to bump the version number (adjust accordingly for minor/major)
-- Run `npm run prep` again and the working directory should be clean
-- Push `main` to github
-- Run `npm publish --access public` to publish the new version to npm
