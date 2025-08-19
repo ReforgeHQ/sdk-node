@@ -7,6 +7,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
     strategy:
       matrix:
         node-version: [18.x, 20.x]
