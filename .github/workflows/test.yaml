@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      NPM_AUTH_TOKEN: ${{ secrets.ORG_REFORGE_NPM_AUTH_TOKEN }}
 
     strategy:
       matrix:
