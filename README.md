@@ -18,17 +18,20 @@ npm install long
 yarn add long
 ```
 
-> **Important:** The `long` package must be directly installed in your project. Some environments (particularly Heroku) require this dependency to be in your project's direct dependencies for proper module resolution. Without it, you may encounter issues with integer values being parsed incorrectly.
+> **Important:** The `long` package must be directly installed in your project. Some environments
+> (particularly Heroku) require this dependency to be in your project's direct dependencies for
+> proper module resolution. Without it, you may encounter issues with integer values being parsed
+> incorrectly.
 
 ## Usage
 
 Set up a Reforge Node.js client.
 
 ```js
-import { Reforge } from "@reforge-com/node";
+import {Reforge} from '@reforge-com/node';
 
 if (!process.env.REFORGE_API_KEY) {
-  throw new Error("REFORGE_API_KEY is not set");
+  throw new Error('REFORGE_API_KEY is not set');
 }
 
 const reforge = new Reforge({
@@ -46,25 +49,27 @@ After the init completes you can use
 - `reforge.isFeatureEnabled('some.feature.name')` returns true or false
 - `reforge.shouldLog({loggerName, desiredLevel, defaultLevel, contexts})` returns true or false
 
-Reforge supports [context](https://docs.prefab.cloud/docs/explanations/concepts/context) for intelligent rule-based evaluation of `get` and `isFeatureEnabled` based on the current request/device/user/etc.
+Reforge supports [context](https://docs.prefab.cloud/docs/explanations/concepts/context) for
+intelligent rule-based evaluation of `get` and `isFeatureEnabled` based on the current
+request/device/user/etc.
 
 Given
 
 ```javascript
 const context = new Map([
   [
-    "user",
+    'user',
     new Map([
-      ["key", "some-unique-identifier"],
-      ["country", "US"],
+      ['key', 'some-unique-identifier'],
+      ['country', 'US'],
     ]),
   ],
 
   [
-    "subscription",
+    'subscription',
     new Map([
-      ["key", "pro-sub"],
-      ["plan", "pro"],
+      ['key', 'pro-sub'],
+      ['plan', 'pro'],
     ]),
   ],
 ]);
@@ -113,3 +118,9 @@ Besides `apiKey`, you can initialize `new Reforge(...)` with the following optio
 | defaultLevel               | Level to be used as the min-verbosity for a `loggerPath` if no value is configured in Reforge                                          | "warn"            |
 | enableSSE                  | Whether or not we should listen for live changes from Reforge                                                                          | true              |
 | enablePolling              | Whether or not we should poll for changes from Reforge                                                                                 | false             |
+
+## Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and
+create. Any contributions you make are **greatly appreciated**. For detailed contributing
+guidelines, please see [CONTRIBUTING.md](CONTRIBUTING.md)
