@@ -22,8 +22,8 @@ export const apiClient = (apiKey: string, fetchFunc: Fetch): InternalFetch => {
 
     const headers = makeHeaders(apiKey, {
       ...(opts["headers"] ?? {}),
-      "Content-Type": "application/x-protobuf",
-      Accept: "application/x-protobuf",
+      "Content-Type": "application/json",
+      Accept: "application/json",
     });
     const fullUrl = new URL(path, source).toString();
     return await fetchFunc(fullUrl, {

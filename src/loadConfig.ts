@@ -6,7 +6,7 @@ import { type ApiClient, fetchWithCache } from "./apiClient";
 
 import { unwrapPrimitive } from "./unwrap";
 import type { Contexts, ProjectEnvId } from "./types";
-import { parseConfigs, parseConfigsFromJSON } from "./parseProto";
+import { parseConfigsFromJSON, parseConfigsFromObject } from "./jsonHelpers";
 
 interface Result {
   configs: Config[];
@@ -95,8 +95,8 @@ const loadConfigFromUrl = async ({
   }
 
   if (response.status === 200) {
-    const buffer = await response.arrayBuffer();
-    const parsed = parseConfigs(buffer);
+    const json = await response["json"]();
+    const parsed = parseConfigsFromObject(json);
     return parse(parsed);
   }
 

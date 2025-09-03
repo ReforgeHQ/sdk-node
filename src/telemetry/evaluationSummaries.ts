@@ -9,7 +9,6 @@ import type {
   TelemetryEvents,
 } from "../proto";
 import { ConfigType } from "../proto";
-import { encode } from "../parseProto";
 import { now } from "./reporter";
 import { valueType } from "../wrap";
 import { configValueTypeToString } from "../unwrap";
@@ -183,7 +182,7 @@ export const evaluationSummaries = (
         events: [event],
       };
 
-      const body = encode("TelemetryEvents", apiData);
+      const body = JSON.stringify(apiData);
 
       const result = await apiClient.fetch({
         source: telemetryHost,

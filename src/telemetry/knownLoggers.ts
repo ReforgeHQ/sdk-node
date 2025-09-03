@@ -1,7 +1,7 @@
 import Long from "long";
 import type { Logger, Loggers } from "../proto";
 import type { ApiClient } from "../apiClient";
-import { encode } from "../parseProto";
+
 import type { ValidLogLevelName } from "../logger";
 import { now } from "./reporter";
 import type { SyncResult, Telemetry } from "./types";
@@ -120,7 +120,7 @@ export const knownLoggers = (
         path: ENDPOINT,
         options: {
           method: "POST",
-          body: encode("Loggers", apiData),
+          body: JSON.stringify(apiData),
         },
       });
 

@@ -3,7 +3,7 @@ import type { ContextUploadMode, SyncResult, Telemetry } from "./types";
 import type { ApiClient } from "../apiClient";
 import type { Contexts } from "../types";
 import { rateLimitCache } from "./rateLimitCache";
-import { encode } from "../parseProto";
+
 import type {
   ConfigValue,
   Context,
@@ -134,7 +134,7 @@ export const exampleContexts = (
         events: [event],
       };
 
-      const body = encode("TelemetryEvents", apiData);
+      const body = JSON.stringify(apiData);
 
       const result = await apiClient.fetch({
         source: telemetryHost,

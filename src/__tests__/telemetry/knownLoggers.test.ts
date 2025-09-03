@@ -35,6 +35,9 @@ describe("knownLoggers", () => {
       arrayBuffer: async (): Promise<ArrayBuffer> => {
         return await Promise.resolve(new ArrayBuffer(0));
       },
+      json: async (): Promise<any> => {
+        return await Promise.resolve({});
+      },
     };
     mockApiClient.fetch.mockResolvedValue(mockFetchResult);
 
