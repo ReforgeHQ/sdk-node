@@ -1,11 +1,10 @@
-import Long from "long";
-import type { Config } from "../../proto";
-import { ConfigType, LogLevel } from "../../proto";
-import { irrelevantLong } from "../testHelpers";
+import type { Config } from "../../types";
+import { ConfigValueType, ConfigType, LogLevel } from "../../types";
+import { irrelevantNumber } from "../testHelpers";
 
 const config: Config = {
-  id: new Long(33),
-  projectId: irrelevantLong,
+  id: "33",
+  projectId: irrelevantNumber,
   key: "log-level.some.component.path",
   changedBy: undefined,
   rows: [
@@ -15,15 +14,15 @@ const config: Config = {
         {
           criteria: [],
           value: {
-            logLevel: LogLevel.INFO,
+            logLevel: LogLevel.Info,
           },
         },
       ],
     },
   ],
   allowableValues: [],
-  configType: ConfigType.LOG_LEVEL,
-  valueType: 9,
+  configType: ConfigType.LogLevel,
+  valueType: ConfigValueType.LogLevel,
   sendToClientSdk: false,
 };
 

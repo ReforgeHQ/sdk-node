@@ -1,9 +1,13 @@
-import { type Config, Config_ValueType, ConfigType } from "../../proto";
-import { irrelevantLong, projectEnvIdUnderTest } from "../testHelpers";
+import { type Config, ConfigValueType, ConfigType } from "../../types";
+import {
+  irrelevantNumberAsString,
+  irrelevantNumber,
+  projectEnvIdUnderTest,
+} from "../testHelpers";
 
 const config: Config = {
-  id: irrelevantLong,
-  projectId: irrelevantLong,
+  id: irrelevantNumberAsString,
+  projectId: irrelevantNumber,
   key: "basic.env",
   changedBy: undefined,
   rows: [
@@ -35,9 +39,9 @@ const config: Config = {
       ],
     },
   ],
-  configType: ConfigType.CONFIG,
+  configType: ConfigType.Config,
   allowableValues: [],
-  valueType: Config_ValueType.STRING_LIST,
+  valueType: ConfigValueType.StringList,
   sendToClientSdk: false,
 };
 

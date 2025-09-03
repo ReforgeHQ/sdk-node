@@ -1,4 +1,3 @@
-import Long from "long";
 import { Reforge } from "../../reforge";
 import { exampleContexts, stub } from "../../telemetry/exampleContexts";
 import type { Contexts } from "../../types";
@@ -119,7 +118,7 @@ describe("exampleContexts", () => {
           exampleContexts: {
             examples: [
               {
-                timestamp: Long.fromNumber(Date.now()),
+                timestamp: Date.now(),
                 contextSet: {
                   contexts: [
                     {

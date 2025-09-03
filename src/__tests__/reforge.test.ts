@@ -1,5 +1,4 @@
 import * as path from "path";
-import Long from "long";
 import fs from "fs";
 import { spawn } from "child_process";
 
@@ -16,27 +15,26 @@ import {
   type TypedNodeServerConfigurationRaw,
   MULTIPLE_INIT_WARNING,
 } from "../reforge";
-import type { Contexts, ProjectEnvId } from "../types";
+import type { Contexts, ProjectEnvId, Config, ConfigValue } from "../types";
 import {
   LogLevel,
   Criterion_CriterionOperator,
   ConfigType,
-  Config_ValueType,
-} from "../proto";
-import type { Config, ConfigValue } from "../proto";
-import { encrypt, generateNewHexKey } from "../../src/encryption";
+  ConfigValueType,
+} from "../types";
+import { encrypt, generateNewHexKey } from "../encryption";
 import secretConfig from "./fixtures/secretConfig";
 import decryptionKeyConfig from "./fixtures/decryptionKeyConfig";
-import { wordLevelToNumber } from "../logger";
 
 import {
   nTimes,
   irrelevant,
   projectEnvIdUnderTest,
   levelAt,
-  irrelevantLong,
+  irrelevantNumber,
 } from "./testHelpers";
 import mostlyDeletedConfig from "./fixtures/mostlyDeletedConfig";
+import { jsonStringifyWithBigInt } from "../bigIntUtils";
 
 const configs = [
   basicConfig,
@@ -114,21 +112,19 @@ describe("reforge", () => {
         const presentValue = 42;
 
         const configToBeDeleted: Config = {
-          id: new Long(999),
-          projectId: irrelevantLong,
+          id: "999",
+          projectId: irrelevantNumber,
           key: deletionConfig.key,
           changedBy: undefined,
           rows: [
             {
               properties: {},
-              values: [
-                { criteria: [], value: { int: new Long(presentValue) } },
-              ],
+              values: [{ criteria: [], value: { int: BigInt(presentValue) } }],
             },
           ],
           allowableValues: [],
-          configType: ConfigType.CONFIG,
-          valueType: 1,
+          configType: ConfigType.Config,
+          valueType: ConfigValueType.Int,
           sendToClientSdk: false,
         };
 
@@ -298,7 +294,7 @@ describe("reforge", () => {
         contextUploadMode: "none",
       });
 
-      await reforge.init({ runtimeConfig: [["hello", { int: new Long(19) }]] });
+      await reforge.init({ runtimeConfig: [["hello", { int: BigInt(19) }]] });
 
       expect(reforge.get("hello")).toEqual(19);
     });
@@ -789,8 +785,8 @@ describe("reforge", () => {
 
       reforge.setConfig(configs, projectEnvIdUnderTest, new Map());
 
-      expect(JSON.stringify(reforge.raw("basic.value"))).toStrictEqual(
-        '{"id":{"low":999,"high":0,"unsigned":false},"projectId":{"low":-1,"high":0,"unsigned":false},"key":"basic.value","rows":[{"properties":{},"values":[{"criteria":[],"value":{"int":{"low":42,"high":0,"unsigned":false}}}]}],"allowableValues":[],"configType":1,"valueType":1,"sendToClientSdk":false}'
+      expect(jsonStringifyWithBigInt(reforge.raw("basic.value"))).toStrictEqual(
+        '{"id":"999","projectId":-1,"key":"basic.value","rows":[{"properties":{},"values":[{"criteria":[],"value":{"int":"42"}}]}],"allowableValues":[],"configType":"CONFIG","valueType":"INT","sendToClientSdk":false}'
       );
     });
   });
@@ -809,13 +805,13 @@ describe("reforge", () => {
       expect(
         reforge.shouldLog({
           loggerName,
-          desiredLevel: "error",
+          desiredLevel: LogLevel.Error,
         })
       ).toEqual(true);
 
       expect(reforge.telemetry.knownLoggers.data).toStrictEqual({
         [loggerName]: {
-          [LogLevel.ERROR]: 1,
+          [LogLevel.Error]: 1,
         },
       });
     });
@@ -833,13 +829,13 @@ describe("reforge", () => {
       expect(
         reforge.shouldLog({
           loggerName,
-          desiredLevel: "debug",
+          desiredLevel: LogLevel.Debug,
         })
       ).toEqual(false);
 
       expect(reforge.telemetry.knownLoggers.data).toStrictEqual({
         [loggerName]: {
-          [LogLevel.DEBUG]: 1,
+          [LogLevel.Debug]: 1,
         },
       });
     });
@@ -880,24 +876,24 @@ describe("reforge", () => {
       expect(
         reforge.shouldLog({
           loggerName,
-          desiredLevel: LogLevel.DEBUG,
-          defaultLevel: LogLevel.TRACE,
+          desiredLevel: LogLevel.Debug,
+          defaultLevel: LogLevel.Trace,
         })
       ).toEqual(true);
 
       expect(
         reforge.shouldLog({
           loggerName,
-          desiredLevel: LogLevel.DEBUG,
-          defaultLevel: LogLevel.DEBUG,
+          desiredLevel: LogLevel.Debug,
+          defaultLevel: LogLevel.Debug,
         })
       ).toEqual(true);
 
       expect(
         reforge.shouldLog({
           loggerName,
-          desiredLevel: LogLevel.DEBUG,
-          defaultLevel: LogLevel.INFO,
+          desiredLevel: LogLevel.Debug,
+          defaultLevel: LogLevel.Info,
         })
       ).toEqual(false);
 
@@ -905,7 +901,7 @@ describe("reforge", () => {
 
       expect(reforge.telemetry.knownLoggers.data).toStrictEqual({
         [loggerName]: {
-          [LogLevel.DEBUG]: 3,
+          [LogLevel.Debug]: 3,
         },
       });
     });
@@ -919,42 +915,42 @@ describe("reforge", () => {
       expect(
         reforge.shouldLog({
           loggerName,
-          desiredLevel: LogLevel.DEBUG,
-          defaultLevel: LogLevel.TRACE,
+          desiredLevel: LogLevel.Debug,
+          defaultLevel: LogLevel.Trace,
         })
       ).toEqual(true);
 
       expect(
         reforge.shouldLog({
           loggerName,
-          desiredLevel: LogLevel.DEBUG,
-          defaultLevel: LogLevel.DEBUG,
+          desiredLevel: LogLevel.Debug,
+          defaultLevel: LogLevel.Debug,
         })
       ).toEqual(true);
 
       expect(
         reforge.shouldLog({
           loggerName,
-          desiredLevel: LogLevel.DEBUG,
-          defaultLevel: LogLevel.INFO,
+          desiredLevel: LogLevel.Debug,
+          defaultLevel: LogLevel.Info,
         })
       ).toEqual(false);
 
       expect(mockConsoleWarn.mock.calls).toEqual([
         [
-          "[reforge] Still initializing... Comparing against defaultLogLevel setting: 5",
+          "[reforge] Still initializing... Comparing against defaultLogLevel setting: WARN",
         ],
         [
-          "[reforge] Still initializing... Comparing against defaultLogLevel setting: 5",
+          "[reforge] Still initializing... Comparing against defaultLogLevel setting: WARN",
         ],
         [
-          "[reforge] Still initializing... Comparing against defaultLogLevel setting: 5",
+          "[reforge] Still initializing... Comparing against defaultLogLevel setting: WARN",
         ],
       ]);
 
       expect(reforge.telemetry.knownLoggers.data).toStrictEqual({
         [loggerName]: {
-          [LogLevel.DEBUG]: 3,
+          [LogLevel.Debug]: 3,
         },
       });
     });
@@ -975,7 +971,7 @@ describe("reforge", () => {
       expect(
         reforge.shouldLog({
           loggerName,
-          desiredLevel: "error",
+          desiredLevel: LogLevel.Error,
         })
       ).toEqual(true);
 
@@ -1000,7 +996,7 @@ describe("reforge", () => {
         new Map()
       );
 
-      const logger = reforge.logger(loggerName, "info");
+      const logger = reforge.logger(loggerName, LogLevel.Info);
 
       expect(logger.trace("test")).toBeUndefined();
       expect(logger.debug("test")).toBeUndefined();
@@ -1037,11 +1033,11 @@ describe("reforge", () => {
             criteria: [
               {
                 propertyName: "user.country",
-                operator: Criterion_CriterionOperator.PROP_IS_ONE_OF,
+                operator: Criterion_CriterionOperator.PropIsOneOf,
                 valueToMatch: { stringList: { values: ["US"] } },
               },
             ],
-            value: { logLevel: wordLevelToNumber("debug" as const) },
+            value: { logLevel: LogLevel.Debug },
           },
         ],
       });
@@ -1049,7 +1045,7 @@ describe("reforge", () => {
       reforge.setConfig([levelAtWithRule], projectEnvIdUnderTest, new Map());
 
       // we initialize outside the inContext block and provide JIT context
-      const logger = reforge.logger(loggerName, "info", {
+      const logger = reforge.logger(loggerName, LogLevel.Info, {
         user: { country: "US" },
       });
 
@@ -1062,16 +1058,23 @@ describe("reforge", () => {
         expect(logger.error("test")).toEqual("ERROR a.b.c.d: test");
         expect(logger.fatal("test")).toEqual("FATAL a.b.c.d: test");
 
-        const innerLoggerInheritedContext = pf.logger(loggerName, "info");
+        const innerLoggerInheritedContext = pf.logger(
+          loggerName,
+          LogLevel.Info
+        );
         expect(innerLoggerInheritedContext.trace("ilic")).toBeUndefined();
         expect(innerLoggerInheritedContext.debug("ilic")).toBeUndefined();
         expect(innerLoggerInheritedContext.info("ilic")).toEqual(
           "INFO  a.b.c.d: ilic"
         );
 
-        const innerLoggerJITContext = reforge.logger(loggerName, "info", {
-          user: { country: "US" },
-        });
+        const innerLoggerJITContext = reforge.logger(
+          loggerName,
+          LogLevel.Info,
+          {
+            user: { country: "US" },
+          }
+        );
         expect(innerLoggerJITContext.trace("iljc")).toBeUndefined();
         expect(innerLoggerJITContext.debug("iljc")).toEqual(
           "DEBUG a.b.c.d: iljc"
@@ -1113,7 +1116,7 @@ describe("reforge", () => {
             criteria: [
               {
                 propertyName: "user.country",
-                operator: Criterion_CriterionOperator.PROP_IS_ONE_OF,
+                operator: Criterion_CriterionOperator.PropIsOneOf,
                 valueToMatch: {
                   stringList: {
                     values: ["US"],
@@ -1122,7 +1125,7 @@ describe("reforge", () => {
               },
             ],
             value: {
-              logLevel: wordLevelToNumber("debug" as const),
+              logLevel: LogLevel.Debug,
             },
           },
         ],
@@ -1132,7 +1135,7 @@ describe("reforge", () => {
 
       const result = reforge.inContext({ user: { country: "US" } }, (pf) => {
         // we initialize inside the context
-        const logger = pf.logger(loggerName, "info");
+        const logger = pf.logger(loggerName, LogLevel.Info);
 
         expect(logger.trace("test")).toBeUndefined();
         expect(logger.debug("test")).toEqual("DEBUG a.b.c.d: test");
@@ -1142,7 +1145,7 @@ describe("reforge", () => {
         expect(logger.fatal("test")).toEqual("FATAL a.b.c.d: test");
 
         // Providing a context should result in that context being used
-        const jitLogger = pf.logger(loggerName, "info", {
+        const jitLogger = pf.logger(loggerName, LogLevel.Info, {
           user: { country: "FR" },
         });
         expect(jitLogger.debug("jitlogger")).toBeUndefined();
@@ -1274,24 +1277,24 @@ import { Reforge } from "../reforge";
       });
 
       const configData = {
-        id: new Long(1),
+        id: "1",
         key: "initial.key.for.notifier.test",
-        projectId: irrelevantLong,
-        configType: ConfigType.CONFIG,
+        projectId: irrelevantNumber,
+        configType: ConfigType.Config,
         rows: [
           {
             properties: {},
             values: [{ criteria: [], value: { string: "initial_value" } }],
           },
         ],
-        valueType: Config_ValueType.STRING,
+        valueType: ConfigValueType.String,
         sendToClientSdk: false,
         allowableValues: [] as ConfigValue[],
         changedBy: undefined,
       };
       const minimalConfigForInit: Config = configData;
 
-      const projectEnvIdForTest: ProjectEnvId = irrelevantLong; // projectEnvId is now a Long
+      const projectEnvIdForTest: ProjectEnvId = irrelevantNumber; // projectEnvId is now a Long
 
       reforge.setConfig([minimalConfigForInit], projectEnvIdForTest, new Map());
     });
@@ -1304,17 +1307,17 @@ import { Reforge } from "../reforge";
       expect(initialResolver).toBeDefined();
 
       const newConfig: Config = {
-        id: new Long(1001),
+        id: "1001",
         key: "new.config.key",
-        projectId: irrelevantLong,
-        configType: ConfigType.CONFIG,
+        projectId: irrelevantNumber,
+        configType: ConfigType.Config,
         rows: [
           {
             properties: {},
             values: [{ criteria: [], value: { string: "new_value" } }],
           },
         ],
-        valueType: Config_ValueType.STRING,
+        valueType: ConfigValueType.String,
         sendToClientSdk: true,
         allowableValues: [],
         changedBy: undefined,
@@ -1327,7 +1330,7 @@ import { Reforge } from "../reforge";
 
     it("should NOT call a listener if total config ID does not change", () => {
       const listenerCallback = jest.fn();
-      const existingConfig: Config = { ...basicConfig, id: new Long(500) };
+      const existingConfig: Config = { ...basicConfig, id: "500" };
       (reforge as any)._createOrReconfigureResolver(
         [existingConfig],
         projectEnvIdUnderTest,
@@ -1338,7 +1341,7 @@ import { Reforge } from "../reforge";
 
       const nonChangingConfig: Config = {
         ...basicConfig,
-        id: new Long(100),
+        id: "100",
         key: "another.key",
         rows: basicConfig.rows.map((r) => ({
           ...r,
@@ -1372,7 +1375,7 @@ import { Reforge } from "../reforge";
       unsubscribe();
 
       const resolver = (reforge as any).resolver;
-      const newConfig: Config = { ...basicConfig, id: new Long(2000) };
+      const newConfig: Config = { ...basicConfig, id: "2000" };
       resolver.update([newConfig]);
 
       expect(listenerCallback).not.toHaveBeenCalled();
@@ -1386,7 +1389,7 @@ import { Reforge } from "../reforge";
       reforge.addConfigChangeListener(listener2);
 
       const resolver = (reforge as any).resolver;
-      const newConfig: Config = { ...basicConfig, id: new Long(3000) };
+      const newConfig: Config = { ...basicConfig, id: "3000" };
       resolver.update([newConfig]);
 
       expect(listener1).toHaveBeenCalledTimes(1);
@@ -1400,14 +1403,14 @@ import { Reforge } from "../reforge";
 
       const initialConfig: Config = {
         ...basicConfig,
-        id: new Long(100),
+        id: "100",
         rows: [
           {
             properties: {},
             values: [{ criteria: [], value: { string: initialValue } }],
           },
         ],
-        valueType: Config_ValueType.STRING,
+        valueType: ConfigValueType.String,
       };
       (reforge as any)._createOrReconfigureResolver(
         [initialConfig],
@@ -1427,14 +1430,14 @@ import { Reforge } from "../reforge";
 
       const updatedConfig: Config = {
         ...basicConfig,
-        id: new Long(200),
+        id: "200",
         rows: [
           {
             properties: {},
             values: [{ criteria: [], value: { string: updatedValueString } }],
           },
         ],
-        valueType: Config_ValueType.STRING,
+        valueType: ConfigValueType.String,
       };
 
       const resolver = (reforge as any).resolver;

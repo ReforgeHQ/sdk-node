@@ -1,17 +1,16 @@
-import Long from "long";
-import type { Config } from "../../proto";
-import { ConfigType } from "../../proto";
-import { irrelevantLong } from "../testHelpers";
+import type { Config } from "../../types";
+import { ConfigValueType, ConfigType } from "../../types";
+import { irrelevantNumber } from "../testHelpers";
 
 const config: Config = {
-  id: new Long(999),
-  projectId: irrelevantLong,
+  id: "999",
+  projectId: irrelevantNumber,
   key: "deleted.value",
   changedBy: undefined,
   rows: [],
   allowableValues: [],
-  configType: ConfigType.DELETED,
-  valueType: 1,
+  configType: ConfigType.Deleted,
+  valueType: ConfigValueType.Int,
   sendToClientSdk: false,
 };
 

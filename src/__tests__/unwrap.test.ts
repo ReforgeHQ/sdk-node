@@ -5,9 +5,8 @@ import {
   NULL_UNWRAPPED_VALUE,
   TRUE_VALUES,
 } from "../unwrap";
-import { Config_ValueType, ProvidedSource } from "../proto";
-import type { ConfigValue, Config } from "../proto";
-import Long from "long";
+import { ConfigValueType, ProvidedSource } from "../types";
+import type { ConfigValue, Config } from "../types";
 
 const key = "some.key";
 const emptyHashByPropertyValue = undefined;
@@ -38,7 +37,7 @@ describe("unwrapValue", () => {
 
   it("should return the int value as a number", () => {
     [true, false].forEach((primitivesOnly) => {
-      const value: ConfigValue = { int: Long.fromInt(42) };
+      const value: ConfigValue = { int: BigInt(42) };
       expect(
         unwrapValue({
           key,
@@ -155,7 +154,7 @@ describe("unwrapValue", () => {
 
   it("can unwrap a provided string", () => {
     const value = {
-      provided: { lookup: "MY_ENV_VAR", source: ProvidedSource.ENV_VAR },
+      provided: { lookup: "MY_ENV_VAR", source: ProvidedSource.EnvVar },
     };
 
     process.env["MY_ENV_VAR"] = "test";
@@ -167,14 +166,14 @@ describe("unwrapValue", () => {
         value,
         hashByPropertyValue: emptyHashByPropertyValue,
         primitivesOnly: false,
-        config: { valueType: Config_ValueType.STRING } as unknown as Config,
+        config: { valueType: ConfigValueType.String } as unknown as Config,
       })
     ).toStrictEqual({ value: "test" });
   });
 
   it("can unwrap a provided int", () => {
     const value = {
-      provided: { lookup: "MY_ENV_VAR", source: ProvidedSource.ENV_VAR },
+      provided: { lookup: "MY_ENV_VAR", source: ProvidedSource.EnvVar },
     };
 
     process.env["MY_ENV_VAR"] = "90210";
@@ -186,14 +185,14 @@ describe("unwrapValue", () => {
         value,
         hashByPropertyValue: emptyHashByPropertyValue,
         primitivesOnly: false,
-        config: { valueType: Config_ValueType.INT } as unknown as Config,
+        config: { valueType: ConfigValueType.Int } as unknown as Config,
       })
     ).toStrictEqual({ value: 90210 });
   });
 
   it("can unwrap a provided double", () => {
     const value = {
-      provided: { lookup: "MY_ENV_VAR", source: ProvidedSource.ENV_VAR },
+      provided: { lookup: "MY_ENV_VAR", source: ProvidedSource.EnvVar },
     };
 
     process.env["MY_ENV_VAR"] = "3.14159265359";
@@ -205,14 +204,14 @@ describe("unwrapValue", () => {
         value,
         hashByPropertyValue: emptyHashByPropertyValue,
         primitivesOnly: false,
-        config: { valueType: Config_ValueType.DOUBLE } as unknown as Config,
+        config: { valueType: ConfigValueType.Double } as unknown as Config,
       })
     ).toStrictEqual({ value: 3.14159265359 });
   });
 
   it("can unwrap a provided bool", () => {
     const value = {
-      provided: { lookup: "MY_ENV_VAR", source: ProvidedSource.ENV_VAR },
+      provided: { lookup: "MY_ENV_VAR", source: ProvidedSource.EnvVar },
     };
 
     TRUE_VALUES.forEach((trueValue) => {
@@ -225,7 +224,7 @@ describe("unwrapValue", () => {
           value,
           hashByPropertyValue: emptyHashByPropertyValue,
           primitivesOnly: false,
-          config: { valueType: Config_ValueType.BOOL } as unknown as Config,
+          config: { valueType: ConfigValueType.Bool } as unknown as Config,
         })
       ).toStrictEqual({ value: true });
     });
@@ -240,7 +239,7 @@ describe("unwrapValue", () => {
           value,
           hashByPropertyValue: emptyHashByPropertyValue,
           primitivesOnly: false,
-          config: { valueType: Config_ValueType.BOOL } as unknown as Config,
+          config: { valueType: ConfigValueType.Bool } as unknown as Config,
         })
       ).toStrictEqual({ value: false });
     });
@@ -248,7 +247,7 @@ describe("unwrapValue", () => {
 
   it("can unwrap a provided stringList", () => {
     const value = {
-      provided: { lookup: "MY_ENV_VAR", source: ProvidedSource.ENV_VAR },
+      provided: { lookup: "MY_ENV_VAR", source: ProvidedSource.EnvVar },
     };
 
     ["a,b,c", "a, b, c", "a , b , c"].forEach((stringValue) => {
@@ -262,7 +261,7 @@ describe("unwrapValue", () => {
           hashByPropertyValue: emptyHashByPropertyValue,
           primitivesOnly: false,
           config: {
-            valueType: Config_ValueType.STRING_LIST,
+            valueType: ConfigValueType.StringList,
           } as unknown as Config,
         })
       ).toStrictEqual({ value: ["a", "b", "c"] });
@@ -276,7 +275,7 @@ describe("unwrapValue", () => {
         value,
         hashByPropertyValue: emptyHashByPropertyValue,
         primitivesOnly: false,
-        config: { valueType: Config_ValueType.STRING } as unknown as Config,
+        config: { valueType: ConfigValueType.String } as unknown as Config,
       })
     ).toStrictEqual({ value: "test" });
   });
@@ -336,14 +335,14 @@ describe("unwrapPrimitive", () => {
     const value: ConfigValue = {
       provided: {
         lookup: "MY_ENV_VAR",
-        source: ProvidedSource.ENV_VAR,
+        source: ProvidedSource.EnvVar,
       },
     };
     expect(unwrapPrimitive(key, value)).toStrictEqual(NULL_UNWRAPPED_VALUE);
 
     expect(jest.mocked(console.error)).toHaveBeenCalledTimes(1);
     expect(jest.mocked(console.error)).toHaveBeenCalledWith(
-      'Unexpected value {"provided":{"lookup":"MY_ENV_VAR","source":1}} in primitivesOnly mode'
+      'Unexpected value {"provided":{"lookup":"MY_ENV_VAR","source":"ENV_VAR"}} in primitivesOnly mode'
     );
   });
 });

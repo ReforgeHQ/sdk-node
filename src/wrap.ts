@@ -1,5 +1,5 @@
-import type { ConfigValue, StringList } from "./proto";
-import { Config_ValueType } from "./proto";
+import type { ConfigValue, StringList } from "./types";
+import { ConfigValueType } from "./types";
 
 type ConfigValueKey = keyof ConfigValue;
 
@@ -46,24 +46,24 @@ export const wrap = (value: unknown): Record<string, ConfigValue> => {
 
 export const configValueType = (
   value: ConfigValue
-): Config_ValueType | undefined => {
+): ConfigValueType | undefined => {
   switch (Object.keys(value)[0]) {
     case "string":
-      return Config_ValueType.STRING;
+      return ConfigValueType.String;
     case "int":
-      return Config_ValueType.INT;
+      return ConfigValueType.Int;
     case "double":
-      return Config_ValueType.DOUBLE;
+      return ConfigValueType.Double;
     case "bool":
-      return Config_ValueType.BOOL;
+      return ConfigValueType.Bool;
     case "stringList":
-      return Config_ValueType.STRING_LIST;
+      return ConfigValueType.StringList;
     case "logLevel":
-      return Config_ValueType.LOG_LEVEL;
+      return ConfigValueType.LogLevel;
     case "intRange":
-      return Config_ValueType.INT_RANGE;
+      return ConfigValueType.IntRange;
     case "json":
-      return Config_ValueType.JSON;
+      return ConfigValueType.Json;
     default:
       return undefined;
   }

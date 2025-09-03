@@ -1,4 +1,3 @@
-import Long from "long";
 import type { SyncResult, Telemetry } from "./types";
 import type { ApiClient } from "../apiClient";
 import type { Evaluation } from "../evaluate";
@@ -7,12 +6,11 @@ import type {
   ConfigEvaluationSummary,
   TelemetryEvent,
   TelemetryEvents,
-} from "../proto";
-import { ConfigType } from "../proto";
-import { encode } from "../parseProto";
-import { now } from "./reporter";
+} from "../types";
+import { ConfigType } from "../types";
 import { valueType } from "../wrap";
 import { configValueTypeToString } from "../unwrap";
+import { jsonStringifyWithBigInt } from "../bigIntUtils";
 
 const ENDPOINT = "/api/v1/telemetry";
 
@@ -43,7 +41,7 @@ export const evaluationSummaries = (
     return stub;
   }
 
-  let startAt: Long | undefined;
+  let startAt: number | undefined;
   const data: EvaluationSummariesTelemetry["data"] = new Map();
 
   const incrementCounter = (key: string, counter: string): void => {
@@ -81,25 +79,25 @@ export const evaluationSummaries = (
         return;
       }
 
-      startAt = startAt ?? now();
+      startAt = startAt ?? Date.now();
 
       if (
         evaluation.unwrappedValue === undefined ||
-        evaluation.configType === ConfigType.LOG_LEVEL
+        evaluation.configType === ConfigType.LogLevel
       ) {
         return;
       }
 
-      const key = JSON.stringify([
+      const key = jsonStringifyWithBigInt([
         evaluation.configKey,
-        evaluation.configType.toString(),
+        evaluation.configType,
       ]);
 
       const valueTypeAsString =
         configValueTypeToString(evaluation.valueType) ??
         valueType(evaluation.unwrappedValue);
 
-      const counter = JSON.stringify([
+      const counter = jsonStringifyWithBigInt([
         evaluation.configId.toString(),
         evaluation.conditionalValueIndex,
         evaluation.configRowIndex,
@@ -136,7 +134,9 @@ export const evaluationSummaries = (
           let selectedValue;
 
           if (valueType === "json") {
-            selectedValue = { json: { json: JSON.stringify(unwrappedValue) } };
+            selectedValue = {
+              json: { json: jsonStringifyWithBigInt(unwrappedValue) },
+            };
           } else if (valueType === "stringList") {
             selectedValue = { stringList: { values: unwrappedValue } };
           } else {
@@ -144,11 +144,11 @@ export const evaluationSummaries = (
           }
 
           const counter: ConfigEvaluationCounter = {
-            configId: Long.fromString(configId),
+            configId,
             conditionalValueIndex,
             configRowIndex,
             selectedValue,
-            count: Long.fromNumber(count),
+            count,
             reason: 0,
           };
 
@@ -172,8 +172,8 @@ export const evaluationSummaries = (
 
       const event: TelemetryEvent = {
         summaries: {
-          start: startAt ?? Long.fromNumber(Date.now()),
-          end: now(),
+          start: startAt ?? Date.now(),
+          end: Date.now(),
           summaries,
         },
       };
@@ -183,7 +183,7 @@ export const evaluationSummaries = (
         events: [event],
       };
 
-      const body = encode("TelemetryEvents", apiData);
+      const body = jsonStringifyWithBigInt(apiData);
 
       const result = await apiClient.fetch({
         source: telemetryHost,

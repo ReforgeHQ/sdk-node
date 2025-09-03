@@ -11,7 +11,6 @@ import mkTimedLogLevel from "./fixtures/timedLogLevel";
 import { Resolver } from "../resolver";
 import type { EvaluateArgs } from "../evaluate";
 import { evaluate } from "../evaluate";
-import type { Contexts } from "../types";
 import { emptyContexts, projectEnvIdUnderTest } from "./testHelpers";
 import { encrypt, generateNewHexKey } from "../../src/encryption";
 import secretConfig from "./fixtures/secretConfig";
@@ -21,10 +20,12 @@ import decryptionKeyConfig, {
 } from "./fixtures/decryptionKeyConfig";
 import {
   type Config,
-  Config_ValueType,
+  type Contexts,
+  ConfigValueType,
+  ConfigType,
   Criterion_CriterionOperator,
   LogLevel,
-} from "../proto";
+} from "../types";
 import { makeConfidential } from "../unwrap";
 import { contextObjToMap } from "../mergeContexts";
 import propStartsWithOneOf from "./fixtures/propStartsWithOneOf";
@@ -53,7 +54,6 @@ import {
 import { createConfig as createRegexConfig } from "./fixtures/propRegexMatches";
 import { createConfig as createSemverConfig } from "./fixtures/propSemverMatches";
 
-import Long from "long";
 import { stringify } from "ts-jest";
 
 const noNamespace = undefined;
@@ -134,7 +134,7 @@ describe("evaluate", () => {
       configId: basicConfig.id,
       configKey: basicConfig.key,
       configType: basicConfig.configType,
-      valueType: Config_ValueType.INT,
+      valueType: ConfigValueType.Int,
       configRowIndex: 0,
       unwrappedValue: 42,
       reportableValue: undefined,
@@ -156,10 +156,10 @@ describe("evaluate", () => {
       configId: basicLogLevel.id,
       configKey: basicLogLevel.key,
       configType: basicLogLevel.configType,
-      valueType: Config_ValueType.LOG_LEVEL,
+      valueType: ConfigValueType.LogLevel,
       configRowIndex: 0,
       conditionalValueIndex: 0,
-      unwrappedValue: 3,
+      unwrappedValue: LogLevel.Info,
       reportableValue: undefined,
       weightedValueIndex: undefined,
     });
@@ -178,7 +178,7 @@ describe("evaluate", () => {
       configId: envConfig.id,
       configKey: envConfig.key,
       configType: envConfig.configType,
-      valueType: Config_ValueType.STRING_LIST,
+      valueType: ConfigValueType.StringList,
       configRowIndex: 0,
       unwrappedValue: ["a", "b", "c", "d"],
       reportableValue: undefined,
@@ -201,7 +201,7 @@ describe("evaluate", () => {
       configKey: rolloutFlag.key,
       conditionalValueIndex: 0,
       configRowIndex: 0,
-      configType: 2,
+      configType: ConfigType.FeatureFlag,
       valueType: rolloutFlag.valueType,
       unwrappedValue: true,
       reportableValue: undefined,
@@ -213,7 +213,7 @@ describe("evaluate", () => {
       configKey: rolloutFlag.key,
       conditionalValueIndex: 0,
       configRowIndex: 0,
-      configType: 2,
+      configType: ConfigType.FeatureFlag,
       valueType: rolloutFlag.valueType,
       unwrappedValue: false,
       reportableValue: undefined,
@@ -814,7 +814,7 @@ describe("evaluate", () => {
       valueType: timedLogLevel.valueType,
       configRowIndex: 0,
       conditionalValueIndex: 1,
-      unwrappedValue: LogLevel.INFO,
+      unwrappedValue: LogLevel.Info,
       reportableValue: undefined,
       weightedValueIndex: undefined,
     });
@@ -839,7 +839,7 @@ describe("evaluate", () => {
       valueType: currentTimedLogLevel.valueType,
       configRowIndex: 0,
       conditionalValueIndex: 0,
-      unwrappedValue: LogLevel.DEBUG,
+      unwrappedValue: LogLevel.Debug,
       reportableValue: undefined,
       weightedValueIndex: undefined,
     });
@@ -908,7 +908,7 @@ describe.each([
 
     test(`returns true for context with date (millis) before`, () => {
       const birthdateNumericBefore = new Map([
-        ["user", new Map([["createdAt", millis.subtract(1000)]])],
+        ["user", new Map([["createdAt", millis - 1000]])],
       ]);
 
       expect(evaluate(args(birthdateNumericBefore))).toStrictEqual({
@@ -944,7 +944,7 @@ describe.each([
 
     test("returns false for context with date (millis) before", () => {
       const birthdateNumericAfter = new Map([
-        ["user", new Map([["createdAt", millis.add(1000)]])],
+        ["user", new Map([["createdAt", millis + 1000]])],
       ]);
 
       expect(evaluate(args(birthdateNumericAfter))).toStrictEqual({
@@ -1013,7 +1013,7 @@ describe.each([
 
     test(`returns false for context with date (millis) BEFORE`, () => {
       const birthdateNumericBefore = new Map([
-        ["user", new Map([["createdAt", millis.subtract(1000)]])],
+        ["user", new Map([["createdAt", millis - 1000]])],
       ]);
 
       expect(evaluate(args(birthdateNumericBefore))).toStrictEqual({
@@ -1049,7 +1049,7 @@ describe.each([
 
     test(`returns true for context with date (millis) AFTER`, () => {
       const birthdateNumericAfter = new Map([
-        ["user", new Map([["createdAt", millis.add(1000)]])],
+        ["user", new Map([["createdAt", millis + 1000]])],
       ]);
 
       expect(evaluate(args(birthdateNumericAfter))).toStrictEqual({
@@ -1219,13 +1219,13 @@ describe("Numeric operator tests", () => {
   describe.each<{
     description: string;
     configs: Config[];
-    contextValue: number | Long;
+    contextValue: number;
     expectedResult: boolean;
   }>([
     {
       description: "less than produces correct results",
       configs: [propLessThanInt, propLessThanDouble],
-      contextValue: Long.fromInt(0),
+      contextValue: 0,
       expectedResult: true,
     },
     {
@@ -1237,7 +1237,7 @@ describe("Numeric operator tests", () => {
     {
       description: "less than produces correct results",
       configs: [propLessThanInt, propLessThanDouble],
-      contextValue: Long.fromInt(100),
+      contextValue: 100,
       expectedResult: false,
     },
     {
@@ -1249,7 +1249,7 @@ describe("Numeric operator tests", () => {
     {
       description: "less than produces correct results",
       configs: [propLessThanInt, propLessThanDouble],
-      contextValue: Long.fromInt(200),
+      contextValue: 200,
       expectedResult: false,
     },
     {
@@ -1261,7 +1261,7 @@ describe("Numeric operator tests", () => {
     {
       description: "less than or equal produces correct results",
       configs: [propLessThanEqualInt, propLessThanEqualDouble],
-      contextValue: Long.fromInt(0),
+      contextValue: 0,
       expectedResult: true,
     },
     {
@@ -1273,7 +1273,7 @@ describe("Numeric operator tests", () => {
     {
       description: "less than or equal produces correct results",
       configs: [propLessThanEqualInt, propLessThanEqualDouble],
-      contextValue: Long.fromInt(100),
+      contextValue: 100,
       expectedResult: true,
     },
     {
@@ -1285,7 +1285,7 @@ describe("Numeric operator tests", () => {
     {
       description: "less than or equal produces correct results",
       configs: [propLessThanEqualInt, propLessThanEqualDouble],
-      contextValue: Long.fromInt(200),
+      contextValue: 200,
       expectedResult: false,
     },
     {
@@ -1297,7 +1297,7 @@ describe("Numeric operator tests", () => {
     {
       description: "greater than produces correct results",
       configs: [propGreaterThanInt, propGreaterThanDouble],
-      contextValue: Long.fromInt(0),
+      contextValue: 0,
       expectedResult: false,
     },
     {
@@ -1309,7 +1309,7 @@ describe("Numeric operator tests", () => {
     {
       description: "greater than produces correct results",
       configs: [propGreaterThanInt, propGreaterThanDouble],
-      contextValue: Long.fromInt(100),
+      contextValue: 100,
       expectedResult: false,
     },
     {
@@ -1321,7 +1321,7 @@ describe("Numeric operator tests", () => {
     {
       description: "greater than produces correct results",
       configs: [propGreaterThanInt, propGreaterThanDouble],
-      contextValue: Long.fromInt(200),
+      contextValue: 200,
       expectedResult: true,
     },
     {
@@ -1333,7 +1333,7 @@ describe("Numeric operator tests", () => {
     {
       description: "greater than or equal produces correct results",
       configs: [propGreaterThanEqualInt, propGreaterThanEqualDouble],
-      contextValue: Long.fromInt(0),
+      contextValue: 0,
       expectedResult: false,
     },
     {
@@ -1345,7 +1345,7 @@ describe("Numeric operator tests", () => {
     {
       description: "greater than or equal produces correct results",
       configs: [propGreaterThanEqualInt, propGreaterThanEqualDouble],
-      contextValue: Long.fromInt(100),
+      contextValue: 100,
       expectedResult: true,
     },
     {
@@ -1357,7 +1357,7 @@ describe("Numeric operator tests", () => {
     {
       description: "greater than or equal produces correct results",
       configs: [propGreaterThanEqualInt, propGreaterThanEqualDouble],
-      contextValue: Long.fromInt(200),
+      contextValue: 200,
       expectedResult: true,
     },
     {
@@ -1431,25 +1431,25 @@ describe("regex tests", () => {
     "prop.matches",
     propertyName,
     patternOne,
-    Criterion_CriterionOperator.PROP_MATCHES
+    Criterion_CriterionOperator.PropMatches
   );
   const configMatchesNot = createRegexConfig(
     "prop.matchesNot",
     propertyName,
     patternOne,
-    Criterion_CriterionOperator.PROP_DOES_NOT_MATCH
+    Criterion_CriterionOperator.PropDoesNotMatch
   );
   const configMatchesBadPattern = createRegexConfig(
     "prop.matchesBadPattern",
     propertyName,
     badPattern,
-    Criterion_CriterionOperator.PROP_MATCHES
+    Criterion_CriterionOperator.PropMatches
   );
   const configMatchesNotBadPattern = createRegexConfig(
     "prop.matchesNOtBadPattern",
     propertyName,
     badPattern,
-    Criterion_CriterionOperator.PROP_DOES_NOT_MATCH
+    Criterion_CriterionOperator.PropDoesNotMatch
   );
 
   describe.each<{
@@ -1564,25 +1564,25 @@ describe("semantic version tests", () => {
     "prop.semVerLessThan",
     propertyName,
     "2.1.0",
-    Criterion_CriterionOperator.PROP_SEMVER_LESS_THAN
+    Criterion_CriterionOperator.PropSemverLessThan
   );
   const configEqualTo = createSemverConfig(
     "prop.semVerEqual",
     propertyName,
     "2.1.0",
-    Criterion_CriterionOperator.PROP_SEMVER_EQUAL
+    Criterion_CriterionOperator.PropSemverEqual
   );
   const configGreaterThan = createSemverConfig(
     "prop.semVerGreaterThan",
     propertyName,
     "2.1.0",
-    Criterion_CriterionOperator.PROP_SEMVER_GREATER_THAN
+    Criterion_CriterionOperator.PropSemverGreaterThan
   );
   const configNotLegitSemver = createSemverConfig(
     "prop.semVerLessThan",
     propertyName,
     "what am i doing here",
-    Criterion_CriterionOperator.PROP_SEMVER_LESS_THAN
+    Criterion_CriterionOperator.PropSemverLessThan
   );
 
   describe.each<{

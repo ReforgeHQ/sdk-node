@@ -7,6 +7,8 @@ import {
 } from "../apiClient";
 import type { FetchResult } from "../types";
 
+const cachedResponseObject = { key: "value" };
+
 describe("fetchWithCache", () => {
   let fetchMock: jest.MockedFunction<(args: InternalFetchArgs) => FetchResult>;
   let mockApiClient: ApiClient;
@@ -27,7 +29,7 @@ describe("fetchWithCache", () => {
   test("calls fetch and returns the response", async () => {
     fetchMock.mockResolvedValue({
       status: 200,
-      arrayBuffer: async () => new ArrayBuffer(10),
+      json: async () => cachedResponseObject,
       headers: new Headers(),
     });
 
@@ -53,7 +55,7 @@ describe("fetchWithCache", () => {
   test("properly parses max-age for cache expiration", async () => {
     fetchMock.mockResolvedValueOnce({
       status: 200,
-      arrayBuffer: async () => new ArrayBuffer(10),
+      json: async () => cachedResponseObject,
       headers: new Headers({ "Cache-Control": "max-age=600" }), // ✅ Cached for 600 seconds
     });
 
@@ -70,20 +72,20 @@ describe("fetchWithCache", () => {
 
     fetchMock.mockClear(); // ✅ Clear call history before second request
 
-    const cachedResponse = await fetchWithCache(mockApiClient, args);
+    const responseResult = await fetchWithCache(mockApiClient, args);
 
     // ✅ Ensure fetchMock was NOT called again
     expect(fetchMock).not.toHaveBeenCalled();
 
     // ✅ Ensure the response comes from cache
-    const buffer = await cachedResponse.arrayBuffer();
-    expect(buffer.byteLength).toBe(10);
+    const json = await responseResult.json();
+    expect(json).toEqual(cachedResponseObject);
   });
 
   test("respects Cache-Control: no-store (does not cache response)", async () => {
     fetchMock.mockResolvedValue({
       status: 200,
-      arrayBuffer: async () => new ArrayBuffer(10),
+      json: async () => cachedResponseObject,
       headers: new Headers({ "Cache-Control": "no-store" }),
     });
 
@@ -106,7 +108,7 @@ describe("fetchWithCache", () => {
   test("respects Cache-Control: must-revalidate (forces revalidation)", async () => {
     fetchMock.mockResolvedValueOnce({
       status: 200,
-      arrayBuffer: async () => new ArrayBuffer(10),
+      json: async () => cachedResponseObject,
       headers: new Headers({
         "Cache-Control": "must-revalidate",
         ETag: '"abc123"',
@@ -124,7 +126,7 @@ describe("fetchWithCache", () => {
     // Mock a revalidation request
     fetchMock.mockResolvedValueOnce({
       status: 200,
-      arrayBuffer: async () => new ArrayBuffer(20),
+      json: async () => ({ data: { another: "cached" } }),
       headers: new Headers({ ETag: '"abc123"' }),
     });
 
@@ -132,14 +134,14 @@ describe("fetchWithCache", () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(2); // Should call API again
     expect(response.status).toBe(200);
-    const buffer = await response.arrayBuffer();
-    expect(buffer.byteLength).toBe(20); // Should return updated data
+    const json = await response.json();
+    expect(json).toEqual({ data: { another: "cached" } }); // Should return updated data
   });
 
   test("evicts expired cache entries after max-age", async () => {
     fetchMock.mockResolvedValueOnce({
       status: 200,
-      arrayBuffer: async () => new ArrayBuffer(10),
+      json: async () => cachedResponseObject,
       headers: new Headers({ "Cache-Control": "max-age=600" }),
     });
 
@@ -156,24 +158,24 @@ describe("fetchWithCache", () => {
 
     fetchMock.mockResolvedValueOnce({
       status: 200,
-      arrayBuffer: async () => new ArrayBuffer(20),
+      json: async () => ({ data: { another: "cached" } }),
       headers: new Headers({ ETag: '"abc123"' }),
     });
 
     const response = await fetchWithCache(mockApiClient, args);
 
     expect(fetchMock).toHaveBeenCalledTimes(2); // Should re-fetch
-    const buffer = await response.arrayBuffer();
-    expect(buffer.byteLength).toBe(20); // New data should be returned
+    const json = await response.json();
+    expect(json).toEqual({ data: { another: "cached" } }); // New data should be returned
   });
 
   test("respects Cache-Control: no-cache (forces revalidation but can use cached data)", async () => {
-    const cachedData = new ArrayBuffer(10);
+    const cachedData = cachedResponseObject;
 
     // First fetch: returns 200 OK and caches the result
     fetchMock.mockResolvedValueOnce({
       status: 200,
-      arrayBuffer: async () => cachedData,
+      json: async () => cachedData,
       headers: new Headers({ ETag: '"abc123"', "Cache-Control": "no-cache" }),
     });
 
@@ -191,7 +193,7 @@ describe("fetchWithCache", () => {
     // Second request: should send `If-None-Match`, and the server responds with 304
     fetchMock.mockResolvedValueOnce({
       status: 304,
-      arrayBuffer: async () => new ArrayBuffer(0), // This should not be used
+      json: async () => ({ data: "not-used" }), // This should not be used
       headers: new Headers({ ETag: '"abc123"' }),
     });
 
@@ -214,8 +216,8 @@ describe("fetchWithCache", () => {
     // ✅ Ensure response contains cached data
     expect(response.status).toBe(200);
 
-    // 🔥 Ensure cached `arrayBuffer()` is used
-    const buffer = await response.arrayBuffer();
-    expect(buffer.byteLength).toBe(10); // Should return cached data
+    // 🔥 Ensure cached `json()` is used
+    const json = await response.json();
+    expect(json).toEqual(cachedResponseObject); // Should return cached data
   });
 });

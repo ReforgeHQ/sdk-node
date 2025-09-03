@@ -1,17 +1,22 @@
-import Long from "long";
 import {
   type ConditionalValue,
   type ConfigRow,
+  type ConfigType,
   type ConfigValue,
+  type ConfigValueType,
   type Criterion,
   Criterion_CriterionOperator,
-} from "./proto";
+  type Contexts,
+  type HashByPropertyValue,
+  type ProjectEnvId,
+} from "./types";
 import type { MinimumConfig, Resolver } from "./resolver";
-import type { Contexts, HashByPropertyValue, ProjectEnvId } from "./types";
+
 import { type GetValue, unwrap } from "./unwrap";
 import { contextLookup } from "./contextLookup";
 import { sortRows } from "./sortRows";
 import SemanticVersion from "./semanticversion";
+import { isBigInt, jsonStringifyWithBigInt } from "./bigIntUtils";
 
 const getHashByPropertyValue = (
   value: ConfigValue | undefined,
@@ -132,22 +137,22 @@ const inIntRange = (criterion: Criterion, contexts: Contexts): boolean => {
     return false;
   }
 
-  return start.lte(comparable as number) && end.gte(comparable as number);
+  return start <= (comparable as number) && end >= (comparable as number);
 };
 
-const dateValueToLong = (
-  value: number | Long | string | unknown
-): Long | undefined => {
-  if (Long.isLong(value)) {
+const dateValueToBigInt = (
+  value: number | bigint | string | unknown
+): bigint | undefined => {
+  if (typeof value === "bigint") {
     return value;
   } else if (typeof value === "number") {
-    return Long.fromNumber(value); // Already in millis
+    return BigInt(value); // Already in millis
   } else if (typeof value === "string") {
     const parsedDate = Date.parse(value); // Convert to millis
     if (isNaN(parsedDate)) {
       return undefined;
     }
-    return Long.fromNumber(parsedDate);
+    return BigInt(parsedDate);
   }
   return undefined;
 };
@@ -210,15 +215,16 @@ const evaluateNumericCriterion = (
   return comparisonFn(compareToResult);
 };
 
-function normalizeNumber(value: unknown): Long | number | null {
-  if (Long.isLong(value)) return value;
+function normalizeNumber(value: unknown): bigint | number | null {
+  if (typeof value === "bigint") return BigInt(value);
   if (typeof value === "number") return value;
+
   return null; // Invalid type
 }
 
-function compareTo(left: number | Long, right: number | Long): number {
-  const leftNum = Long.isLong(left) ? left.toNumber() : left;
-  const rightNum = Long.isLong(right) ? right.toNumber() : right;
+function compareTo(left: number | bigint, right: number | bigint): number {
+  const leftNum = isBigInt(left) ? BigInt(left) : left;
+  const rightNum = isBigInt(right) ? BigInt(right) : right;
 
   // If either value is a float, use direct number comparison
   if (!Number.isInteger(leftNum) || !Number.isInteger(rightNum)) {
@@ -232,8 +238,14 @@ function compareTo(left: number | Long, right: number | Long): number {
   }
 
   // Both are integers, safe to compare as Longs
-  if (Long.isLong(left) || Long.isLong(right)) {
-    return Long.fromNumber(leftNum).compare(Long.fromNumber(rightNum));
+  if (isBigInt(left) || isBigInt(right)) {
+    if (BigInt(left) < BigInt(right)) {
+      return -1;
+    } else if (BigInt(left) > BigInt(right)) {
+      return 1;
+    } else {
+      return 0;
+    }
   }
 
   if (leftNum < rightNum) {
@@ -248,13 +260,13 @@ function compareTo(left: number | Long, right: number | Long): number {
 const evaluateDateCriterion = (
   criterion: Criterion,
   contexts: Contexts,
-  comparator: (a: Long, b: Long) => boolean
+  comparator: (a: bigint, b: bigint) => boolean
 ): boolean => {
   // Retrieve the context value (which might be a timestamp in millis or an HTTP date string)
-  const contextMillis = dateValueToLong(
+  const contextMillis = dateValueToBigInt(
     contextLookup(contexts, criterion.propertyName)
   );
-  const configMills = dateValueToLong(
+  const configMills = dateValueToBigInt(
     unwrap({ key: "why", value: criterion.valueToMatch }).value
   );
   if (
@@ -278,76 +290,76 @@ const allCriteriaMatch = (
 
   return value.criteria.every((criterion) => {
     switch (criterion.operator) {
-      case Criterion_CriterionOperator.HIERARCHICAL_MATCH:
+      case Criterion_CriterionOperator.HierarchicalMatch:
         return criterion.valueToMatch?.string === namespace;
-      case Criterion_CriterionOperator.PROP_IS_ONE_OF:
+      case Criterion_CriterionOperator.PropIsOneOf:
         return propIsOneOf(criterion, contexts);
-      case Criterion_CriterionOperator.PROP_IS_NOT_ONE_OF:
+      case Criterion_CriterionOperator.PropIsNotOneOf:
         return !propIsOneOf(criterion, contexts);
-      case Criterion_CriterionOperator.PROP_ENDS_WITH_ONE_OF:
+      case Criterion_CriterionOperator.PropEndsWithOneOf:
         return propEndsWithOneOf(criterion, contexts);
-      case Criterion_CriterionOperator.PROP_DOES_NOT_END_WITH_ONE_OF:
+      case Criterion_CriterionOperator.PropDoesNotEndWithOneOf:
         return !propEndsWithOneOf(criterion, contexts);
-      case Criterion_CriterionOperator.PROP_STARTS_WITH_ONE_OF:
+      case Criterion_CriterionOperator.PropStartsWithOneOf:
         return propStartsWithOneOf(criterion, contexts);
-      case Criterion_CriterionOperator.PROP_DOES_NOT_START_WITH_ONE_OF:
+      case Criterion_CriterionOperator.PropDoesNotStartWithOneOf:
         return !propStartsWithOneOf(criterion, contexts);
-      case Criterion_CriterionOperator.PROP_CONTAINS_ONE_OF:
+      case Criterion_CriterionOperator.PropContainsOneOf:
         return propContainsOneOf(criterion, contexts);
-      case Criterion_CriterionOperator.PROP_DOES_NOT_CONTAIN_ONE_OF:
+      case Criterion_CriterionOperator.PropDoesNotContainOneOf:
         return !propContainsOneOf(criterion, contexts);
-      case Criterion_CriterionOperator.IN_SEG:
+      case Criterion_CriterionOperator.InSeg:
         return inSegment(criterion, contexts, resolver);
-      case Criterion_CriterionOperator.NOT_IN_SEG:
+      case Criterion_CriterionOperator.NotInSeg:
         return !inSegment(criterion, contexts, resolver);
-      case Criterion_CriterionOperator.IN_INT_RANGE:
+      case Criterion_CriterionOperator.InIntRange:
         return inIntRange(criterion, contexts);
-      case Criterion_CriterionOperator.PROP_BEFORE:
-        return evaluateDateCriterion(criterion, contexts, (a, b) => a.lt(b));
-      case Criterion_CriterionOperator.PROP_AFTER:
-        return evaluateDateCriterion(criterion, contexts, (a, b) => a.gt(b));
-      case Criterion_CriterionOperator.PROP_GREATER_THAN:
+      case Criterion_CriterionOperator.PropBefore:
+        return evaluateDateCriterion(criterion, contexts, (a, b) => a < b);
+      case Criterion_CriterionOperator.PropAfter:
+        return evaluateDateCriterion(criterion, contexts, (a, b) => a > b);
+      case Criterion_CriterionOperator.PropGreaterThan:
         return evaluateNumericCriterion(
           criterion,
           contexts,
           (compareResult) => compareResult > 0
         );
-      case Criterion_CriterionOperator.PROP_GREATER_THAN_OR_EQUAL:
+      case Criterion_CriterionOperator.PropGreaterThanOrEqual:
         return evaluateNumericCriterion(
           criterion,
           contexts,
           (compareResult) => compareResult >= 0
         );
-      case Criterion_CriterionOperator.PROP_LESS_THAN:
+      case Criterion_CriterionOperator.PropLessThan:
         return evaluateNumericCriterion(
           criterion,
           contexts,
           (compareResult) => compareResult < 0
         );
-      case Criterion_CriterionOperator.PROP_LESS_THAN_OR_EQUAL:
+      case Criterion_CriterionOperator.PropLessThanOrEqual:
         return evaluateNumericCriterion(
           criterion,
           contexts,
           (compareResult) => compareResult <= 0
         );
 
-      case Criterion_CriterionOperator.PROP_MATCHES:
+      case Criterion_CriterionOperator.PropMatches:
         return evaluateRegexCriterion(criterion, contexts, false);
-      case Criterion_CriterionOperator.PROP_DOES_NOT_MATCH:
+      case Criterion_CriterionOperator.PropDoesNotMatch:
         return evaluateRegexCriterion(criterion, contexts, true);
-      case Criterion_CriterionOperator.PROP_SEMVER_LESS_THAN:
+      case Criterion_CriterionOperator.PropSemverLessThan:
         return evaluateSemverCriterion(
           criterion,
           contexts,
           (compareResult) => compareResult < 0
         );
-      case Criterion_CriterionOperator.PROP_SEMVER_EQUAL:
+      case Criterion_CriterionOperator.PropSemverEqual:
         return evaluateSemverCriterion(
           criterion,
           contexts,
           (compareResult) => compareResult === 0
         );
-      case Criterion_CriterionOperator.PROP_SEMVER_GREATER_THAN:
+      case Criterion_CriterionOperator.PropSemverGreaterThan:
         return evaluateSemverCriterion(
           criterion,
           contexts,
@@ -355,7 +367,7 @@ const allCriteriaMatch = (
         );
       default:
         throw new Error(
-          `Unexpected criteria ${JSON.stringify(criterion.operator)}`
+          `Unexpected criteria ${jsonStringifyWithBigInt(criterion.operator)}`
         );
     }
   });
@@ -403,10 +415,10 @@ export interface EvaluateArgs {
 }
 
 export interface Evaluation {
-  configId: Long | undefined;
+  configId: string | undefined;
   configKey: string;
-  configType: number;
-  valueType: number;
+  configType: ConfigType;
+  valueType: ConfigValueType;
   unwrappedValue: GetValue;
   reportableValue: GetValue;
   conditionalValueIndex: number;

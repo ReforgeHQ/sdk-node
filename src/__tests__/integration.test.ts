@@ -1,3 +1,4 @@
+import { jsonStringifyWithBigInt } from "../bigIntUtils";
 import { Reforge } from "../reforge";
 import type { ReforgeInterface } from "../reforge";
 import type { ResolverAPI } from "../resolver";
@@ -150,7 +151,7 @@ describe("integration tests", () => {
       if (result == null) {
         if (
           test.expectedTelemetryData !== null &&
-          JSON.stringify(test.expectedTelemetryData) !== "[null]"
+          jsonStringifyWithBigInt(test.expectedTelemetryData) !== "[null]"
         ) {
           throw new Error(
             "Result was unexpectedly void. Maybe `data.size === 0`?"

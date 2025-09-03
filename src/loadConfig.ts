@@ -1,17 +1,19 @@
 import * as fs from "fs";
-import Long from "long";
-import type { Config, Configs } from "./proto";
-import { maxLong } from "./maxLong";
+import { maxBigIntId } from "./bigIntUtils";
 import { type ApiClient, fetchWithCache } from "./apiClient";
 
 import { unwrapPrimitive } from "./unwrap";
-import type { Contexts, ProjectEnvId } from "./types";
-import { parseConfigs, parseConfigsFromJSON } from "./parseProto";
+import type { Config, Configs, Contexts, ProjectEnvId } from "./types";
+import {
+  parseConfigsFromObject,
+  keysToCamel,
+  parseConfigsFromJSONString,
+} from "./jsonHelpers";
 
 interface Result {
   configs: Config[];
   projectEnvId: ProjectEnvId;
-  startAtId: Long;
+  startAtId: string;
   defaultContext: Contexts;
 }
 
@@ -22,14 +24,14 @@ export async function loadConfig({
   apiClient,
 }: {
   sources: string[];
-  startAtId?: Long;
+  startAtId?: string;
   apiClient: ApiClient;
   datafile?: string;
 }): Promise<Result> {
   if (datafile !== undefined) {
     // Read from file instead of API
     const buffer = fs.readFileSync(datafile);
-    const parsed = parseConfigsFromJSON(buffer.toString("utf-8"));
+    const parsed = parseConfigsFromJSONString(buffer.toString("utf-8"));
     return await Promise.resolve(parse(parsed));
   }
 
@@ -65,7 +67,10 @@ const extractDefaultContext = (
 
       for (const key of Object.keys(context.values ?? {})) {
         const { value } = unwrapPrimitive(key, context.values[key]);
-        values.set(key, value);
+
+        const mappedKey = key === "userId" ? "user-id" : key;
+
+        values.set(mappedKey, value);
       }
 
       defaultContext.set(context.type, values);
@@ -81,11 +86,11 @@ const loadConfigFromUrl = async ({
   apiClient,
 }: {
   source: string;
-  startAtId?: Long;
+  startAtId?: string;
   apiClient: ApiClient;
   etag?: string;
 }): ReturnType<typeof loadConfig> => {
-  const path = `/api/v1/configs/${startAtId?.toString() ?? 0}`;
+  const path = `/api/v1/configs/${startAtId ?? "0"}`;
   const response = await fetchWithCache(apiClient, { source, path });
 
   if (response.status === 401) {
@@ -95,8 +100,9 @@ const loadConfigFromUrl = async ({
   }
 
   if (response.status === 200) {
-    const buffer = await response.arrayBuffer();
-    const parsed = parseConfigs(buffer);
+    const json = await response.json();
+    const protobufBackwardsCompatableKeys = keysToCamel(json);
+    const parsed = parseConfigsFromObject(protobufBackwardsCompatableKeys);
     return parse(parsed);
   }
 
@@ -112,26 +118,12 @@ const parse = (parsed: Configs): Result => {
 
   const configs = parsed.configs ?? [];
 
-  // Check if configs has at least one item and verify if its id is a Long
-  if (configs.length > 0) {
-    const firstConfig = configs[0];
-    if (
-      firstConfig !== undefined &&
-      firstConfig !== null &&
-      !Long.isLong(firstConfig.id)
-    ) {
-      throw new Error(
-        'Reforge requires the "long" package to be in your project. See https://www.npmjs.com/package/long'
-      );
-    }
-  }
-
   const defaultContext = extractDefaultContext(parsed.defaultContext);
 
   return {
     configs,
     projectEnvId: parsed.configServicePointer.projectEnvId,
-    startAtId: maxLong(configs.map((c) => c.id)),
+    startAtId: maxBigIntId(configs.map((c) => c.id)),
     defaultContext,
   };
 };

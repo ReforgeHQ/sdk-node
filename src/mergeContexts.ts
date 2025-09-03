@@ -1,10 +1,10 @@
-import type { Contexts, Context, ContextObj } from "./types";
+import type { Contexts, MapContext, ContextObj } from "./types";
 
 export const contextObjToMap = (obj: ContextObj): Contexts => {
-  const outerMap: Contexts = new Map<string, Context>();
+  const outerMap: Contexts = new Map<string, MapContext>();
 
   for (const [outerKey, innerObj] of Object.entries(obj)) {
-    const innerMap: Context = new Map<string, unknown>();
+    const innerMap: MapContext = new Map<string, unknown>();
     for (const [innerKey, innerValue] of Object.entries(innerObj)) {
       innerMap.set(innerKey, innerValue);
     }

@@ -1,4 +1,4 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": ["node_modules", "src/**/proto.ts", "src/**/proto.json", "dist"]
+  "exclude": ["node_modules", "dist"]
 }

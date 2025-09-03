@@ -1,22 +1,21 @@
-import Long from "long";
 import {
   type Config,
-  Config_ValueType,
+  ConfigValueType,
   ConfigType,
   Criterion_CriterionOperator,
-} from "../../proto";
-import { irrelevantLong, projectEnvIdUnderTest } from "../testHelpers";
+} from "../../types";
+import { irrelevantNumber, projectEnvIdUnderTest } from "../testHelpers";
 
 const config: Config = {
-  id: new Long(992),
-  projectId: irrelevantLong,
+  id: "992",
+  projectId: irrelevantNumber,
 
   key: "prop.is.one.of.jsonValue",
   changedBy: undefined,
   rows: [
     {
       properties: {},
-      projectEnvId: irrelevantLong,
+      projectEnvId: irrelevantNumber,
       values: [
         {
           criteria: [],
@@ -36,7 +35,7 @@ const config: Config = {
           criteria: [
             {
               propertyName: "reforge.user-id",
-              operator: Criterion_CriterionOperator.PROP_IS_ONE_OF,
+              operator: Criterion_CriterionOperator.PropIsOneOf,
               valueToMatch: {
                 stringList: {
                   values: ["4", "5"],
@@ -54,7 +53,7 @@ const config: Config = {
           criteria: [
             {
               propertyName: "user.country",
-              operator: Criterion_CriterionOperator.PROP_IS_ONE_OF,
+              operator: Criterion_CriterionOperator.PropIsOneOf,
               valueToMatch: {
                 stringList: {
                   values: ["US", "UK"],
@@ -72,7 +71,7 @@ const config: Config = {
           criteria: [
             {
               propertyName: "user.trackingId",
-              operator: Criterion_CriterionOperator.PROP_IS_ONE_OF,
+              operator: Criterion_CriterionOperator.PropIsOneOf,
               valueToMatch: {
                 stringList: {
                   values: ["CONFIDENTIAL"],
@@ -89,7 +88,7 @@ const config: Config = {
           criteria: [
             {
               propertyName: "user.trackingId",
-              operator: Criterion_CriterionOperator.PROP_IS_ONE_OF,
+              operator: Criterion_CriterionOperator.PropIsOneOf,
               valueToMatch: {
                 stringList: {
                   values: ["SECRET"],
@@ -141,8 +140,8 @@ const config: Config = {
       },
     },
   ],
-  configType: ConfigType.CONFIG,
-  valueType: Config_ValueType.JSON,
+  configType: ConfigType.Config,
+  valueType: ConfigValueType.Json,
   sendToClientSdk: false,
 };
 export default config;

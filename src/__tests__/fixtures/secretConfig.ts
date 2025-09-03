@@ -1,11 +1,10 @@
-import Long from "long";
-import type { Config } from "../../proto";
-import { ConfigType } from "../../proto";
-import { irrelevantLong } from "../testHelpers";
+import type { Config } from "../../types";
+import { ConfigValueType, ConfigType } from "../../types";
+import { irrelevantNumber } from "../testHelpers";
 
 const config = (encryptedValue: string): Config => ({
-  id: new Long(51),
-  projectId: irrelevantLong,
+  id: "51",
+  projectId: irrelevantNumber,
   key: "secret.config",
   changedBy: undefined,
   rows: [
@@ -24,8 +23,8 @@ const config = (encryptedValue: string): Config => ({
     },
   ],
   allowableValues: [],
-  configType: ConfigType.CONFIG,
-  valueType: 2,
+  configType: ConfigType.Config,
+  valueType: ConfigValueType.String,
   sendToClientSdk: false,
 });
 

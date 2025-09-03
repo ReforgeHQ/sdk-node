@@ -1,8 +1,6 @@
-import Long from "long";
-import { ConfigType } from "../proto";
-import type { Config } from "../proto";
-import { wordLevelToNumber, PREFIX } from "../logger";
-import type { ValidLogLevelName } from "../logger";
+import { ConfigValueType, ConfigType } from "../types";
+import type { Config, LogLevel } from "../types";
+import { type LogLevelMethodName, PREFIX } from "../logger";
 
 export const nTimes = (n: number, fn: () => void): void => {
   for (let i = 0; i < n; i++) {
@@ -10,15 +8,16 @@ export const nTimes = (n: number, fn: () => void): void => {
   }
 };
 
-export const projectEnvIdUnderTest = new Long(5);
+export const projectEnvIdUnderTest = 5;
 export const emptyContexts = new Map();
 export const irrelevant = "this value does not matter";
-export const irrelevantLong = new Long(-1);
+export const irrelevantNumberAsString = "-1";
+export const irrelevantNumber = -1;
 
-export const levelAt = (path: string, level: string): Config => {
+export const levelAt = (path: string, level: LogLevelMethodName): Config => {
   return {
-    id: irrelevantLong,
-    projectId: irrelevantLong,
+    id: irrelevantNumberAsString,
+    projectId: irrelevantNumber,
     key: `${PREFIX}${path}`,
     changedBy: undefined,
     rows: [
@@ -28,15 +27,15 @@ export const levelAt = (path: string, level: string): Config => {
           {
             criteria: [],
             value: {
-              logLevel: wordLevelToNumber(level as ValidLogLevelName),
+              logLevel: level.toUpperCase() as LogLevel,
             },
           },
         ],
       },
     ],
     allowableValues: [],
-    configType: ConfigType.LOG_LEVEL,
-    valueType: 9,
+    configType: ConfigType.LogLevel,
+    valueType: ConfigValueType.LogLevel,
     sendToClientSdk: true,
   };
 };
@@ -44,8 +43,8 @@ export const levelAt = (path: string, level: string): Config => {
 export const mockApiClient = {
   fetch: jest.fn(async () => ({
     status: 200,
-    arrayBuffer: async (): Promise<ArrayBuffer> => {
-      return await Promise.resolve(new ArrayBuffer(0));
+    json: async (): Promise<any> => {
+      return await Promise.resolve(JSON.stringify({ key: "value" }));
     },
   })),
 };

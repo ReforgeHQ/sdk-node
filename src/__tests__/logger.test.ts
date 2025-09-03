@@ -1,14 +1,18 @@
-import type { Config } from "../proto";
-import { ConfigType, LogLevel, Criterion_CriterionOperator } from "../proto";
-import { Resolver } from "../resolver";
+import type { Config } from "../types";
 import {
-  shouldLog,
-  wordLevelToNumber,
-  PREFIX,
-  type ValidLogLevel,
-  type ValidLogLevelName,
-} from "../logger";
-import { levelAt, irrelevantLong, projectEnvIdUnderTest } from "./testHelpers";
+  ConfigType,
+  LogLevel,
+  Criterion_CriterionOperator,
+  ConfigValueType,
+} from "../types";
+import { Resolver } from "../resolver";
+import { shouldLog, PREFIX, type LogLevelMethodName } from "../logger";
+import {
+  levelAt,
+  irrelevantNumberAsString,
+  projectEnvIdUnderTest,
+  irrelevantNumber,
+} from "./testHelpers";
 
 const getResolver = (configs: Config[]): Resolver => {
   return new Resolver(
@@ -20,7 +24,7 @@ const getResolver = (configs: Config[]): Resolver => {
   );
 };
 
-const examples: Array<[ValidLogLevelName, ValidLogLevelName, boolean]> = [
+const examples: Array<[LogLevelMethodName, LogLevelMethodName, boolean]> = [
   ["trace", "trace", true],
   ["trace", "debug", true],
   ["trace", "info", true],
@@ -72,9 +76,9 @@ describe("shouldLog", () => {
     expect(
       shouldLog({
         loggerName,
-        desiredLevel: LogLevel.TRACE,
+        desiredLevel: LogLevel.Trace,
         resolver,
-        defaultLevel: 5,
+        defaultLevel: LogLevel.Trace,
       })
     ).toEqual(true);
   });
@@ -86,9 +90,9 @@ describe("shouldLog", () => {
       expect(
         shouldLog({
           loggerName,
-          desiredLevel: wordLevelToNumber(desiredLevel) as ValidLogLevel,
+          desiredLevel: desiredLevel.toUpperCase() as LogLevel,
           resolver,
-          defaultLevel: LogLevel.WARN,
+          defaultLevel: LogLevel.Warn,
         })
       ).toEqual(expected);
     });
@@ -105,8 +109,8 @@ describe("shouldLog", () => {
     expect(
       shouldLog({
         loggerName,
-        defaultLevel: LogLevel.WARN,
-        desiredLevel: LogLevel.TRACE,
+        defaultLevel: LogLevel.Warn,
+        desiredLevel: LogLevel.Trace,
         resolver,
       })
     ).toEqual(true);
@@ -114,8 +118,8 @@ describe("shouldLog", () => {
     expect(
       shouldLog({
         loggerName: "some.test",
-        defaultLevel: LogLevel.WARN,
-        desiredLevel: LogLevel.TRACE,
+        defaultLevel: LogLevel.Warn,
+        desiredLevel: LogLevel.Trace,
         resolver,
       })
     ).toEqual(false);
@@ -123,8 +127,8 @@ describe("shouldLog", () => {
     expect(
       shouldLog({
         loggerName: "some.test",
-        defaultLevel: LogLevel.WARN,
-        desiredLevel: LogLevel.DEBUG,
+        defaultLevel: LogLevel.Warn,
+        desiredLevel: LogLevel.Debug,
         resolver,
       })
     ).toEqual(true);
@@ -132,8 +136,8 @@ describe("shouldLog", () => {
     expect(
       shouldLog({
         loggerName: "some.test",
-        defaultLevel: LogLevel.WARN,
-        desiredLevel: LogLevel.INFO,
+        defaultLevel: LogLevel.Warn,
+        desiredLevel: LogLevel.Info,
         resolver,
       })
     ).toEqual(true);
@@ -143,8 +147,8 @@ describe("shouldLog", () => {
     const loggerName = "some.test.name";
 
     const config = {
-      id: irrelevantLong,
-      projectId: irrelevantLong,
+      id: irrelevantNumberAsString,
+      projectId: irrelevantNumber,
       key: `${PREFIX}${loggerName}`,
       changedBy: undefined,
       rows: [
@@ -156,7 +160,7 @@ describe("shouldLog", () => {
               criteria: [
                 {
                   propertyName: "user.country",
-                  operator: Criterion_CriterionOperator.PROP_IS_ONE_OF,
+                  operator: Criterion_CriterionOperator.PropIsOneOf,
                   valueToMatch: {
                     stringList: {
                       values: ["US", "UK"],
@@ -165,21 +169,21 @@ describe("shouldLog", () => {
                 },
               ],
               value: {
-                logLevel: LogLevel.INFO,
+                logLevel: LogLevel.Info,
               },
             },
             {
               criteria: [],
               value: {
-                logLevel: LogLevel.WARN,
+                logLevel: LogLevel.Warn,
               },
             },
           ],
         },
       ],
       allowableValues: [],
-      configType: ConfigType.LOG_LEVEL,
-      valueType: 3,
+      configType: ConfigType.LogLevel,
+      valueType: ConfigValueType.LogLevel,
       sendToClientSdk: false,
     };
 
@@ -189,8 +193,8 @@ describe("shouldLog", () => {
     expect(
       shouldLog({
         loggerName: "some.test.name.here",
-        defaultLevel: LogLevel.WARN,
-        desiredLevel: LogLevel.INFO,
+        defaultLevel: LogLevel.Warn,
+        desiredLevel: LogLevel.Info,
         resolver,
         contexts: new Map(),
       })
@@ -200,8 +204,8 @@ describe("shouldLog", () => {
     expect(
       shouldLog({
         loggerName: "some.test.name.here",
-        defaultLevel: LogLevel.WARN,
-        desiredLevel: LogLevel.INFO,
+        defaultLevel: LogLevel.Warn,
+        desiredLevel: LogLevel.Info,
         resolver,
         contexts: new Map().set("user", new Map().set("country", "CA")),
       })
@@ -211,8 +215,8 @@ describe("shouldLog", () => {
     expect(
       shouldLog({
         loggerName: "some.test.name.here",
-        defaultLevel: LogLevel.WARN,
-        desiredLevel: LogLevel.INFO,
+        defaultLevel: LogLevel.Warn,
+        desiredLevel: LogLevel.Info,
         resolver,
         contexts: new Map().set("user", new Map().set("country", "US")),
       })
@@ -226,8 +230,8 @@ describe("shouldLog", () => {
     expect(
       shouldLog({
         loggerName,
-        desiredLevel: LogLevel.DEBUG,
-        defaultLevel: LogLevel.TRACE,
+        desiredLevel: LogLevel.Debug,
+        defaultLevel: LogLevel.Trace,
         resolver,
       })
     ).toEqual(true);
@@ -235,8 +239,8 @@ describe("shouldLog", () => {
     expect(
       shouldLog({
         loggerName,
-        desiredLevel: LogLevel.DEBUG,
-        defaultLevel: LogLevel.DEBUG,
+        desiredLevel: LogLevel.Debug,
+        defaultLevel: LogLevel.Debug,
         resolver,
       })
     ).toEqual(true);
@@ -244,25 +248,10 @@ describe("shouldLog", () => {
     expect(
       shouldLog({
         loggerName,
-        desiredLevel: LogLevel.DEBUG,
-        defaultLevel: LogLevel.INFO,
+        desiredLevel: LogLevel.Debug,
+        defaultLevel: LogLevel.Info,
         resolver,
       })
     ).toEqual(false);
-  });
-});
-
-describe("wordLevelToNumber", () => {
-  it("turns a string level into a number", () => {
-    expect(wordLevelToNumber("trace")).toEqual(1);
-    expect(wordLevelToNumber("debug")).toEqual(2);
-    expect(wordLevelToNumber("info")).toEqual(3);
-    expect(wordLevelToNumber("warn")).toEqual(5);
-    expect(wordLevelToNumber("error")).toEqual(6);
-    expect(wordLevelToNumber("fatal")).toEqual(9);
-  });
-
-  it("returns undefined for unrecognized levels", () => {
-    expect(wordLevelToNumber("something-else" as any)).toBeUndefined();
   });
 });

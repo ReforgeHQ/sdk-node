@@ -1,31 +1,22 @@
 import crypto from "crypto";
-import Long from "long";
 import { apiClient, type ApiClient } from "./apiClient";
 import { loadConfig } from "./loadConfig";
 import { Resolver, type MinimumConfig, type ResolverAPI } from "./resolver";
 import { Sources } from "./sources";
+import { ConfigType, ConfigValueType, LogLevel, ProvidedSource } from "./types";
 import type {
   ContextObj,
   Contexts,
   Fetch,
   OnNoDefault,
   ProjectEnvId,
-} from "./types";
-import {
-  ConfigType,
-  Config_ValueType as ConfigValueType,
-  LogLevel,
-  ProvidedSource,
-} from "./proto";
-import type {
   ConditionalValue,
   Config,
   ConfigValue,
   ConfigRow,
   Provided,
-} from "./proto";
-import { wordLevelToNumber, parseLevel } from "./logger";
-import type { ValidLogLevelName, ValidLogLevel, makeLogger } from "./logger";
+} from "./types";
+import { LOG_LEVEL_RANK_LOOKUP, type makeLogger } from "./logger";
 import { SSEConnection } from "./sseConnection";
 import { TelemetryReporter } from "./telemetry/reporter";
 
@@ -41,7 +32,7 @@ import {
 } from "./configChangeNotifier";
 
 const DEFAULT_POLL_INTERVAL = 60 * 1000;
-export const REFORGE_DEFAULT_LOG_LEVEL = LogLevel.WARN;
+export const REFORGE_DEFAULT_LOG_LEVEL = LogLevel.Warn;
 export const MULTIPLE_INIT_WARNING =
   "[reforge] init() called multiple times. This is generally not recommended as it can lead to multiple concurrent SSE connections and/or redundant polling. A Reforge instance is typically meant to be long-lived and exist outside of your request/response life-cycle. If you're using `init()` to change context, you're better off using `inContext` or setting per-request context to pass to your `get`/etc. calls.";
 
@@ -82,7 +73,7 @@ export interface ReforgeInterface {
   isFeatureEnabled: (key: string, contexts?: Contexts | ContextObj) => boolean;
   logger: (
     loggerName: string,
-    defaultLevel: ValidLogLevelName
+    defaultLevel: LogLevel
   ) => ReturnType<typeof makeLogger>;
   shouldLog: ({
     loggerName,
@@ -91,8 +82,8 @@ export interface ReforgeInterface {
     contexts,
   }: {
     loggerName: string;
-    desiredLevel: ValidLogLevel | ValidLogLevelName;
-    defaultLevel?: ValidLogLevel | ValidLogLevelName;
+    desiredLevel: LogLevel;
+    defaultLevel?: LogLevel;
     contexts?: Contexts | ContextObj;
   }) => boolean;
   telemetry?: Telemetry;
@@ -119,7 +110,7 @@ interface ConstructorProps {
   onNoDefault?: OnNoDefault;
   pollInterval?: number;
   fetch?: Fetch;
-  defaultLogLevel?: ValidLogLevel | ValidLogLevelName;
+  defaultLogLevel?: LogLevel;
   collectLoggerCounts?: boolean;
   contextUploadMode?: ContextUploadMode;
   collectEvaluationSummaries?: boolean;
@@ -137,7 +128,7 @@ class Reforge implements ReforgeInterface {
   private readonly pollInterval: number;
   private resolver: Resolver | undefined;
   private readonly apiClient: ApiClient;
-  private readonly defaultLogLevel: ValidLogLevel;
+  private readonly defaultLogLevel: LogLevel;
   private readonly instanceHash: string;
   private readonly onUpdate: (configs: Array<Config | MinimumConfig>) => void;
   private initCount: number = 0;
@@ -148,7 +139,7 @@ class Reforge implements ReforgeInterface {
   readonly telemetry: Telemetry;
   private running = true;
   private pollTimeout?: NodeJS.Timeout;
-  private startAtId = Long.fromInt(0);
+  private startAtId = "0";
   private readonly configChangeNotifier: ConfigChangeNotifier;
 
   constructor({
@@ -189,19 +180,11 @@ class Reforge implements ReforgeInterface {
     this.onUpdate = onUpdate ?? (() => {});
     this.globalContext = globalContext;
 
-    const parsedDefaultLogLevel = parseLevel(defaultLogLevel);
-
-    if (parsedDefaultLogLevel === undefined) {
-      console.warn(
-        `Invalid default log level provided: ${defaultLogLevel}. Defaulting to ${REFORGE_DEFAULT_LOG_LEVEL}.`
-      );
-    }
-
     if (this.sources.isEmpty()) {
       throw new Error("At least one source is required");
     }
 
-    this.defaultLogLevel = parsedDefaultLogLevel ?? REFORGE_DEFAULT_LOG_LEVEL;
+    this.defaultLogLevel = defaultLogLevel ?? REFORGE_DEFAULT_LOG_LEVEL;
 
     this.apiClient = apiClient(this.apiKey, fetch);
 
@@ -216,6 +199,7 @@ class Reforge implements ReforgeInterface {
       contextShapes: contextShapes(
         this.apiClient,
         this.sources.telemetrySource,
+        this.instanceHash,
         contextUploadMode
       ),
       exampleContexts: exampleContexts(
@@ -324,7 +308,7 @@ class Reforge implements ReforgeInterface {
 
   logger(
     loggerName: string,
-    defaultLevel?: ValidLogLevelName,
+    defaultLevel?: LogLevel,
     contexts?: Contexts | ContextObj
   ): ReturnType<typeof makeLogger> {
     requireResolver(this.resolver);
@@ -372,7 +356,7 @@ class Reforge implements ReforgeInterface {
     this._createOrReconfigureResolver(config, projectEnvId, defaultContext);
   }
 
-  startSSE(startAtId: Long): void {
+  startSSE(startAtId: string): void {
     requireResolver(this.resolver);
 
     this.sseConnection = new SSEConnection({
@@ -442,8 +426,8 @@ class Reforge implements ReforgeInterface {
     contexts,
   }: {
     loggerName: string;
-    desiredLevel: ValidLogLevel | ValidLogLevelName;
-    defaultLevel?: ValidLogLevel | ValidLogLevelName;
+    desiredLevel: LogLevel;
+    defaultLevel?: LogLevel;
     contexts?: Contexts | ContextObj;
   }): boolean {
     if (this.resolver != null) {
@@ -455,7 +439,7 @@ class Reforge implements ReforgeInterface {
       });
     }
 
-    const numericDesiredLevel = parseLevel(desiredLevel);
+    const numericDesiredLevel = LOG_LEVEL_RANK_LOOKUP[desiredLevel];
 
     if (numericDesiredLevel === undefined) {
       console.warn(
@@ -469,11 +453,11 @@ class Reforge implements ReforgeInterface {
       `[reforge] Still initializing... Comparing against defaultLogLevel setting: ${this.defaultLogLevel}`
     );
 
-    this.telemetry.knownLoggers.push(loggerName, numericDesiredLevel);
+    this.telemetry.knownLoggers.push(loggerName, desiredLevel);
 
-    return (
-      (parseLevel(defaultLevel) ?? this.defaultLogLevel) <= numericDesiredLevel
-    );
+    const activeDefaultLevel = defaultLevel ?? this.defaultLogLevel;
+
+    return LOG_LEVEL_RANK_LOOKUP[activeDefaultLevel] <= numericDesiredLevel;
   }
 
   isFeatureEnabled(key: string, contexts?: Contexts | ContextObj): boolean {
@@ -556,7 +540,4 @@ export {
   type Contexts,
   type Provided,
   type Resolver,
-  type ValidLogLevel,
-  type ValidLogLevelName,
-  wordLevelToNumber,
 };

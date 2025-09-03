@@ -1,11 +1,10 @@
 import type { SortableRow } from "../sortRows";
 import { sortRows } from "../sortRows";
-import Long from "long";
-import type { ConfigRow } from "../proto";
+import type { ConfigRow } from "../types";
 
 describe("sortRows", () => {
-  const projectEnvId1 = Long.fromInt(1);
-  const projectEnvId2 = Long.fromInt(2);
+  const projectEnvId1 = 1;
+  const projectEnvId2 = 2;
 
   it("should sort rows with matching projectEnvId first", () => {
     const rows: SortableRow[] = [
@@ -27,7 +26,7 @@ describe("sortRows", () => {
       { projectEnvId: projectEnvId2 },
     ];
 
-    const result = sortRows(rows, Long.fromInt(3));
+    const result = sortRows(rows, 3);
 
     expect(result).toEqual(rows);
   });

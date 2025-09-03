@@ -10,8 +10,8 @@ export const sortRows = <T extends SortableRow>(
   projectEnvId: ProjectEnvId
 ): T[] => {
   return rows.sort((a, b) => {
-    const aMatches = a.projectEnvId?.equals(projectEnvId) ?? false;
-    const bMatches = b.projectEnvId?.equals(projectEnvId) ?? false;
+    const aMatches = a.projectEnvId === projectEnvId;
+    const bMatches = b.projectEnvId === projectEnvId;
 
     if (aMatches && !bMatches) {
       return -1;

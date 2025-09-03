@@ -1,17 +1,17 @@
-import Long from "long";
 import type { ContextUploadMode, SyncResult, Telemetry } from "./types";
 import type { ApiClient } from "../apiClient";
-import type { Contexts } from "../types";
 import { rateLimitCache } from "./rateLimitCache";
-import { encode } from "../parseProto";
+
 import type {
+  Contexts,
   ConfigValue,
   Context,
   ExampleContext,
   TelemetryEvent,
   TelemetryEvents,
-} from "../proto";
+} from "../types";
 import { wrap } from "../wrap";
+import { jsonStringifyWithBigInt } from "../bigIntUtils";
 
 const ENDPOINT = "/api/v1/telemetry";
 
@@ -37,7 +37,7 @@ const groupedKey = (contexts: Contexts): string => {
   return Array.from(contexts.values())
     .map((context) => {
       const key = context.get("key") ?? context.get("trackingId");
-      return typeof key === "string" ? key : JSON.stringify(key);
+      return typeof key === "string" ? key : jsonStringifyWithBigInt(key);
     })
     .filter((str) => str?.length > 0)
     .sort()
@@ -113,7 +113,7 @@ export const exampleContexts = (
 
       const examples: ExampleContext[] = data.map(([timestamp, contexts]) => {
         return {
-          timestamp: Long.fromNumber(timestamp),
+          timestamp,
           contextSet: {
             contexts: contextsToProto(contexts),
           },
@@ -134,7 +134,7 @@ export const exampleContexts = (
         events: [event],
       };
 
-      const body = encode("TelemetryEvents", apiData);
+      const body = jsonStringifyWithBigInt(apiData);
 
       const result = await apiClient.fetch({
         source: telemetryHost,

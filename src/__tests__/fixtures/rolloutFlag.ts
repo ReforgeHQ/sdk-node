@@ -1,15 +1,19 @@
-import { type Config, Config_ValueType, ConfigType } from "../../proto";
-import { irrelevantLong, projectEnvIdUnderTest } from "../testHelpers";
+import { type Config, ConfigValueType, ConfigType } from "../../types";
+import {
+  irrelevantNumberAsString,
+  irrelevantNumber,
+  projectEnvIdUnderTest,
+} from "../testHelpers";
 
 const config: Config = {
-  id: irrelevantLong,
-  projectId: irrelevantLong,
+  id: irrelevantNumberAsString,
+  projectId: irrelevantNumber,
   key: "rollout.flag",
   changedBy: undefined,
   rows: [
     {
       properties: {},
-      projectEnvId: irrelevantLong,
+      projectEnvId: irrelevantNumber,
       values: [
         {
           criteria: [],
@@ -56,8 +60,8 @@ const config: Config = {
       bool: true,
     },
   ],
-  configType: ConfigType.FEATURE_FLAG,
-  valueType: Config_ValueType.BOOL,
+  configType: ConfigType.FeatureFlag,
+  valueType: ConfigValueType.Bool,
   sendToClientSdk: false,
 };
 

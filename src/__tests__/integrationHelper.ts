@@ -1,14 +1,19 @@
-import type Long from "long";
 import type { Reforge } from "../reforge";
-import { wordLevelToNumber } from "../reforge";
-import type { Context, Contexts, ContextValue } from "../types";
-import type { ContextShapes, Logger, Loggers, TelemetryEvents } from "../proto";
+import {
+  type ContextShapes,
+  type Logger,
+  type Loggers,
+  type MapContext,
+  type Contexts,
+  type ContextValue,
+  LogLevel,
+  type TelemetryEvents,
+} from "../types";
 import type { knownLoggers, LoggerLevelName } from "../telemetry/knownLoggers";
 import type { contextShapes } from "../telemetry/contextShapes";
 import type { exampleContexts } from "../telemetry/exampleContexts";
 import { unwrapPrimitive } from "../unwrap";
 import fs from "fs";
-import { type ValidLogLevelName, PREFIX } from "../logger";
 
 process.env[
   `REFORGE_INTEGRATION_TEST_ENCRYPTION_KEY`
@@ -38,22 +43,6 @@ const testsPath = `${testDataPath}/tests/current`;
 const expectedWarnings: Record<string, RegExp> = {
   "always returns false for a non-boolean flag":
     /Non-boolean FF's return `false` for isFeatureEnabled checks./,
-};
-
-const typeLookup: Record<number, string> = {
-  1: "CONFIG",
-  2: "FEATURE_FLAG",
-  3: "LOG_LEVEL",
-  4: "SEGMENT",
-};
-
-const logLevelLookup: Record<string, number> = {
-  TRACE: 1,
-  DEBUG: 2,
-  INFO: 3,
-  WARN: 5,
-  ERROR: 6,
-  FATAL: 9,
 };
 
 type YAMLContext = Record<string, Record<string, any>> | undefined;
@@ -220,10 +209,7 @@ const calcExpectedValueForTelemetry = (testCase: RawTelemetryTestCase): any => {
   return expectedData;
 };
 
-const calcExpectedValue = (
-  testCase: RawInputOutputTestCase,
-  key: string
-): any => {
+const calcExpectedValue = (testCase: RawInputOutputTestCase): any => {
   if (testCase.expected === undefined) {
     return undefined;
   }
@@ -232,10 +218,6 @@ const calcExpectedValue = (
 
   if (expectedValue === null) {
     expectedValue = undefined;
-  }
-
-  if (key.startsWith(PREFIX)) {
-    expectedValue = logLevelLookup[expectedValue];
   }
 
   if (testCase.type === "DURATION") {
@@ -261,7 +243,7 @@ const coerceContexts = (
       );
     }
 
-    const context: Context = new Map<string, ContextValue>(
+    const context: MapContext = new Map<string, ContextValue>(
       Object.entries(incomingContext)
     );
 
@@ -373,12 +355,12 @@ const aggregatorSpecificLogic = {
 
             return {
               key: summary.key,
-              type: typeLookup[summary.type],
+              type: summary.type,
               value: Object.values(
                 counter.selectedValue as Record<string, unknown>
               )[0],
               value_type: valueType,
-              count: counter.count.toNumber(),
+              count: counter.count,
               summary: massagedSummary,
             };
           });
@@ -402,10 +384,13 @@ const aggregatorSpecificLogic = {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         testData.forEach(({ logger_name, counts }) => {
           Object.keys(counts).forEach((severityWord: string) => {
-            const nonPluralSeverityWord = severityWord.replace(
-              /s$/,
-              ""
-            ) as ValidLogLevelName;
+            const nonPluralSeverityWord = severityWord
+              .replace(/s$/, "")
+              .toUpperCase() as LogLevel;
+
+            if (!Object.values(LogLevel).includes(nonPluralSeverityWord)) {
+              throw new Error(`Unknown severity ${severityWord}`);
+            }
 
             const count = counts[severityWord];
 
@@ -414,15 +399,9 @@ const aggregatorSpecificLogic = {
             }
 
             for (let i = 0; i < count; i++) {
-              const severity = wordLevelToNumber(nonPluralSeverityWord);
-
-              if (severity === undefined) {
-                throw new Error(`Unknown severity ${severityWord}`);
-              }
-
               (aggregator as ReturnType<typeof knownLoggers>).push(
                 logger_name,
-                severity
+                nonPluralSeverityWord
               );
             }
           });
@@ -441,10 +420,10 @@ const aggregatorSpecificLogic = {
           ];
 
           levels.forEach((severity) => {
-            const recordedSeverity: Long | undefined = logger[severity];
+            const recordedSeverity: number | undefined = logger[severity];
 
             if (recordedSeverity != null) {
-              counts[severity] = recordedSeverity.toNumber();
+              counts[severity] = recordedSeverity;
             }
           });
 
@@ -521,7 +500,7 @@ export const tests = (): {
 
       const key = testCase.input.key ?? testCase.input.flag ?? "";
 
-      const expectedValue = calcExpectedValue(testCase, key);
+      const expectedValue = calcExpectedValue(testCase);
 
       const expectedWarning =
         expectedWarnings[

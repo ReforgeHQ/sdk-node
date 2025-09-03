@@ -1,6 +1,6 @@
-import Long from "long";
 import { knownLoggers, stub } from "../../telemetry/knownLoggers";
 import { mockApiClient } from "../testHelpers";
+import { LogLevel } from "../../types";
 
 const telemetrySource = "https://telemetry.example.com";
 
@@ -19,21 +19,21 @@ describe("knownLoggers", () => {
       "instanceHash",
       true
     );
-    logger.push("loggerName1", 1);
-    logger.push("loggerName1", 1);
-    logger.push("loggerName2", 2);
+    logger.push("loggerName1", LogLevel.Trace);
+    logger.push("loggerName1", LogLevel.Trace);
+    logger.push("loggerName2", LogLevel.Debug);
 
     expect(logger.data).toEqual({
-      loggerName1: { 1: 2 },
-      loggerName2: { 2: 1 },
+      loggerName1: { [LogLevel.Trace]: 2 },
+      loggerName2: { [LogLevel.Debug]: 1 },
     });
   });
 
   it("should sync log entries to the server", async () => {
     const mockFetchResult = {
       status: 200,
-      arrayBuffer: async (): Promise<ArrayBuffer> => {
-        return await Promise.resolve(new ArrayBuffer(0));
+      json: async (): Promise<any> => {
+        return await Promise.resolve(JSON.stringify({ key: "value" }));
       },
     };
     mockApiClient.fetch.mockResolvedValue(mockFetchResult);
@@ -44,10 +44,10 @@ describe("knownLoggers", () => {
       "instanceHash",
       true
     );
-    logger.push("loggerName1", 1);
-    logger.push("loggerName1", 2);
-    logger.push("loggerName1", 1);
-    logger.push("loggerName2", 2);
+    logger.push("loggerName1", LogLevel.Trace);
+    logger.push("loggerName1", LogLevel.Debug);
+    logger.push("loggerName1", LogLevel.Trace);
+    logger.push("loggerName2", LogLevel.Debug);
 
     const syncResult = await logger.sync();
 
@@ -58,16 +58,16 @@ describe("knownLoggers", () => {
         loggers: [
           {
             loggerName: "loggerName1",
-            traces: new Long(2),
-            debugs: new Long(1),
+            traces: 2,
+            debugs: 1,
           },
           {
             loggerName: "loggerName2",
-            debugs: new Long(1),
+            debugs: 1,
           },
         ],
-        startAt: expect.any(Long),
-        endAt: expect.any(Long),
+        startAt: expect.any(Number),
+        endAt: expect.any(Number),
         instanceHash: "instanceHash",
       }),
     });
@@ -84,14 +84,14 @@ describe("knownLoggers", () => {
       undefined,
       2
     );
-    logger.push("loggerName1", 1);
-    logger.push("loggerName2", 1);
-    logger.push("loggerName3", 2);
-    logger.push("loggerName1", 1);
+    logger.push("loggerName1", LogLevel.Trace);
+    logger.push("loggerName2", LogLevel.Trace);
+    logger.push("loggerName3", LogLevel.Debug);
+    logger.push("loggerName1", LogLevel.Trace);
 
     expect(logger.data).toEqual({
-      loggerName1: { 1: 2 },
-      loggerName2: { 1: 1 },
+      loggerName1: { [LogLevel.Trace]: 2 },
+      loggerName2: { [LogLevel.Trace]: 1 },
     });
   });
 });

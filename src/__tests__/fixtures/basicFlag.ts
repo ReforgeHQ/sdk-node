@@ -1,10 +1,10 @@
-import type { Config } from "../../proto";
-import { ConfigType } from "../../proto";
-import { irrelevantLong } from "../testHelpers";
+import type { Config } from "../../types";
+import { ConfigValueType, ConfigType } from "../../types";
+import { irrelevantNumberAsString, irrelevantNumber } from "../testHelpers";
 
 const config: Config = {
-  id: irrelevantLong,
-  projectId: irrelevantLong,
+  id: irrelevantNumberAsString,
+  projectId: irrelevantNumber,
   key: "basic.flag",
   changedBy: undefined,
   rows: [
@@ -21,8 +21,8 @@ const config: Config = {
     },
   ],
   allowableValues: [{ bool: true }, { bool: false }],
-  configType: ConfigType.FEATURE_FLAG,
-  valueType: 5,
+  configType: ConfigType.FeatureFlag,
+  valueType: ConfigValueType.Bool,
   sendToClientSdk: false,
 };
 

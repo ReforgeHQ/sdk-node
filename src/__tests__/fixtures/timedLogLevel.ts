@@ -1,11 +1,15 @@
-import Long from "long";
-import type { Config } from "../../proto";
-import { ConfigType, Criterion_CriterionOperator, LogLevel } from "../../proto";
-import { irrelevantLong } from "../testHelpers";
+import type { Config } from "../../types";
+import {
+  ConfigValueType,
+  ConfigType,
+  Criterion_CriterionOperator,
+  LogLevel,
+} from "../../types";
+import { irrelevantNumber } from "../testHelpers";
 
 const config = (start: number, end: number): Config => ({
-  id: Long.fromNumber(33),
-  projectId: irrelevantLong,
+  id: "33",
+  projectId: irrelevantNumber,
   key: "log-level.some.component.path",
   changedBy: undefined,
   rows: [
@@ -16,27 +20,27 @@ const config = (start: number, end: number): Config => ({
           criteria: [
             {
               propertyName: "reforge.current-time",
-              operator: Criterion_CriterionOperator.IN_INT_RANGE,
+              operator: Criterion_CriterionOperator.InIntRange,
               valueToMatch: {
                 intRange: {
-                  start: Long.fromValue(start),
-                  end: Long.fromValue(end),
+                  start: BigInt(start),
+                  end: BigInt(end),
                 },
               },
             },
           ],
-          value: { logLevel: LogLevel.DEBUG },
+          value: { logLevel: LogLevel.Debug },
         },
         {
           criteria: [],
-          value: { logLevel: LogLevel.INFO },
+          value: { logLevel: LogLevel.Info },
         },
       ],
     },
   ],
   allowableValues: [],
-  configType: ConfigType.LOG_LEVEL,
-  valueType: 9,
+  configType: ConfigType.LogLevel,
+  valueType: ConfigValueType.LogLevel,
   sendToClientSdk: false,
 });
 

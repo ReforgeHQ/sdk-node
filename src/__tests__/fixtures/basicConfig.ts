@@ -1,10 +1,9 @@
-import Long from "long";
-import { type Config, Config_ValueType, ConfigType } from "../../proto";
-import { irrelevantLong } from "../testHelpers";
+import { type Config, ConfigValueType, ConfigType } from "../../types";
+import { irrelevantNumber } from "../testHelpers";
 
 const config: Config = {
-  id: new Long(999),
-  projectId: irrelevantLong,
+  id: "999",
+  projectId: irrelevantNumber,
   key: "basic.value",
   changedBy: undefined,
   rows: [
@@ -14,15 +13,15 @@ const config: Config = {
         {
           criteria: [],
           value: {
-            int: new Long(42),
+            int: BigInt(42),
           },
         },
       ],
     },
   ],
   allowableValues: [],
-  configType: ConfigType.CONFIG,
-  valueType: Config_ValueType.INT,
+  configType: ConfigType.Config,
+  valueType: ConfigValueType.Int,
   sendToClientSdk: false,
 };
 

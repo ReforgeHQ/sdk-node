@@ -1,17 +1,25 @@
-import type { Config } from "../../proto";
-import { ConfigType, Criterion_CriterionOperator } from "../../proto";
-import { irrelevantLong, projectEnvIdUnderTest } from "../testHelpers";
+import type { Config } from "../../types";
+import {
+  ConfigValueType,
+  ConfigType,
+  Criterion_CriterionOperator,
+} from "../../types";
+import {
+  irrelevantNumberAsString,
+  irrelevantNumber,
+  projectEnvIdUnderTest,
+} from "../testHelpers";
 
 const config: Config = {
-  id: irrelevantLong,
-  projectId: irrelevantLong,
+  id: irrelevantNumberAsString,
+  projectId: irrelevantNumber,
 
   key: "prop.is.one.of.and.ends.with",
   changedBy: undefined,
   rows: [
     {
       properties: {},
-      projectEnvId: irrelevantLong,
+      projectEnvId: irrelevantNumber,
       values: [
         {
           criteria: [],
@@ -29,7 +37,7 @@ const config: Config = {
           criteria: [
             {
               propertyName: "user.country",
-              operator: Criterion_CriterionOperator.PROP_IS_ONE_OF,
+              operator: Criterion_CriterionOperator.PropIsOneOf,
               valueToMatch: {
                 stringList: {
                   values: ["US", "UK"],
@@ -38,7 +46,7 @@ const config: Config = {
             },
             {
               propertyName: "user.email",
-              operator: Criterion_CriterionOperator.PROP_ENDS_WITH_ONE_OF,
+              operator: Criterion_CriterionOperator.PropEndsWithOneOf,
               valueToMatch: {
                 stringList: {
                   values: ["@reforge.com"],
@@ -67,8 +75,8 @@ const config: Config = {
       string: "default",
     },
   ],
-  configType: ConfigType.CONFIG,
-  valueType: 2,
+  configType: ConfigType.Config,
+  valueType: ConfigValueType.String,
   sendToClientSdk: false,
 };
 export default config;

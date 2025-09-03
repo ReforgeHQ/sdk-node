@@ -1,11 +1,10 @@
-import Long from "long";
-import type { Config } from "../../proto";
-import { ConfigType } from "../../proto";
-import { irrelevantLong } from "../testHelpers";
+import type { Config } from "../../types";
+import { ConfigValueType, ConfigType } from "../../types";
+import { irrelevantNumber } from "../testHelpers";
 
 const config: Config = {
-  id: new Long(999),
-  projectId: irrelevantLong,
+  id: "999",
+  projectId: irrelevantNumber,
   key: "reforge.secrets.encryption.key",
   changedBy: undefined,
   rows: [
@@ -23,8 +22,8 @@ const config: Config = {
     },
   ],
   allowableValues: [],
-  configType: ConfigType.CONFIG,
-  valueType: 2,
+  configType: ConfigType.Config,
+  valueType: ConfigValueType.String,
   sendToClientSdk: false,
 };
 
