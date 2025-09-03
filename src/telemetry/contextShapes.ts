@@ -1,6 +1,6 @@
 import type { ContextShape, ContextShapes } from "../proto";
 import type { Contexts } from "../types";
-import { encode } from "../parseProto";
+
 import type { ApiClient } from "../apiClient";
 import type { ContextUploadMode, SyncResult, Telemetry } from "./types";
 
@@ -108,7 +108,7 @@ export const contextShapes = (
         apiData.namespace = namespace;
       }
 
-      const body = encode("ContextShapes", apiData);
+      const body = JSON.stringify(apiData);
 
       const result = await apiClient.fetch({
         source: telemetryHost,

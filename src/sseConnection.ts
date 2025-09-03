@@ -2,7 +2,7 @@ import type Long from "long";
 import { makeHeaders } from "./makeHeaders";
 import type { Resolver } from "./resolver";
 import EventSource from "eventsource";
-import { parseConfigs } from "./parseProto";
+import { parseConfigsFromJSON } from "./jsonHelpers";
 
 interface ConstructorProps {
   apiKey: string;
@@ -33,7 +33,7 @@ class SSEConnection {
     this.channel = new EventSource(url, { headers });
 
     this.channel.onmessage = (message: any) => {
-      const newConfigs = parseConfigs(message.data);
+      const newConfigs = parseConfigsFromJSON(message.data);
 
       resolver.update(newConfigs.configs);
     };
