@@ -11,9 +11,12 @@ import rolloutFlag from "./fixtures/rolloutFlag";
 import envConfig from "./fixtures/envConfig";
 import propIsOneOf from "./fixtures/propIsOneOf";
 import propIsOneOfAndEndsWith from "./fixtures/propIsOneOfAndEndsWith";
-import { Reforge, MULTIPLE_INIT_WARNING } from "../reforge";
+import {
+  Reforge,
+  type TypedNodeServerConfigurationRaw,
+  MULTIPLE_INIT_WARNING,
+} from "../reforge";
 import type { Contexts, ProjectEnvId } from "../types";
-import type { GetValue } from "../unwrap";
 import {
   LogLevel,
   Criterion_CriterionOperator,
@@ -1414,7 +1417,7 @@ import { Reforge } from "../reforge";
 
       expect(reforge.get(targetKey)).toBe(initialValue);
 
-      let valueInListener: GetValue | undefined;
+      let valueInListener: TypedNodeServerConfigurationRaw[typeof targetKey];
 
       const listenerCallback = jest.fn(() => {
         valueInListener = reforge.get(targetKey);
