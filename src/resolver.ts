@@ -9,12 +9,11 @@ import type {
   OnNoDefault,
   ProjectEnvId,
 } from "./types";
-import type { Telemetry } from "./reforge";
+import type { Telemetry, TypedNodeServerConfigurationRaw } from "./reforge";
 import { REFORGE_DEFAULT_LOG_LEVEL } from "./reforge";
 
 import { mergeContexts, contextObjToMap } from "./mergeContexts";
 
-import type { GetValue } from "./unwrap";
 import { configValueType } from "./wrap";
 import { evaluate } from "./evaluate";
 
@@ -40,12 +39,12 @@ export interface ResolverAPI {
   ) => void;
   raw: (key: string) => MinimumConfig | undefined;
   set: (key: string, value: ConfigValue) => void;
-  get: (
-    key: string,
+  get: <K extends keyof TypedNodeServerConfigurationRaw>(
+    key: K,
     localContexts?: Contexts | ContextObj,
-    defaultValue?: GetValue | symbol,
+    defaultValue?: TypedNodeServerConfigurationRaw[K],
     onNoDefault?: OnNoDefault
-  ) => GetValue;
+  ) => TypedNodeServerConfigurationRaw[K];
   isFeatureEnabled: (key: string, contexts?: Contexts | ContextObj) => boolean;
   keys: () => string[];
   logger: (
@@ -215,12 +214,12 @@ class Resolver implements ResolverAPI {
     this.config.set(key, config);
   }
 
-  get(
-    key: string,
+  get<K extends keyof TypedNodeServerConfigurationRaw>(
+    key: K,
     localContexts?: Contexts | ContextObj,
-    defaultValue: GetValue | symbol = NOT_PROVIDED,
+    defaultValue: TypedNodeServerConfigurationRaw[K] = NOT_PROVIDED,
     onNoDefault: OnNoDefault = this.onNoDefault
-  ): GetValue {
+  ): TypedNodeServerConfigurationRaw[K] {
     const config = this.raw(key);
 
     if (config === undefined) {
@@ -236,7 +235,7 @@ class Resolver implements ResolverAPI {
         return undefined;
       }
 
-      return defaultValue as GetValue;
+      return defaultValue;
     }
 
     const mergedContexts = mergeContexts(

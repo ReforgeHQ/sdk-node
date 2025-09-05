@@ -26,7 +26,6 @@ import type {
 } from "./proto";
 import { wordLevelToNumber, parseLevel } from "./logger";
 import type { ValidLogLevelName, ValidLogLevel, makeLogger } from "./logger";
-import type { GetValue } from "./unwrap";
 import { SSEConnection } from "./sseConnection";
 import { TelemetryReporter } from "./telemetry/reporter";
 
@@ -54,12 +53,32 @@ function requireResolver(
   }
 }
 
+// @reforge-com/cli#generate will create interfaces into this namespace for Node to consume
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface NodeServerConfigurationRaw {}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface NodeServerConfigurationAccessor {}
+
+export type TypedNodeServerConfigurationRaw =
+  keyof NodeServerConfigurationRaw extends never
+    ? Record<string, unknown>
+    : {
+        [TypedFlagKey in keyof NodeServerConfigurationRaw]: NodeServerConfigurationRaw[TypedFlagKey];
+      };
+
+export type TypedNodeServerConfigurationAccessor =
+  keyof NodeServerConfigurationAccessor extends never
+    ? Record<string, unknown>
+    : {
+        [TypedFlagKey in keyof NodeServerConfigurationAccessor]: NodeServerConfigurationAccessor[TypedFlagKey];
+      };
+
 export interface ReforgeInterface {
-  get: (
-    key: string,
+  get: <T extends keyof TypedNodeServerConfigurationRaw>(
+    key: T,
     contexts?: Contexts | ContextObj,
-    defaultValue?: GetValue
-  ) => GetValue;
+    defaultValue?: TypedNodeServerConfigurationRaw[T]
+  ) => TypedNodeServerConfigurationRaw[T];
   isFeatureEnabled: (key: string, contexts?: Contexts | ContextObj) => boolean;
   logger: (
     loggerName: string,
@@ -406,11 +425,11 @@ class Reforge implements ReforgeInterface {
     return this.resolver.cloneWithContext(contexts);
   }
 
-  get(
-    key: string,
+  get<K extends keyof TypedNodeServerConfigurationRaw>(
+    key: K,
     contexts?: Contexts | ContextObj,
-    defaultValue?: GetValue
-  ): GetValue {
+    defaultValue?: TypedNodeServerConfigurationRaw[K]
+  ): TypedNodeServerConfigurationRaw[K] {
     requireResolver(this.resolver);
 
     return this.resolver.get(key, contexts, defaultValue);
