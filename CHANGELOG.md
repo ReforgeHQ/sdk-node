@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.0-pre.3 - 2025-08-04
+
+- Simplify type definitions and expose as overridable interfaces
+
 ## 0.0.0-pre.1 - 2025-08-04
 
 - Reforge rebrand
