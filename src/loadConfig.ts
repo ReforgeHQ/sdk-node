@@ -6,7 +6,6 @@ import { unwrapPrimitive } from "./unwrap";
 import type { Config, Configs, Contexts, ProjectEnvId } from "./types";
 import {
   parseConfigsFromObject,
-  keysToCamel,
   parseConfigsFromJSONString,
 } from "./jsonHelpers";
 
@@ -57,7 +56,7 @@ export async function loadConfig({
 }
 
 const extractDefaultContext = (
-  rawDefaultContext: Configs["defaultContext"]
+  rawDefaultContext: Configs["default_context"]
 ): Contexts => {
   const defaultContext: Contexts = new Map();
 
@@ -68,9 +67,7 @@ const extractDefaultContext = (
       for (const key of Object.keys(context.values ?? {})) {
         const { value } = unwrapPrimitive(key, context.values[key]);
 
-        const mappedKey = key === "userId" ? "user-id" : key;
-
-        values.set(mappedKey, value);
+        values.set(key, value);
       }
 
       defaultContext.set(context.type, values);
@@ -101,8 +98,7 @@ const loadConfigFromUrl = async ({
 
   if (response.status === 200) {
     const json = await response.json();
-    const protobufBackwardsCompatableKeys = keysToCamel(json);
-    const parsed = parseConfigsFromObject(protobufBackwardsCompatableKeys);
+    const parsed = parseConfigsFromObject(json);
     return parse(parsed);
   }
 
@@ -112,17 +108,17 @@ const loadConfigFromUrl = async ({
 };
 
 const parse = (parsed: Configs): Result => {
-  if (parsed.configServicePointer?.projectEnvId === undefined) {
+  if (parsed.config_service_pointer?.project_env_id === undefined) {
     throw new Error("No projectEnvId found in config.");
   }
 
   const configs = parsed.configs ?? [];
 
-  const defaultContext = extractDefaultContext(parsed.defaultContext);
+  const defaultContext = extractDefaultContext(parsed.default_context);
 
   return {
     configs,
-    projectEnvId: parsed.configServicePointer.projectEnvId,
+    projectEnvId: parsed.config_service_pointer.project_env_id,
     startAtId: maxBigIntId(configs.map((c) => c.id)),
     defaultContext,
   };

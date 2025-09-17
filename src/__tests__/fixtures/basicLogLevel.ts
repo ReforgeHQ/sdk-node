@@ -4,9 +4,9 @@ import { irrelevantNumber } from "../testHelpers";
 
 const config: Config = {
   id: "33",
-  projectId: irrelevantNumber,
+  project_id: irrelevantNumber,
   key: "log-level.some.component.path",
-  changedBy: undefined,
+  changed_by: undefined,
   rows: [
     {
       properties: {},
@@ -14,16 +14,16 @@ const config: Config = {
         {
           criteria: [],
           value: {
-            logLevel: LogLevel.Info,
+            log_level: LogLevel.Info,
           },
         },
       ],
     },
   ],
-  allowableValues: [],
-  configType: ConfigType.LogLevel,
-  valueType: ConfigValueType.LogLevel,
-  sendToClientSdk: false,
+  allowable_values: [],
+  config_type: ConfigType.LogLevel,
+  value_type: ConfigValueType.LogLevel,
+  send_to_client_sdk: false,
 };
 
 export default config;

@@ -7,18 +7,18 @@ import {
 
 const config: Config = {
   id: irrelevantNumberAsString,
-  projectId: irrelevantNumber,
+  project_id: irrelevantNumber,
   key: "basic.env",
-  changedBy: undefined,
+  changed_by: undefined,
   rows: [
     {
       properties: {},
-      projectEnvId: projectEnvIdUnderTest,
+      project_env_id: projectEnvIdUnderTest,
       values: [
         {
           criteria: [],
           value: {
-            stringList: {
+            string_list: {
               values: ["a", "b", "c", "d"],
             },
           },
@@ -31,7 +31,7 @@ const config: Config = {
         {
           criteria: [],
           value: {
-            stringList: {
+            string_list: {
               values: ["no"],
             },
           },
@@ -39,10 +39,10 @@ const config: Config = {
       ],
     },
   ],
-  configType: ConfigType.Config,
-  allowableValues: [],
-  valueType: ConfigValueType.StringList,
-  sendToClientSdk: false,
+  config_type: ConfigType.Config,
+  allowable_values: [],
+  value_type: ConfigValueType.StringList,
+  send_to_client_sdk: false,
 };
 
 export default config;

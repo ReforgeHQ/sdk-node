@@ -12,14 +12,14 @@ import {
 
 const config: Config = {
   id: irrelevantNumberAsString,
-  projectId: irrelevantNumber,
+  project_id: irrelevantNumber,
 
   key: "prop.is.not.one.of",
-  changedBy: undefined,
+  changed_by: undefined,
   rows: [
     {
       properties: {},
-      projectEnvId: irrelevantNumber,
+      project_env_id: irrelevantNumber,
       values: [
         {
           criteria: [],
@@ -31,15 +31,15 @@ const config: Config = {
     },
     {
       properties: {},
-      projectEnvId: projectEnvIdUnderTest,
+      project_env_id: projectEnvIdUnderTest,
       values: [
         {
           criteria: [
             {
-              propertyName: "user.country",
+              property_name: "user.country",
               operator: Criterion_CriterionOperator.PropIsNotOneOf,
-              valueToMatch: {
-                stringList: {
+              value_to_match: {
+                string_list: {
                   values: ["US", "UK"],
                 },
               },
@@ -58,7 +58,7 @@ const config: Config = {
       ],
     },
   ],
-  allowableValues: [
+  allowable_values: [
     {
       string: "correct",
     },
@@ -69,8 +69,8 @@ const config: Config = {
       string: "default",
     },
   ],
-  configType: ConfigType.Config,
-  valueType: ConfigValueType.String,
-  sendToClientSdk: false,
+  config_type: ConfigType.Config,
+  value_type: ConfigValueType.String,
+  send_to_client_sdk: false,
 };
 export default config;

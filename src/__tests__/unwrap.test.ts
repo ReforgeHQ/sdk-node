@@ -65,13 +65,13 @@ describe("unwrapValue", () => {
     });
   });
 
-  it("should return the stringList values as an array", () => {
+  it("should return the string_list values as an array", () => {
     [true, false].forEach((primitivesOnly) => {
-      const value: ConfigValue = { stringList: { values: ["a", "b", "c"] } };
+      const value: ConfigValue = { string_list: { values: ["a", "b", "c"] } };
       expect(
         unwrapValue({
           key,
-          kind: "stringList",
+          kind: "string_list",
           value,
           hashByPropertyValue: emptyHashByPropertyValue,
           primitivesOnly,
@@ -99,8 +99,8 @@ describe("unwrapValue", () => {
 
   it("should return a random weighted value with no context", () => {
     const value: ConfigValue = {
-      weightedValues: {
-        weightedValues: [
+      weighted_values: {
+        weighted_values: [
           { value: { string: "a" }, weight: 1 },
           { value: { string: "b" }, weight: 1 },
           { value: { string: "c" }, weight: 1 },
@@ -128,8 +128,8 @@ describe("unwrapValue", () => {
 
   it("should return a consistent weighted value with context", () => {
     const value: ConfigValue = {
-      weightedValues: {
-        weightedValues: [
+      weighted_values: {
+        weighted_values: [
           { value: { string: "a" }, weight: 1 },
           { value: { string: "b" }, weight: 1 },
           { value: { string: "c" }, weight: 1 },
@@ -166,7 +166,7 @@ describe("unwrapValue", () => {
         value,
         hashByPropertyValue: emptyHashByPropertyValue,
         primitivesOnly: false,
-        config: { valueType: ConfigValueType.String } as unknown as Config,
+        config: { value_type: ConfigValueType.String } as unknown as Config,
       })
     ).toStrictEqual({ value: "test" });
   });
@@ -185,7 +185,7 @@ describe("unwrapValue", () => {
         value,
         hashByPropertyValue: emptyHashByPropertyValue,
         primitivesOnly: false,
-        config: { valueType: ConfigValueType.Int } as unknown as Config,
+        config: { value_type: ConfigValueType.Int } as unknown as Config,
       })
     ).toStrictEqual({ value: 90210 });
   });
@@ -204,7 +204,7 @@ describe("unwrapValue", () => {
         value,
         hashByPropertyValue: emptyHashByPropertyValue,
         primitivesOnly: false,
-        config: { valueType: ConfigValueType.Double } as unknown as Config,
+        config: { value_type: ConfigValueType.Double } as unknown as Config,
       })
     ).toStrictEqual({ value: 3.14159265359 });
   });
@@ -224,7 +224,7 @@ describe("unwrapValue", () => {
           value,
           hashByPropertyValue: emptyHashByPropertyValue,
           primitivesOnly: false,
-          config: { valueType: ConfigValueType.Bool } as unknown as Config,
+          config: { value_type: ConfigValueType.Bool } as unknown as Config,
         })
       ).toStrictEqual({ value: true });
     });
@@ -239,13 +239,13 @@ describe("unwrapValue", () => {
           value,
           hashByPropertyValue: emptyHashByPropertyValue,
           primitivesOnly: false,
-          config: { valueType: ConfigValueType.Bool } as unknown as Config,
+          config: { value_type: ConfigValueType.Bool } as unknown as Config,
         })
       ).toStrictEqual({ value: false });
     });
   });
 
-  it("can unwrap a provided stringList", () => {
+  it("can unwrap a provided string_list", () => {
     const value = {
       provided: { lookup: "MY_ENV_VAR", source: ProvidedSource.EnvVar },
     };
@@ -261,7 +261,7 @@ describe("unwrapValue", () => {
           hashByPropertyValue: emptyHashByPropertyValue,
           primitivesOnly: false,
           config: {
-            valueType: ConfigValueType.StringList,
+            value_type: ConfigValueType.StringList,
           } as unknown as Config,
         })
       ).toStrictEqual({ value: ["a", "b", "c"] });
@@ -275,7 +275,7 @@ describe("unwrapValue", () => {
         value,
         hashByPropertyValue: emptyHashByPropertyValue,
         primitivesOnly: false,
-        config: { valueType: ConfigValueType.String } as unknown as Config,
+        config: { value_type: ConfigValueType.String } as unknown as Config,
       })
     ).toStrictEqual({ value: "test" });
   });

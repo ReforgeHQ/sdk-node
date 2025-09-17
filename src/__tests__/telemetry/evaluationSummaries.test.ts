@@ -295,7 +295,7 @@ describe("evaluationSummaries", () => {
                     count: 1,
                     reason: 0,
                     selectedValue: {
-                      stringList: {
+                      string_list: {
                         values: ["a", "b", "c", "d"],
                       },
                     },

@@ -17,7 +17,7 @@ export const valueType = (value: unknown): ConfigValueKey => {
   }
 
   if (Array.isArray(value)) {
-    return "stringList";
+    return "string_list";
   }
 
   return "string";
@@ -27,15 +27,15 @@ export const wrap = (value: unknown): Record<string, ConfigValue> => {
   const type = valueType(value);
 
   if (Array.isArray(value)) {
-    if (type !== "stringList") {
-      throw new Error(`Expected stringList, got ${type}`);
+    if (type !== "string_list") {
+      throw new Error(`Expected string_list, got ${type}`);
     }
 
     const values: string[] = value.map((v) => v.toString());
     const stringList: StringList = { values };
 
     return {
-      stringList: stringList as ConfigValue,
+      string_list: stringList as ConfigValue,
     };
   }
 
@@ -56,11 +56,11 @@ export const configValueType = (
       return ConfigValueType.Double;
     case "bool":
       return ConfigValueType.Bool;
-    case "stringList":
+    case "string_list":
       return ConfigValueType.StringList;
-    case "logLevel":
+    case "log_level":
       return ConfigValueType.LogLevel;
-    case "intRange":
+    case "int_range":
       return ConfigValueType.IntRange;
     case "json":
       return ConfigValueType.Json;

@@ -4,9 +4,9 @@ import { irrelevantNumberAsString, irrelevantNumber } from "../testHelpers";
 
 const config: Config = {
   id: irrelevantNumberAsString,
-  projectId: irrelevantNumber,
+  project_id: irrelevantNumber,
   key: "basic.flag",
-  changedBy: undefined,
+  changed_by: undefined,
   rows: [
     {
       properties: {},
@@ -20,10 +20,10 @@ const config: Config = {
       ],
     },
   ],
-  allowableValues: [{ bool: true }, { bool: false }],
-  configType: ConfigType.FeatureFlag,
-  valueType: ConfigValueType.Bool,
-  sendToClientSdk: false,
+  allowable_values: [{ bool: true }, { bool: false }],
+  config_type: ConfigType.FeatureFlag,
+  value_type: ConfigValueType.Bool,
+  send_to_client_sdk: false,
 };
 
 export default config;

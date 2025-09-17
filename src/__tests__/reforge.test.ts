@@ -113,19 +113,19 @@ describe("reforge", () => {
 
         const configToBeDeleted: Config = {
           id: "999",
-          projectId: irrelevantNumber,
+          project_id: irrelevantNumber,
           key: deletionConfig.key,
-          changedBy: undefined,
+          changed_by: undefined,
           rows: [
             {
               properties: {},
               values: [{ criteria: [], value: { int: BigInt(presentValue) } }],
             },
           ],
-          allowableValues: [],
-          configType: ConfigType.Config,
-          valueType: ConfigValueType.Int,
-          sendToClientSdk: false,
+          allowable_values: [],
+          config_type: ConfigType.Config,
+          value_type: ConfigValueType.Int,
+          send_to_client_sdk: false,
         };
 
         reforge.setConfig(
@@ -786,7 +786,7 @@ describe("reforge", () => {
       reforge.setConfig(configs, projectEnvIdUnderTest, new Map());
 
       expect(jsonStringifyWithBigInt(reforge.raw("basic.value"))).toStrictEqual(
-        '{"id":"999","projectId":-1,"key":"basic.value","rows":[{"properties":{},"values":[{"criteria":[],"value":{"int":"42"}}]}],"allowableValues":[],"configType":"CONFIG","valueType":"INT","sendToClientSdk":false}'
+        '{"id":"999","project_id":-1,"key":"basic.value","rows":[{"properties":{},"values":[{"criteria":[],"value":{"int":"42"}}]}],"allowable_values":[],"config_type":"CONFIG","value_type":"INT","send_to_client_sdk":false}'
       );
     });
   });
@@ -1032,12 +1032,12 @@ describe("reforge", () => {
           {
             criteria: [
               {
-                propertyName: "user.country",
+                property_name: "user.country",
                 operator: Criterion_CriterionOperator.PropIsOneOf,
-                valueToMatch: { stringList: { values: ["US"] } },
+                value_to_match: { string_list: { values: ["US"] } },
               },
             ],
-            value: { logLevel: LogLevel.Debug },
+            value: { log_level: LogLevel.Debug },
           },
         ],
       });
@@ -1115,17 +1115,17 @@ describe("reforge", () => {
           {
             criteria: [
               {
-                propertyName: "user.country",
+                property_name: "user.country",
                 operator: Criterion_CriterionOperator.PropIsOneOf,
-                valueToMatch: {
-                  stringList: {
+                value_to_match: {
+                  string_list: {
                     values: ["US"],
                   },
                 },
               },
             ],
             value: {
-              logLevel: LogLevel.Debug,
+              log_level: LogLevel.Debug,
             },
           },
         ],
@@ -1276,23 +1276,22 @@ import { Reforge } from "../reforge";
         enableSSE: false,
       });
 
-      const configData = {
+      const minimalConfigForInit: Config = {
         id: "1",
         key: "initial.key.for.notifier.test",
-        projectId: irrelevantNumber,
-        configType: ConfigType.Config,
+        project_id: irrelevantNumber,
+        config_type: ConfigType.Config,
         rows: [
           {
             properties: {},
             values: [{ criteria: [], value: { string: "initial_value" } }],
           },
         ],
-        valueType: ConfigValueType.String,
-        sendToClientSdk: false,
-        allowableValues: [] as ConfigValue[],
-        changedBy: undefined,
+        value_type: ConfigValueType.String,
+        send_to_client_sdk: false,
+        allowable_values: [] as ConfigValue[],
+        changed_by: undefined,
       };
-      const minimalConfigForInit: Config = configData;
 
       const projectEnvIdForTest: ProjectEnvId = irrelevantNumber; // projectEnvId is now a Long
 
@@ -1309,18 +1308,18 @@ import { Reforge } from "../reforge";
       const newConfig: Config = {
         id: "1001",
         key: "new.config.key",
-        projectId: irrelevantNumber,
-        configType: ConfigType.Config,
+        project_id: irrelevantNumber,
+        config_type: ConfigType.Config,
         rows: [
           {
             properties: {},
             values: [{ criteria: [], value: { string: "new_value" } }],
           },
         ],
-        valueType: ConfigValueType.String,
-        sendToClientSdk: true,
-        allowableValues: [],
-        changedBy: undefined,
+        value_type: ConfigValueType.String,
+        send_to_client_sdk: true,
+        allowable_values: [],
+        changed_by: undefined,
       };
 
       initialResolver.update([newConfig]);
@@ -1348,7 +1347,7 @@ import { Reforge } from "../reforge";
           properties: r.properties ?? {},
           values: r.values.map((v) => ({ ...v, criteria: v.criteria ?? [] })),
         })),
-        valueType: basicConfig.valueType,
+        value_type: basicConfig.value_type,
       };
       resolver.update([nonChangingConfig]);
       expect(listenerCallback).not.toHaveBeenCalled();
@@ -1362,7 +1361,7 @@ import { Reforge } from "../reforge";
           properties: r.properties ?? {},
           values: r.values.map((v) => ({ ...v, criteria: v.criteria ?? [] })),
         })),
-        valueType: basicConfig.valueType,
+        value_type: basicConfig.value_type,
       };
       resolver.update([nonLongIdConfig]);
       expect(listenerCallback).not.toHaveBeenCalled();
@@ -1410,7 +1409,7 @@ import { Reforge } from "../reforge";
             values: [{ criteria: [], value: { string: initialValue } }],
           },
         ],
-        valueType: ConfigValueType.String,
+        value_type: ConfigValueType.String,
       };
       (reforge as any)._createOrReconfigureResolver(
         [initialConfig],
@@ -1437,7 +1436,7 @@ import { Reforge } from "../reforge";
             values: [{ criteria: [], value: { string: updatedValueString } }],
           },
         ],
-        valueType: ConfigValueType.String,
+        value_type: ConfigValueType.String,
       };
 
       const resolver = (reforge as any).resolver;

@@ -22,21 +22,21 @@ const getHashByPropertyValue = (
   value: ConfigValue | undefined,
   contexts: Contexts
 ): HashByPropertyValue => {
-  if (value?.weightedValues === undefined || value?.weightedValues === null) {
+  if (value?.weighted_values === undefined || value?.weighted_values === null) {
     return undefined;
   }
 
   return contextLookup(
     contexts,
-    value.weightedValues.hashByPropertyName
+    value.weighted_values.hash_by_property_name
   )?.toString();
 };
 
 const getArrayifiedContextValue = (
   contexts: any,
-  criterion: { propertyName: string }
+  criterion: { property_name: string }
 ): string[] => {
-  const result = contextLookup(contexts, criterion.propertyName);
+  const result = contextLookup(contexts, criterion.property_name);
 
   if (Array.isArray(result)) {
     return result.map((item) => item.toString());
@@ -48,9 +48,11 @@ const getArrayifiedContextValue = (
 const propIsOneOf = (criterion: Criterion, contexts: Contexts): boolean => {
   const contextValue: string[] = getArrayifiedContextValue(contexts, criterion);
 
-  return (criterion?.valueToMatch?.stringList?.values ?? []).some((value) => {
-    return contextValue.includes(value.toString());
-  });
+  return (criterion?.value_to_match?.string_list?.values ?? []).some(
+    (value) => {
+      return contextValue.includes(value.toString());
+    }
+  );
 };
 
 const propMatchesOneOf = (
@@ -58,10 +60,10 @@ const propMatchesOneOf = (
   contexts: Contexts,
   matcher: (contextValue: string, value: string) => boolean
 ): boolean => {
-  return (criterion.valueToMatch?.stringList?.values ?? []).some((value) => {
+  return (criterion.value_to_match?.string_list?.values ?? []).some((value) => {
     const contextValue = contextLookup(
       contexts,
-      criterion.propertyName
+      criterion.property_name
     )?.toString();
     // Explicitly check for non-null and non-empty contextValue
     return (
@@ -104,7 +106,7 @@ const inSegment = (
   contexts: Contexts,
   resolver: Resolver
 ): boolean => {
-  const segmentKey = criterion.valueToMatch?.string;
+  const segmentKey = criterion.value_to_match?.string;
 
   if (segmentKey === undefined) {
     return false;
@@ -128,10 +130,10 @@ const inSegment = (
 };
 
 const inIntRange = (criterion: Criterion, contexts: Contexts): boolean => {
-  const start = criterion.valueToMatch?.intRange?.start;
-  const end = criterion.valueToMatch?.intRange?.end;
+  const start = criterion.value_to_match?.int_range?.start;
+  const end = criterion.value_to_match?.int_range?.end;
 
-  const comparable = contextLookup(contexts, criterion.propertyName);
+  const comparable = contextLookup(contexts, criterion.property_name);
 
   if (start === undefined || end === undefined || comparable === undefined) {
     return false;
@@ -162,8 +164,8 @@ const evaluateRegexCriterion = (
   contexts: Contexts,
   reverseIt: boolean
 ): boolean => {
-  const testValue = contextLookup(contexts, criterion.propertyName);
-  const pattern = criterion.valueToMatch?.string;
+  const testValue = contextLookup(contexts, criterion.property_name);
+  const pattern = criterion.value_to_match?.string;
 
   if (!(typeof testValue === "string" && typeof pattern === "string")) {
     return false;
@@ -181,8 +183,8 @@ const evaluateSemverCriterion = (
   contexts: Contexts,
   comparisonFn: (compareResult: number) => boolean
 ): boolean => {
-  const leftSide = contextLookup(contexts, criterion.propertyName);
-  const rightSide = criterion.valueToMatch?.string;
+  const leftSide = contextLookup(contexts, criterion.property_name);
+  const rightSide = criterion.value_to_match?.string;
 
   if (!(typeof leftSide === "string" && typeof rightSide === "string")) {
     return false;
@@ -202,10 +204,10 @@ const evaluateNumericCriterion = (
   comparisonFn: (compareResult: number) => boolean
 ): boolean => {
   const contextValue = normalizeNumber(
-    contextLookup(contexts, criterion.propertyName)
+    contextLookup(contexts, criterion.property_name)
   );
   const configValue = normalizeNumber(
-    unwrap({ key: "ignored", value: criterion.valueToMatch }).value
+    unwrap({ key: "ignored", value: criterion.value_to_match }).value
   );
 
   if (configValue == null || contextValue == null) {
@@ -264,10 +266,10 @@ const evaluateDateCriterion = (
 ): boolean => {
   // Retrieve the context value (which might be a timestamp in millis or an HTTP date string)
   const contextMillis = dateValueToBigInt(
-    contextLookup(contexts, criterion.propertyName)
+    contextLookup(contexts, criterion.property_name)
   );
   const configMills = dateValueToBigInt(
-    unwrap({ key: "why", value: criterion.valueToMatch }).value
+    unwrap({ key: "why", value: criterion.value_to_match }).value
   );
   if (
     typeof configMills === "undefined" ||
@@ -291,7 +293,7 @@ const allCriteriaMatch = (
   return value.criteria.every((criterion) => {
     switch (criterion.operator) {
       case Criterion_CriterionOperator.HierarchicalMatch:
-        return criterion.valueToMatch?.string === namespace;
+        return criterion.value_to_match?.string === namespace;
       case Criterion_CriterionOperator.PropIsOneOf:
         return propIsOneOf(criterion, contexts);
       case Criterion_CriterionOperator.PropIsNotOneOf:
@@ -457,8 +459,8 @@ export const evaluate = ({
   return {
     configKey: config.key,
     configId: config.id,
-    configType: config.configType,
-    valueType: config.valueType,
+    configType: config.config_type,
+    valueType: config.value_type,
     conditionalValueIndex,
     configRowIndex,
     unwrappedValue,

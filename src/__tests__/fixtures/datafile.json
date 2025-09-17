@@ -2,13 +2,13 @@
   "configs": [
     {
       "id": "17017945481107357",
-      "projectId": "124",
+      "project_id": "124",
       "key": "from.the.datafile",
-      "changedBy": { "email": "jeffrey.chupp@reforge.com" },
+      "changed_by": { "email": "jeffrey.chupp@reforge.com" },
       "rows": [{ "values": [{ "value": { "string": "it.works" } }] }],
-      "configType": "CONFIG",
-      "valueType": "STRING"
+      "config_type": "CONFIG",
+      "value_type": "STRING"
     }
   ],
-  "configServicePointer": { "projectId": "124", "projectEnvId": "143" }
+  "config_service_pointer": { "project_id": "124", "project_env_id": "143" }
 }

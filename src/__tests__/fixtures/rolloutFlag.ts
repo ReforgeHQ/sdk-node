@@ -7,13 +7,13 @@ import {
 
 const config: Config = {
   id: irrelevantNumberAsString,
-  projectId: irrelevantNumber,
+  project_id: irrelevantNumber,
   key: "rollout.flag",
-  changedBy: undefined,
+  changed_by: undefined,
   rows: [
     {
       properties: {},
-      projectEnvId: irrelevantNumber,
+      project_env_id: irrelevantNumber,
       values: [
         {
           criteria: [],
@@ -25,13 +25,13 @@ const config: Config = {
     },
     {
       properties: {},
-      projectEnvId: projectEnvIdUnderTest,
+      project_env_id: projectEnvIdUnderTest,
       values: [
         {
           criteria: [],
           value: {
-            weightedValues: {
-              weightedValues: [
+            weighted_values: {
+              weighted_values: [
                 {
                   weight: 90,
                   value: {
@@ -45,14 +45,14 @@ const config: Config = {
                   },
                 },
               ],
-              hashByPropertyName: "user.trackingId",
+              hash_by_property_name: "user.trackingId",
             },
           },
         },
       ],
     },
   ],
-  allowableValues: [
+  allowable_values: [
     {
       bool: false,
     },
@@ -60,9 +60,9 @@ const config: Config = {
       bool: true,
     },
   ],
-  configType: ConfigType.FeatureFlag,
-  valueType: ConfigValueType.Bool,
-  sendToClientSdk: false,
+  config_type: ConfigType.FeatureFlag,
+  value_type: ConfigValueType.Bool,
+  send_to_client_sdk: false,
 };
 
 export default config;

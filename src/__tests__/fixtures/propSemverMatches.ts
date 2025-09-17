@@ -17,9 +17,9 @@ const createConfig = (
 ): Config => {
   return {
     id: "999",
-    projectId: irrelevantNumber,
+    project_id: irrelevantNumber,
     key,
-    changedBy: undefined,
+    changed_by: undefined,
     rows: [
       {
         properties: {},
@@ -27,9 +27,9 @@ const createConfig = (
           {
             criteria: [
               {
-                propertyName,
+                property_name: propertyName,
                 operator,
-                valueToMatch: {
+                value_to_match: {
                   string: valueToMatch,
                 },
               },
@@ -47,10 +47,10 @@ const createConfig = (
         ],
       },
     ],
-    allowableValues: [],
-    configType: ConfigType.Config,
-    valueType: ConfigValueType.Bool,
-    sendToClientSdk: false,
+    allowable_values: [],
+    config_type: ConfigType.Config,
+    value_type: ConfigValueType.Bool,
+    send_to_client_sdk: false,
   };
 };
 
