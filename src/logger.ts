@@ -1,48 +1,31 @@
 import type { ContextObj, Contexts } from "./types";
 import { type Resolver } from "./resolver";
+import { LogLevel } from "./types";
+import { jsonStringifyWithBigInt } from "./bigIntUtils";
 
 export const PREFIX = "log-level.";
 
-const validLogLevelNames = [
-  "trace",
-  "debug",
-  "info",
-  "warn",
-  "error",
-  "fatal",
-] as const;
+// Create a union type of the enum values
+type LogLevelValue = `${LogLevel}`;
+// Use Lowercase utility type to get lowercase versions
+export type LogLevelMethodName = Lowercase<LogLevelValue>;
 
-export type ValidLogLevelName = (typeof validLogLevelNames)[number];
-
-export type ValidLogLevel = 1 | 2 | 3 | 5 | 6 | 9;
-
-const WORD_LEVEL_LOOKUP: Record<ValidLogLevelName, ValidLogLevel> = {
-  trace: 1,
-  debug: 2,
-  info: 3,
-  warn: 5,
-  error: 6,
-  fatal: 9,
-};
-
-export const wordLevelToNumber = (
-  level: ValidLogLevelName
-): ValidLogLevel | undefined => {
-  return WORD_LEVEL_LOOKUP[level];
-};
-
-export const parseLevel = (
-  level: ValidLogLevel | ValidLogLevelName | undefined
-): ValidLogLevel | undefined => {
-  if (typeof level === "number") {
-    return level;
-  }
-
-  if (typeof level === "string") {
-    return wordLevelToNumber(level);
-  }
-
-  return undefined;
+export const LOG_LEVEL_RANK_LOOKUP: Record<
+  LogLevel | LogLevelMethodName,
+  number
+> = {
+  trace: 0,
+  debug: 1,
+  info: 2,
+  warn: 3,
+  error: 4,
+  fatal: 5,
+  TRACE: 0,
+  DEBUG: 1,
+  INFO: 2,
+  WARN: 3,
+  ERROR: 4,
+  FATAL: 5,
 };
 
 export const shouldLog = ({
@@ -53,23 +36,31 @@ export const shouldLog = ({
   contexts,
 }: {
   loggerName: string;
-  desiredLevel: ValidLogLevel;
-  defaultLevel: ValidLogLevel;
+  desiredLevel: LogLevel;
+  defaultLevel: LogLevel;
   resolver: Resolver;
   contexts?: Contexts | ContextObj;
 }): boolean => {
   let loggerNameWithPrefix = PREFIX + loggerName;
 
   while (loggerNameWithPrefix.includes(".")) {
-    const resolvedLevel = resolver.get(
+    let resolvedLevel = resolver.get(
       loggerNameWithPrefix,
       contexts,
       undefined,
       "ignore"
-    );
+    ) as LogLevel | undefined;
+
+    if (resolvedLevel && !Object.values(LogLevel).includes(resolvedLevel)) {
+      console.warn("Invalid log level for logger", resolvedLevel);
+      resolvedLevel = undefined;
+    }
 
     if (resolvedLevel !== undefined) {
-      return Number(resolvedLevel) <= desiredLevel;
+      return (
+        LOG_LEVEL_RANK_LOOKUP[resolvedLevel] <=
+        LOG_LEVEL_RANK_LOOKUP[desiredLevel]
+      );
     }
 
     loggerNameWithPrefix = loggerNameWithPrefix.slice(
@@ -78,11 +69,13 @@ export const shouldLog = ({
     );
   }
 
-  return defaultLevel <= desiredLevel;
+  return (
+    LOG_LEVEL_RANK_LOOKUP[defaultLevel] <= LOG_LEVEL_RANK_LOOKUP[desiredLevel]
+  );
 };
 
 type MadeLogger = Record<
-  ValidLogLevelName,
+  LogLevelMethodName,
   (
     message: unknown,
     contexts?: Contexts | ContextObj | undefined
@@ -96,19 +89,16 @@ export const makeLogger = ({
   contexts: makeLoggerLevelContexts,
 }: {
   loggerName: string;
-  defaultLevel: ValidLogLevel;
+  defaultLevel: LogLevel;
   resolver: Resolver;
   contexts?: Contexts | ContextObj;
 }): MadeLogger => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const logger = {} as MadeLogger;
 
-  validLogLevelNames.forEach((levelName) => {
-    const desiredLevel = parseLevel(levelName);
-
-    if (desiredLevel === undefined) {
-      throw new Error(`Invalid level: ${levelName}`);
-    }
+  Object.values(LogLevel).forEach((sourceLevelName) => {
+    // This is a safe cast, as LogLevelMethodNames is directly derived from LogLevel
+    const levelName = sourceLevelName.toLowerCase() as LogLevelMethodName;
 
     const printableName = (
       levelName + " ".repeat(5 - levelName.length)
@@ -118,13 +108,15 @@ export const makeLogger = ({
       if (
         resolver.shouldLog({
           loggerName,
-          desiredLevel,
+          desiredLevel: sourceLevelName,
           defaultLevel,
           contexts: makeLoggerLevelContexts,
         })
       ) {
         const printableMessage =
-          typeof message === "string" ? message : JSON.stringify(message);
+          typeof message === "string"
+            ? message
+            : jsonStringifyWithBigInt(message);
 
         const output = `${printableName} ${loggerName}: ${printableMessage}`;
         console.log(output);

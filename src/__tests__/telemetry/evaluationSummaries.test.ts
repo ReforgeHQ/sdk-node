@@ -1,17 +1,15 @@
-import Long from "long";
 import { Reforge } from "../../reforge";
 import { evaluationSummaries, stub } from "../../telemetry/evaluationSummaries";
 import { Resolver } from "../../resolver";
-import type { Config } from "../../proto";
+import type { Config, Contexts } from "../../types";
 import { contextObjToMap } from "../../mergeContexts";
-import type { Contexts } from "../../types";
 
 import {
   emptyContexts,
   projectEnvIdUnderTest,
   mockApiClient,
   irrelevant,
-  irrelevantLong,
+  irrelevantNumberAsString,
 } from "../testHelpers";
 
 import { evaluate, type Evaluation } from "../../evaluate";
@@ -103,7 +101,7 @@ describe("evaluationSummaries", () => {
     expect(aggregator.data).toEqual(
       new Map([
         [
-          '["prop.is.one.of","1"]',
+          '["prop.is.one.of","CONFIG"]',
           new Map([
             ['["991",1,0,"string","correct",null]', 2],
             ['["991",4,0,"string","default",null]', 3],
@@ -112,7 +110,7 @@ describe("evaluationSummaries", () => {
           ]),
         ],
         [
-          '["prop.is.one.of.jsonValue","1"]',
+          '["prop.is.one.of.jsonValue","CONFIG"]',
           new Map([
             ['["992",1,0,"json",{"result":"correct"},null]', 2],
             ['["992",4,0,"json",{"result":"default"},null]', 1],
@@ -133,7 +131,7 @@ describe("evaluationSummaries", () => {
     expect(aggregator.data).toEqual(
       new Map([
         [
-          '["prop.is.one.of","1"]',
+          '["prop.is.one.of","CONFIG"]',
           new Map([
             ['["991",1,0,"string","correct",null]', 2],
             ['["991",4,0,"string","default",null]', 4],
@@ -142,14 +140,17 @@ describe("evaluationSummaries", () => {
           ]),
         ],
         [
-          '["prop.is.one.of.jsonValue","1"]',
+          '["prop.is.one.of.jsonValue","CONFIG"]',
           new Map([
             ['["992",1,0,"json",{"result":"correct"},null]', 2],
             ['["992",4,0,"json",{"result":"default"},null]', 1],
             ['["992",3,0,"json",{"result":"encrypted"},null]', 1],
           ]),
         ],
-        ['["basic.value","1"]', new Map([['["999",0,0,"int",42,null]', 1]])],
+        [
+          '["basic.value","CONFIG"]',
+          new Map([['["999",0,0,"int",42,null]', 1]]),
+        ],
       ])
     );
   });
@@ -169,10 +170,10 @@ describe("evaluationSummaries", () => {
     expect(aggregator.data).toStrictEqual(
       new Map([
         [
-          '["rollout.flag","2"]',
+          '["rollout.flag","FEATURE_FLAG"]',
           new Map([
-            ['["4294967295",0,0,"bool",false,0]', 2],
-            ['["4294967295",0,0,"bool",true,1]', 1],
+            ['["-1",0,0,"bool",false,0]', 2],
+            ['["-1",0,0,"bool",true,1]', 1],
           ]),
         ],
       ])
@@ -220,60 +221,60 @@ describe("evaluationSummaries", () => {
       events: [
         {
           summaries: {
-            start: Long.fromNumber(start),
-            end: Long.fromNumber(Date.now()),
+            start,
+            end: Date.now(),
             summaries: [
               {
                 key: "prop.is.one.of",
-                type: "1",
+                type: "CONFIG",
                 counters: [
                   {
-                    configId: Long.fromNumber(991),
+                    configId: "991",
                     conditionalValueIndex: 1,
                     configRowIndex: 0,
                     selectedValue: {
                       string: "correct",
                     },
-                    count: Long.fromNumber(2),
+                    count: 2,
                     reason: 0,
                   },
                   {
-                    configId: Long.fromNumber(991),
+                    configId: "991",
                     conditionalValueIndex: 4,
                     configRowIndex: 0,
                     selectedValue: {
                       string: "default",
                     },
-                    count: Long.fromNumber(3),
+                    count: 3,
                     reason: 0,
                   },
                 ],
               },
               {
                 key: "basic.value",
-                type: "1",
+                type: "CONFIG",
                 counters: [
                   {
-                    configId: Long.fromNumber(999),
+                    configId: "999",
                     conditionalValueIndex: 0,
                     configRowIndex: 0,
                     selectedValue: {
                       int: 42,
                     },
-                    count: Long.fromNumber(1),
+                    count: 1,
                     reason: 0,
                   },
                 ],
               },
               {
                 key: "prop.is.one.of.jsonValue",
-                type: "1",
+                type: "CONFIG",
                 counters: [
                   {
                     conditionalValueIndex: 4,
-                    configId: Long.fromNumber(992),
+                    configId: "992",
                     configRowIndex: 0,
-                    count: Long.fromNumber(1),
+                    count: 1,
                     reason: 0,
                     selectedValue: {
                       json: {
@@ -285,16 +286,16 @@ describe("evaluationSummaries", () => {
               },
               {
                 key: "basic.env",
-                type: "1",
+                type: "CONFIG",
                 counters: [
                   {
                     conditionalValueIndex: 0,
-                    configId: irrelevantLong,
+                    configId: irrelevantNumberAsString,
                     configRowIndex: 0,
-                    count: Long.fromNumber(1),
+                    count: 1,
                     reason: 0,
                     selectedValue: {
-                      stringList: {
+                      string_list: {
                         values: ["a", "b", "c", "d"],
                       },
                     },
@@ -337,7 +338,10 @@ describe("evaluationSummaries", () => {
 
       expect(reforge.telemetry.evaluationSummaries.data).toStrictEqual(
         new Map([
-          ['["basic.value","1"]', new Map([['["999",0,0,"int",42,null]', 1]])],
+          [
+            '["basic.value","CONFIG"]',
+            new Map([['["999",0,0,"int",42,null]', 1]]),
+          ],
         ])
       );
     });
@@ -358,7 +362,7 @@ describe("evaluationSummaries", () => {
   });
 
   it("preserves large config IDs without precision loss", async () => {
-    const largeConfigId = Long.fromString("17537369033474523");
+    const largeConfigId = "17537369033474523";
     const largeConfig: Config = {
       ...basicConfig,
       id: largeConfigId,
@@ -382,6 +386,6 @@ describe("evaluationSummaries", () => {
     const counter =
       syncResult.dataSent.events[0].summaries?.summaries[0].counters[0];
     expect(counter?.configId?.toString()).toBe("17537369033474523");
-    expect(counter?.configId?.equals(largeConfigId)).toBe(true);
+    expect(counter?.configId).toEqual(largeConfigId);
   });
 });

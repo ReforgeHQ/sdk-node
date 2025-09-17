@@ -1,18 +1,16 @@
-import Long from "long";
-import type { Logger, Loggers } from "../proto";
+import { type Logger, type Loggers, LogLevel } from "../types";
 import type { ApiClient } from "../apiClient";
-import { encode } from "../parseProto";
-import type { ValidLogLevelName } from "../logger";
-import { now } from "./reporter";
-import type { SyncResult, Telemetry } from "./types";
 
-const ENDPOINT = "/api/v1/known-loggers";
+import type { SyncResult, Telemetry } from "./types";
+import { jsonStringifyWithBigInt } from "../bigIntUtils";
+
+const ENDPOINT = "/api/v1/telemetry";
 
 const MAX_DATA_SIZE = 10000;
 
 type KnownLogger = Telemetry & {
   data: Record<string, Record<string, number>>;
-  push: (loggerName: string, severity: number) => void;
+  push: (loggerName: string, severity: LogLevel) => void;
 };
 
 export const stub: KnownLogger = {
@@ -25,15 +23,17 @@ export const stub: KnownLogger = {
 
 type Pluralize<S extends string> = `${S}s`;
 
-export type LoggerLevelName = Pluralize<ValidLogLevelName>;
+export type LoggerLevelName = Pluralize<
+  "trace" | "debug" | "info" | "warn" | "error" | "fatal"
+>;
 
-const NUMBER_LEVEL_LOOKUP: Record<string, LoggerLevelName> = {
-  1: "traces",
-  2: "debugs",
-  3: "infos",
-  5: "warns",
-  6: "errors",
-  9: "fatals",
+const NUMBER_LEVEL_LOOKUP: Record<LogLevel, LoggerLevelName> = {
+  [LogLevel.Trace]: "traces",
+  [LogLevel.Debug]: "debugs",
+  [LogLevel.Info]: "infos",
+  [LogLevel.Warn]: "warns",
+  [LogLevel.Error]: "errors",
+  [LogLevel.Fatal]: "fatals",
 };
 
 export const knownLoggers = (
@@ -48,8 +48,8 @@ export const knownLoggers = (
     return stub;
   }
 
-  const data: Record<string, Record<string, number>> = {};
-  let startAt: Long | undefined;
+  const data: Record<string, Partial<Record<LogLevel, number>>> = {};
+  let startAt: number | undefined;
 
   return {
     enabled: true,
@@ -58,12 +58,12 @@ export const knownLoggers = (
 
     timeout: undefined,
 
-    push(loggerName: string, severity: number) {
+    push(loggerName: string, severity: LogLevel) {
       if (telemetryHost === undefined) {
         return;
       }
 
-      startAt = startAt ?? now();
+      startAt = startAt ?? Date.now();
 
       if (data[loggerName] == null) {
         if (Object.keys(data).length >= maxDataSize) {
@@ -73,9 +73,7 @@ export const knownLoggers = (
         data[loggerName] = {};
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       (data[loggerName] as Record<string, number>)[severity] =
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         ((data[loggerName] as Record<string, number>)[severity] ?? 0) + 1;
     },
 
@@ -94,10 +92,10 @@ export const knownLoggers = (
 
         Object.keys(record).forEach((severity) => {
           const key: LoggerLevelName | undefined =
-            NUMBER_LEVEL_LOOKUP[severity];
+            NUMBER_LEVEL_LOOKUP[severity as LogLevel];
 
           if (key !== undefined) {
-            logger[key] = Long.fromNumber(record[severity] ?? 0);
+            logger[key] = record[severity as LogLevel] ?? 0;
           }
         });
 
@@ -106,8 +104,8 @@ export const knownLoggers = (
 
       const apiData: Loggers = {
         loggers,
-        startAt: startAt ?? Long.fromNumber(Date.now()),
-        endAt: now(),
+        startAt: startAt ?? Date.now(),
+        endAt: Date.now(),
         instanceHash,
       };
 
@@ -120,7 +118,7 @@ export const knownLoggers = (
         path: ENDPOINT,
         options: {
           method: "POST",
-          body: encode("Loggers", apiData),
+          body: jsonStringifyWithBigInt({ loggers: apiData }),
         },
       });
 

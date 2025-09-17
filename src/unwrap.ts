@@ -1,19 +1,19 @@
 import { createHash } from "crypto";
 import {
-  Config_ValueType,
+  ConfigValueType,
   type ConfigValue,
   type Provided,
   ProvidedSource,
   type WeightedValue,
-} from "./proto";
-import type { HashByPropertyValue } from "./types";
+  type HashByPropertyValue,
+} from "./types";
 import { isNonNullable } from "./types";
 import type { MinimumConfig, Resolver } from "./resolver";
 import { decrypt } from "./encryption";
 import { durationToMilliseconds } from "./duration";
 
 import murmurhash from "murmurhash";
-import Long from "long";
+import { isBigInt, jsonStringifyWithBigInt } from "./bigIntUtils";
 
 const CONFIDENTIAL_PREFIX = "*****";
 
@@ -26,6 +26,7 @@ export const makeConfidential = (secret: string): string => {
 export type GetValue =
   | string
   | number
+  | bigint
   | boolean
   | string[]
   | object
@@ -49,7 +50,7 @@ const kindOf = (
   value: ConfigValue
 ): keyof ConfigValue | undefined => {
   const kind: keyof ConfigValue | undefined =
-    configValueTypeToString(config?.valueType) ??
+    configValueTypeToString(config?.value_type) ??
     (Object.keys(value)[0] as keyof ConfigValue);
   return kind;
 };
@@ -83,10 +84,10 @@ const unwrapWeightedValues = (
   value: ConfigValue,
   hashByPropertyValue: HashByPropertyValue
 ): UnwrappedValue => {
-  const values = value.weightedValues?.weightedValues;
+  const values = value.weighted_values?.weighted_values;
 
   if (values === undefined) {
-    console.warn(`Unexpected value ${JSON.stringify(value)}`);
+    console.warn(`Unexpected value ${jsonStringifyWithBigInt(value)}`);
     return NULL_UNWRAPPED_VALUE;
   }
 
@@ -119,7 +120,7 @@ const providedValue = (
   }
 
   if (
-    provided.source === ProvidedSource.ENV_VAR &&
+    provided.source === ProvidedSource.EnvVar &&
     provided.lookup !== undefined
   ) {
     const envVar = process.env[provided.lookup];
@@ -137,26 +138,26 @@ const providedValue = (
 export const TRUE_VALUES = new Set(["true", "1", "t", "yes"]);
 
 export const configValueTypeToString = (
-  valueType: Config_ValueType | undefined
+  valueType: ConfigValueType | undefined
 ): keyof ConfigValue | undefined => {
   switch (valueType) {
-    case Config_ValueType.STRING:
+    case ConfigValueType.String:
       return "string";
-    case Config_ValueType.INT:
+    case ConfigValueType.Int:
       return "int";
-    case Config_ValueType.DOUBLE:
+    case ConfigValueType.Double:
       return "double";
-    case Config_ValueType.BOOL:
+    case ConfigValueType.Bool:
       return "bool";
-    case Config_ValueType.STRING_LIST:
-      return "stringList";
-    case Config_ValueType.LOG_LEVEL:
-      return "logLevel";
-    case Config_ValueType.INT_RANGE:
-      return "intRange";
-    case Config_ValueType.DURATION:
+    case ConfigValueType.StringList:
+      return "string_list";
+    case ConfigValueType.LogLevel:
+      return "log_level";
+    case ConfigValueType.IntRange:
+      return "int_range";
+    case ConfigValueType.Duration:
       return "duration";
-    case Config_ValueType.JSON:
+    case ConfigValueType.Json:
       return "json";
     default:
       return undefined;
@@ -164,25 +165,25 @@ export const configValueTypeToString = (
 };
 
 const coerceIntoType = (config: MinimumConfig, value: string): GetValue => {
-  switch (config.valueType) {
-    case Config_ValueType.STRING:
+  switch (config.value_type) {
+    case ConfigValueType.String:
       return value;
-    case Config_ValueType.INT:
+    case ConfigValueType.Int:
       if (!Number.isInteger(parseInt(value, 10))) {
         throw new Error(`Expected integer, got ${value}`);
       }
       return parseInt(value, 10);
-    case Config_ValueType.DOUBLE:
+    case ConfigValueType.Double:
       return parseFloat(value);
-    case Config_ValueType.BOOL:
+    case ConfigValueType.Bool:
       return TRUE_VALUES.has(value.toLowerCase());
-    case Config_ValueType.STRING_LIST:
+    case ConfigValueType.StringList:
       return value.split(/\s*,\s*/);
-    case Config_ValueType.DURATION:
+    case ConfigValueType.Duration:
       return value;
     default:
       console.error(
-        `Unexpected valueType ${config.valueType} for provided ${config.key}`
+        `Unexpected valueType ${config.value_type} for provided ${config.key}`
       );
       return undefined;
   }
@@ -206,22 +207,24 @@ export const unwrapValue = ({
   resolver?: Resolver;
 }): Omit<UnwrappedValue, "reportableValue"> => {
   if (primitivesOnly) {
-    if (isNonNullable(value.provided) || isNonNullable(value.decryptWith)) {
+    if (isNonNullable(value.provided) || isNonNullable(value.decrypt_with)) {
       console.error(
-        `Unexpected value ${JSON.stringify(value)} in primitivesOnly mode`
+        `Unexpected value ${jsonStringifyWithBigInt(
+          value
+        )} in primitivesOnly mode`
       );
       return NULL_UNWRAPPED_VALUE;
     }
   } else {
-    if (isNonNullable(value.decryptWith)) {
+    if (isNonNullable(value.decrypt_with)) {
       if (resolver === undefined) {
         throw new Error("Resolver must be provided to unwrap encrypted values");
       }
 
-      const key = resolver.get(value.decryptWith);
+      const key = resolver.get(value.decrypt_with);
 
       if (key === undefined) {
-        throw new Error(`Key ${value.decryptWith} not found`);
+        throw new Error(`Key ${value.decrypt_with} not found`);
       }
 
       return {
@@ -232,7 +235,7 @@ export const unwrapValue = ({
     if (value.provided != null) {
       if (config == null) {
         throw new Error(
-          `Unexpected value ${JSON.stringify(
+          `Unexpected value ${jsonStringifyWithBigInt(
             value
           )} in provided mode without config`
         );
@@ -242,33 +245,32 @@ export const unwrapValue = ({
     }
   }
 
-  if (value.weightedValues != null) {
+  if (value.weighted_values != null) {
     return unwrapWeightedValues(key, value, hashByPropertyValue);
   }
 
   switch (kind) {
     case "string":
       return { value: value.string };
-    case "stringList":
-      return { value: value.stringList?.values };
+    case "string_list":
+      return { value: value.string_list?.values };
     case "int":
-      if (Number.isInteger(value.int)) {
-        const val = value.int as unknown as number;
+      if (Number.isInteger(Number(value.int))) {
+        const val = Number(value.int) as unknown as number;
         return { value: val };
       }
-      if (Long.isLong(value.int)) {
-        if (longIsIntSafe(value.int)) {
-          return { value: value.int.toInt() };
-        }
-        return { value: value.int };
+
+      if (isBigInt(value.int)) {
+        return { value: BigInt(value.int) };
       }
+
       return { value: undefined };
     case "bool":
       return { value: value.bool };
     case "double":
       return { value: value.double };
-    case "logLevel":
-      return { value: value.logLevel };
+    case "log_level":
+      return { value: value.log_level };
     case "json":
       if (value.json?.json === undefined) {
         throw new Error(`Invalid json value for ${key}`);
@@ -285,9 +287,9 @@ export const unwrapValue = ({
       };
     default:
       throw new Error(
-        `Unexpected value ${JSON.stringify(value)} | kind=${JSON.stringify(
-          kind
-        )}`
+        `Unexpected value ${jsonStringifyWithBigInt(
+          value
+        )} | kind=${jsonStringifyWithBigInt(kind)}`
       );
   }
 };
@@ -314,7 +316,7 @@ export const unwrap = ({
   const kind = kindOf(config, value);
 
   if (kind === undefined) {
-    throw new Error(`Unexpected value ${JSON.stringify(value)}`);
+    throw new Error(`Unexpected value ${jsonStringifyWithBigInt(value)}`);
   }
 
   const unwrappedValue = unwrapValue({
@@ -328,7 +330,7 @@ export const unwrap = ({
   });
 
   const shouldObscure: boolean =
-    value.confidential === true || isNonNullable(value.decryptWith);
+    value.confidential === true || isNonNullable(value.decrypt_with);
 
   return {
     ...unwrappedValue,
@@ -343,8 +345,4 @@ export const unwrapPrimitive = (
   value: ConfigValue | undefined
 ): UnwrappedValue => {
   return unwrap({ key, value, primitivesOnly: true });
-};
-
-export const longIsIntSafe = (longValue: Long): boolean => {
-  return longValue.high === 0 || longValue.high === -1;
 };

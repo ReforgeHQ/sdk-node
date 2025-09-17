@@ -8,30 +8,15 @@ Install the client
 
 `npm install @reforge-com/node` or `yarn add @reforge-com/node`
 
-## Required Peer Dependencies
-
-This library requires the `long` package to handle 64-bit integers properly:
-
-```bash
-npm install long
-# or
-yarn add long
-```
-
-> **Important:** The `long` package must be directly installed in your project. Some environments
-> (particularly Heroku) require this dependency to be in your project's direct dependencies for
-> proper module resolution. Without it, you may encounter issues with integer values being parsed
-> incorrectly.
-
 ## Usage
 
 Set up a Reforge Node.js client.
 
 ```js
-import {Reforge} from '@reforge-com/node';
+import { Reforge } from "@reforge-com/node";
 
 if (!process.env.REFORGE_API_KEY) {
-  throw new Error('REFORGE_API_KEY is not set');
+  throw new Error("REFORGE_API_KEY is not set");
 }
 
 const reforge = new Reforge({
@@ -58,18 +43,18 @@ Given
 ```javascript
 const context = new Map([
   [
-    'user',
+    "user",
     new Map([
-      ['key', 'some-unique-identifier'],
-      ['country', 'US'],
+      ["key", "some-unique-identifier"],
+      ["country", "US"],
     ]),
   ],
 
   [
-    'subscription',
+    "subscription",
     new Map([
-      ['key', 'pro-sub'],
-      ['plan', 'pro'],
+      ["key", "pro-sub"],
+      ["plan", "pro"],
     ]),
   ],
 ]);

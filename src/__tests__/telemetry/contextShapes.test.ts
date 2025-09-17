@@ -33,19 +33,32 @@ const telemetrySource = "https://telemetry.example.com";
 
 describe("contextShapes", () => {
   it("returns stub if contextUploadMode is not `none`", () => {
-    expect(contextShapes(mockApiClient, telemetrySource, "shapeOnly")).not.toBe(
-      stub
-    );
     expect(
-      contextShapes(mockApiClient, telemetrySource, "periodicExample")
+      contextShapes(
+        mockApiClient,
+        telemetrySource,
+        "instance-hash",
+        "shapeOnly"
+      )
     ).not.toBe(stub);
-    expect(contextShapes(mockApiClient, telemetrySource, "none")).toBe(stub);
+    expect(
+      contextShapes(
+        mockApiClient,
+        telemetrySource,
+        "instance-hash",
+        "periodicExample"
+      )
+    ).not.toBe(stub);
+    expect(
+      contextShapes(mockApiClient, telemetrySource, "instance-hash", "none")
+    ).toBe(stub);
   });
 
   it("pushes data", () => {
     const aggregator = contextShapes(
       mockApiClient,
       telemetrySource,
+      "instance-hash",
       "shapeOnly"
     );
 
@@ -71,6 +84,7 @@ describe("contextShapes", () => {
     const aggregator = contextShapes(
       mockApiClient,
       telemetrySource,
+      "instance-hash",
       "shapeOnly"
     );
 
@@ -107,6 +121,7 @@ describe("contextShapes", () => {
     const aggregator = contextShapes(
       mockApiClient,
       telemetrySource,
+      "instance-hash",
       "shapeOnly",
       undefined,
       2

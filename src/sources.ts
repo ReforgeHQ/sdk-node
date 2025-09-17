@@ -1,3 +1,5 @@
+import { jsonStringifyWithBigInt } from "./bigIntUtils";
+
 const DEFAULT_SOURCES = [
   "https://belt.prefab.cloud",
   "https://suspenders.prefab.cloud",
@@ -31,7 +33,7 @@ class Sources {
 
     if (this.telemetrySource === undefined) {
       console.debug(
-        `No telemetry source found in sources. No telemetry will be reported. Sources were ${JSON.stringify(
+        `No telemetry source found in sources. No telemetry will be reported. Sources were ${jsonStringifyWithBigInt(
           this.sources
         )}`
       );

@@ -1,10 +1,10 @@
-import type { ContextShape, ContextShapes } from "../proto";
-import type { Contexts } from "../types";
-import { encode } from "../parseProto";
+import type { Contexts, ContextShape, ContextShapes } from "../types";
+
 import type { ApiClient } from "../apiClient";
 import type { ContextUploadMode, SyncResult, Telemetry } from "./types";
+import { jsonStringifyWithBigInt } from "../bigIntUtils";
 
-const ENDPOINT = "/api/v1/context-shapes";
+const ENDPOINT = "/api/v1/telemetry";
 
 const MAX_DATA_SIZE = 10000;
 
@@ -44,6 +44,7 @@ export const fieldTypeForValue = (value: unknown): number => {
 export const contextShapes = (
   apiClient: ApiClient,
   telemetryHost: string | undefined,
+  instanceHash: string,
   contextUploadMode: ContextUploadMode,
   namespace?: string,
   maxDataSize: number = MAX_DATA_SIZE
@@ -108,7 +109,10 @@ export const contextShapes = (
         apiData.namespace = namespace;
       }
 
-      const body = encode("ContextShapes", apiData);
+      const body = jsonStringifyWithBigInt({
+        instanceHash,
+        events: [{ contextShapes: apiData }],
+      });
 
       const result = await apiClient.fetch({
         source: telemetryHost,

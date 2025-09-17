@@ -1,7 +1,7 @@
 import type { ProjectEnvId } from "./types";
 
 export interface SortableRow {
-  projectEnvId?: ProjectEnvId;
+  project_env_id?: ProjectEnvId;
 }
 
 // sort so that the rows matching our projectEnvId are first
@@ -10,8 +10,8 @@ export const sortRows = <T extends SortableRow>(
   projectEnvId: ProjectEnvId
 ): T[] => {
   return rows.sort((a, b) => {
-    const aMatches = a.projectEnvId?.equals(projectEnvId) ?? false;
-    const bMatches = b.projectEnvId?.equals(projectEnvId) ?? false;
+    const aMatches = a.project_env_id === projectEnvId;
+    const bMatches = b.project_env_id === projectEnvId;
 
     if (aMatches && !bMatches) {
       return -1;

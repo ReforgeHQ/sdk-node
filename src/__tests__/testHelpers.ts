@@ -1,8 +1,6 @@
-import Long from "long";
-import { ConfigType } from "../proto";
-import type { Config } from "../proto";
-import { wordLevelToNumber, PREFIX } from "../logger";
-import type { ValidLogLevelName } from "../logger";
+import { ConfigValueType, ConfigType } from "../types";
+import type { Config, LogLevel } from "../types";
+import { type LogLevelMethodName, PREFIX } from "../logger";
 
 export const nTimes = (n: number, fn: () => void): void => {
   for (let i = 0; i < n; i++) {
@@ -10,17 +8,18 @@ export const nTimes = (n: number, fn: () => void): void => {
   }
 };
 
-export const projectEnvIdUnderTest = new Long(5);
+export const projectEnvIdUnderTest = 5;
 export const emptyContexts = new Map();
 export const irrelevant = "this value does not matter";
-export const irrelevantLong = new Long(-1);
+export const irrelevantNumberAsString = "-1";
+export const irrelevantNumber = -1;
 
-export const levelAt = (path: string, level: string): Config => {
+export const levelAt = (path: string, level: LogLevelMethodName): Config => {
   return {
-    id: irrelevantLong,
-    projectId: irrelevantLong,
+    id: irrelevantNumberAsString,
+    project_id: irrelevantNumber,
     key: `${PREFIX}${path}`,
-    changedBy: undefined,
+    changed_by: undefined,
     rows: [
       {
         properties: {},
@@ -28,24 +27,24 @@ export const levelAt = (path: string, level: string): Config => {
           {
             criteria: [],
             value: {
-              logLevel: wordLevelToNumber(level as ValidLogLevelName),
+              log_level: level.toUpperCase() as LogLevel,
             },
           },
         ],
       },
     ],
-    allowableValues: [],
-    configType: ConfigType.LOG_LEVEL,
-    valueType: 9,
-    sendToClientSdk: true,
+    allowable_values: [],
+    config_type: ConfigType.LogLevel,
+    value_type: ConfigValueType.LogLevel,
+    send_to_client_sdk: true,
   };
 };
 
 export const mockApiClient = {
   fetch: jest.fn(async () => ({
     status: 200,
-    arrayBuffer: async (): Promise<ArrayBuffer> => {
-      return await Promise.resolve(new ArrayBuffer(0));
+    json: async (): Promise<any> => {
+      return await Promise.resolve(JSON.stringify({ key: "value" }));
     },
   })),
 };

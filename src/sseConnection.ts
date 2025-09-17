@@ -1,8 +1,7 @@
-import type Long from "long";
 import { makeHeaders } from "./makeHeaders";
 import type { Resolver } from "./resolver";
 import EventSource from "eventsource";
-import { parseConfigs } from "./parseProto";
+import { parseConfigsFromJSONString } from "./jsonHelpers";
 
 interface ConstructorProps {
   apiKey: string;
@@ -19,7 +18,7 @@ class SSEConnection {
     this.sources = sources;
   }
 
-  start(resolver: Resolver, startAtId: Long): void {
+  start(resolver: Resolver, startAtId: string): void {
     const headers = makeHeaders(this.apiKey, {
       "x-reforge-start-at-id": startAtId.toString(),
       Accept: "text/event-stream",
@@ -28,12 +27,12 @@ class SSEConnection {
     const url = `${(this.sources[0] as string).replace(
       /(belt|suspenders)\./,
       "stream."
-    )}/api/v1/sse/config`;
+    )}/api/v1/sse/config?format=json`;
 
     this.channel = new EventSource(url, { headers });
 
     this.channel.onmessage = (message: any) => {
-      const newConfigs = parseConfigs(message.data);
+      const newConfigs = parseConfigsFromJSONString(message.data);
 
       resolver.update(newConfigs.configs);
     };

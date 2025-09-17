@@ -1,12 +1,6 @@
 {
   "include": ["src/**/*.ts"],
-  "exclude": [
-    "node_modules",
-    "src/**/proto.ts",
-    "src/**/proto.json",
-    "src/**/__tests__/*",
-    "dist"
-  ],
+  "exclude": ["node_modules", "src/**/__tests__/*", "dist"],
   "compilerOptions": {
     "target": "es2018",
     "module": "es2015",

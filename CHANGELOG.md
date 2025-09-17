@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.0-pre.4 - 2025-09-15
+
+- Remove protobuf dependencies and use JSON API directly
+- Remove `long` peer dependency completely and use native `BigInt` type
+
 ## 0.0.0-pre.3 - 2025-08-04
 
 - Simplify type definitions and expose as overridable interfaces

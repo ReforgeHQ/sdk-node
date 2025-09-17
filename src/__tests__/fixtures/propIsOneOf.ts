@@ -1,18 +1,21 @@
-import Long from "long";
-import type { Config } from "../../proto";
-import { ConfigType, Criterion_CriterionOperator } from "../../proto";
-import { irrelevantLong, projectEnvIdUnderTest } from "../testHelpers";
+import type { Config } from "../../types";
+import {
+  ConfigValueType,
+  ConfigType,
+  Criterion_CriterionOperator,
+} from "../../types";
+import { irrelevantNumber, projectEnvIdUnderTest } from "../testHelpers";
 
 const config: Config = {
-  id: new Long(991),
-  projectId: irrelevantLong,
+  id: "991",
+  project_id: irrelevantNumber,
 
   key: "prop.is.one.of",
-  changedBy: undefined,
+  changed_by: undefined,
   rows: [
     {
       properties: {},
-      projectEnvId: irrelevantLong,
+      project_env_id: irrelevantNumber,
       values: [
         {
           criteria: [],
@@ -24,15 +27,15 @@ const config: Config = {
     },
     {
       properties: {},
-      projectEnvId: projectEnvIdUnderTest,
+      project_env_id: projectEnvIdUnderTest,
       values: [
         {
           criteria: [
             {
-              propertyName: "reforge.user-id",
-              operator: Criterion_CriterionOperator.PROP_IS_ONE_OF,
-              valueToMatch: {
-                stringList: {
+              property_name: "reforge.user-id",
+              operator: Criterion_CriterionOperator.PropIsOneOf,
+              value_to_match: {
+                string_list: {
                   values: ["4", "5"],
                 },
               },
@@ -45,10 +48,10 @@ const config: Config = {
         {
           criteria: [
             {
-              propertyName: "user.country",
-              operator: Criterion_CriterionOperator.PROP_IS_ONE_OF,
-              valueToMatch: {
-                stringList: {
+              property_name: "user.country",
+              operator: Criterion_CriterionOperator.PropIsOneOf,
+              value_to_match: {
+                string_list: {
                   values: ["US", "UK"],
                 },
               },
@@ -61,10 +64,10 @@ const config: Config = {
         {
           criteria: [
             {
-              propertyName: "user.trackingId",
-              operator: Criterion_CriterionOperator.PROP_IS_ONE_OF,
-              valueToMatch: {
-                stringList: {
+              property_name: "user.trackingId",
+              operator: Criterion_CriterionOperator.PropIsOneOf,
+              value_to_match: {
+                string_list: {
                   values: ["CONFIDENTIAL"],
                 },
               },
@@ -78,17 +81,17 @@ const config: Config = {
         {
           criteria: [
             {
-              propertyName: "user.trackingId",
-              operator: Criterion_CriterionOperator.PROP_IS_ONE_OF,
-              valueToMatch: {
-                stringList: {
+              property_name: "user.trackingId",
+              operator: Criterion_CriterionOperator.PropIsOneOf,
+              value_to_match: {
+                string_list: {
                   values: ["SECRET"],
                 },
               },
             },
           ],
           value: {
-            decryptWith: "reforge.secrets.encryption.key",
+            decrypt_with: "reforge.secrets.encryption.key",
             string:
               "8933c39f7f73b6e815dfbe--b3f5216809e719efd8803dad--b16761b9418d8145a98f88a631681298",
           },
@@ -102,7 +105,7 @@ const config: Config = {
       ],
     },
   ],
-  allowableValues: [
+  allowable_values: [
     {
       string: "correct",
     },
@@ -113,8 +116,8 @@ const config: Config = {
       string: "default",
     },
   ],
-  configType: ConfigType.CONFIG,
-  valueType: 2,
-  sendToClientSdk: false,
+  config_type: ConfigType.Config,
+  value_type: ConfigValueType.String,
+  send_to_client_sdk: false,
 };
 export default config;

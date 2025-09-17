@@ -1,17 +1,25 @@
-import type { Config } from "../../proto";
-import { ConfigType, Criterion_CriterionOperator } from "../../proto";
-import { irrelevantLong, projectEnvIdUnderTest } from "../testHelpers";
+import type { Config } from "../../types";
+import {
+  ConfigValueType,
+  ConfigType,
+  Criterion_CriterionOperator,
+} from "../../types";
+import {
+  irrelevantNumberAsString,
+  irrelevantNumber,
+  projectEnvIdUnderTest,
+} from "../testHelpers";
 
 const config: Config = {
-  id: irrelevantLong,
-  projectId: irrelevantLong,
+  id: irrelevantNumberAsString,
+  project_id: irrelevantNumber,
 
   key: "prop.ends.with",
-  changedBy: undefined,
+  changed_by: undefined,
   rows: [
     {
       properties: {},
-      projectEnvId: irrelevantLong,
+      project_env_id: irrelevantNumber,
       values: [
         {
           criteria: [],
@@ -23,16 +31,15 @@ const config: Config = {
     },
     {
       properties: {},
-      projectEnvId: projectEnvIdUnderTest,
+      project_env_id: projectEnvIdUnderTest,
       values: [
         {
           criteria: [
             {
-              propertyName: "user.aka",
-              operator:
-                Criterion_CriterionOperator.PROP_DOES_NOT_START_WITH_ONE_OF,
-              valueToMatch: {
-                stringList: {
+              property_name: "user.aka",
+              operator: Criterion_CriterionOperator.PropDoesNotStartWithOneOf,
+              value_to_match: {
+                string_list: {
                   values: ["one", "two"],
                 },
               },
@@ -51,7 +58,7 @@ const config: Config = {
       ],
     },
   ],
-  allowableValues: [
+  allowable_values: [
     {
       string: "wrong projectEnvId",
     },
@@ -59,8 +66,8 @@ const config: Config = {
       string: "default",
     },
   ],
-  configType: ConfigType.CONFIG,
-  valueType: 2,
-  sendToClientSdk: false,
+  config_type: ConfigType.Config,
+  value_type: ConfigValueType.String,
+  send_to_client_sdk: false,
 };
 export default config;

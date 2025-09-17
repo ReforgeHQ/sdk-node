@@ -1,25 +1,24 @@
-import Long from "long";
 import {
   type Config,
-  Config_ValueType,
+  ConfigValueType,
   ConfigType,
   type Criterion_CriterionOperator,
-} from "../../proto";
-import { irrelevantLong } from "../testHelpers";
+} from "../../types";
+import { irrelevantNumber } from "../testHelpers";
 
 const createConfig = (
   key: string,
   propertyName: string,
   valueToMatch: string,
   operator:
-    | Criterion_CriterionOperator.PROP_MATCHES
-    | Criterion_CriterionOperator.PROP_DOES_NOT_MATCH
+    | Criterion_CriterionOperator.PropMatches
+    | Criterion_CriterionOperator.PropDoesNotMatch
 ): Config => {
   return {
-    id: new Long(999),
-    projectId: irrelevantLong,
+    id: "999",
+    project_id: irrelevantNumber,
     key,
-    changedBy: undefined,
+    changed_by: undefined,
     rows: [
       {
         properties: {},
@@ -27,9 +26,9 @@ const createConfig = (
           {
             criteria: [
               {
-                propertyName,
+                property_name: propertyName,
                 operator,
-                valueToMatch: {
+                value_to_match: {
                   string: valueToMatch,
                 },
               },
@@ -47,10 +46,10 @@ const createConfig = (
         ],
       },
     ],
-    allowableValues: [],
-    configType: ConfigType.CONFIG,
-    valueType: Config_ValueType.BOOL,
-    sendToClientSdk: false,
+    allowable_values: [],
+    config_type: ConfigType.Config,
+    value_type: ConfigValueType.Bool,
+    send_to_client_sdk: false,
   };
 };
 

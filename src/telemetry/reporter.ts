@@ -1,8 +1,5 @@
-import Long from "long";
 import { Backoff } from "./backoff";
 import type { Telemetry } from "./types";
-
-export const now = (): Long => Long.fromNumber(Date.now());
 
 const syncTelemetry = (telemetry: Telemetry, backoff: Backoff): void => {
   // Exit early if telemetry is disabled

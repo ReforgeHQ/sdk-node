@@ -1,13 +1,14 @@
-import type { Config, ConfigValue } from "./proto";
-import { shouldLog, makeLogger, parseLevel } from "./logger";
-import type { ValidLogLevelName, ValidLogLevel } from "./logger";
-import { ConfigType } from "./proto";
-import type {
-  ContextObj,
-  Context,
-  Contexts,
-  OnNoDefault,
-  ProjectEnvId,
+import { shouldLog, makeLogger, LOG_LEVEL_RANK_LOOKUP } from "./logger";
+import {
+  type ContextObj,
+  type MapContext,
+  type Contexts,
+  type OnNoDefault,
+  type ProjectEnvId,
+  type Config,
+  type ConfigValue,
+  type LogLevel,
+  ConfigType,
 } from "./types";
 import type { Telemetry, TypedNodeServerConfigurationRaw } from "./reforge";
 import { REFORGE_DEFAULT_LOG_LEVEL } from "./reforge";
@@ -16,8 +17,9 @@ import { mergeContexts, contextObjToMap } from "./mergeContexts";
 
 import { configValueType } from "./wrap";
 import { evaluate } from "./evaluate";
+import { jsonStringifyWithBigInt } from "./bigIntUtils";
 
-const emptyContexts: Contexts = new Map<string, Context>();
+const emptyContexts: Contexts = new Map<string, MapContext>();
 
 export const NOT_PROVIDED = Symbol("NOT_PROVIDED");
 
@@ -49,13 +51,13 @@ export interface ResolverAPI {
   keys: () => string[];
   logger: (
     loggerName: string,
-    defaultLevel: ValidLogLevelName | ValidLogLevel,
+    defaultLevel: LogLevel,
     contexts?: Contexts | ContextObj
   ) => ReturnType<typeof makeLogger>;
   shouldLog: (args: {
     loggerName: string;
-    desiredLevel: ValidLogLevel | ValidLogLevelName;
-    defaultLevel?: ValidLogLevel | ValidLogLevelName;
+    desiredLevel: LogLevel;
+    defaultLevel?: LogLevel;
     contexts?: Contexts | ContextObj;
   }) => boolean;
   setOnUpdate: (
@@ -63,7 +65,7 @@ export interface ResolverAPI {
   ) => void;
 }
 
-type OptionalKeys = "id" | "projectId" | "changedBy" | "allowableValues";
+type OptionalKeys = "id" | "project_id" | "changed_by" | "allowable_values";
 
 export type MinimumConfig = {
   [K in keyof Config]: K extends OptionalKeys
@@ -81,7 +83,8 @@ const mergeDefaultContexts = (
   const mergedContexts: Contexts = new Map(localContexts);
 
   for (const type of defaultContext.keys()) {
-    const defaultSingleContext: Context = defaultContext.get(type) ?? new Map();
+    const defaultSingleContext: MapContext =
+      defaultContext.get(type) ?? new Map();
 
     const mergedContext = new Map(localContexts.get(type) ?? new Map());
 
@@ -169,8 +172,8 @@ class Resolver implements ResolverAPI {
   ): void {
     for (const config of configs) {
       if (
-        config.configType === ConfigType.DELETED ||
-        config.rows.length === 0
+        config.config_type === ConfigType.Deleted ||
+        config.rows?.length === 0
       ) {
         this.config.delete(config.key);
       } else {
@@ -196,19 +199,21 @@ class Resolver implements ResolverAPI {
     const valueType = configValueType(value);
 
     if (!valueType) {
-      throw new Error(`Unknown value type for ${JSON.stringify(value)}`);
+      throw new Error(
+        `Unknown value type for ${jsonStringifyWithBigInt(value)}`
+      );
     }
 
     const config: MinimumConfig = {
       id: undefined,
-      projectId: undefined,
-      changedBy: undefined,
-      allowableValues: undefined,
+      project_id: undefined,
+      changed_by: undefined,
+      allowable_values: undefined,
       key,
       rows: [{ properties: {}, values: [{ value, criteria: [] }] }],
-      configType: ConfigType.CONFIG,
-      valueType,
-      sendToClientSdk: false,
+      config_type: ConfigType.Config,
+      value_type: valueType,
+      send_to_client_sdk: false,
     };
 
     this.config.set(key, config);
@@ -231,7 +236,6 @@ class Resolver implements ResolverAPI {
         if (onNoDefault === "warn") {
           console.warn(`No value found for key '${key}'`);
         }
-
         return undefined;
       }
 
@@ -286,18 +290,12 @@ class Resolver implements ResolverAPI {
 
   logger(
     loggerName: string,
-    defaultLevel: ValidLogLevelName | ValidLogLevel,
+    defaultLevel: LogLevel,
     contexts?: Contexts | ContextObj
   ): ReturnType<typeof makeLogger> {
-    const parsedDefaultLevel = parseLevel(defaultLevel);
-
-    if (parsedDefaultLevel === undefined) {
-      throw new Error(`Invalid default level: ${defaultLevel}`);
-    }
-
     return makeLogger({
       loggerName,
-      defaultLevel: parsedDefaultLevel,
+      defaultLevel,
       contexts: contexts ?? this.contexts,
       resolver: this,
     });
@@ -310,11 +308,11 @@ class Resolver implements ResolverAPI {
     contexts,
   }: {
     loggerName: string;
-    desiredLevel: ValidLogLevel | ValidLogLevelName;
-    defaultLevel?: ValidLogLevel | ValidLogLevelName;
+    desiredLevel: LogLevel;
+    defaultLevel?: LogLevel;
     contexts?: Contexts | ContextObj;
   }): boolean {
-    const numericDesiredLevel = parseLevel(desiredLevel);
+    const numericDesiredLevel = LOG_LEVEL_RANK_LOOKUP[desiredLevel];
 
     if (numericDesiredLevel === undefined) {
       console.warn(
@@ -325,14 +323,14 @@ class Resolver implements ResolverAPI {
     }
 
     if (this.telemetry != null) {
-      this.telemetry.knownLoggers.push(loggerName, numericDesiredLevel);
+      this.telemetry.knownLoggers.push(loggerName, desiredLevel);
     }
 
     return shouldLog({
       loggerName,
-      desiredLevel: numericDesiredLevel,
+      desiredLevel,
       contexts: contexts ?? this.contexts,
-      defaultLevel: parseLevel(defaultLevel) ?? REFORGE_DEFAULT_LOG_LEVEL,
+      defaultLevel: defaultLevel ?? REFORGE_DEFAULT_LOG_LEVEL,
       resolver: this,
     });
   }

@@ -1,6 +1,5 @@
-import Long from "long";
 import type { MinimumConfig } from "./resolver";
-import { maxLong } from "./maxLong";
+import { maxBigIntId } from "./bigIntUtils";
 
 export interface ResolverInterface {
   keys: () => string[];
@@ -13,7 +12,7 @@ export class ConfigChangeNotifier {
   private readonly listeners: Set<GlobalListenerCallback> =
     new Set<GlobalListenerCallback>();
 
-  private lastTotalId: Long = Long.ZERO;
+  private lastTotalId: string = "0";
   private resolver: ResolverInterface | undefined;
 
   /**
@@ -50,28 +49,28 @@ export class ConfigChangeNotifier {
 
     const newTotalId = this.calculateCurrentTotalId();
 
-    if (!newTotalId.equals(this.lastTotalId)) {
+    if (newTotalId !== this.lastTotalId) {
       this.lastTotalId = newTotalId;
       this.notifyGlobalListeners();
     }
   };
 
-  private readonly calculateCurrentTotalId = (): Long => {
+  private readonly calculateCurrentTotalId = (): string => {
     if (this.resolver == null) {
-      return Long.ZERO;
+      return "0";
     }
 
     const keys = this.resolver.keys();
-    const ids: Long[] = [];
+    const ids: string[] = [];
 
     for (const key of keys) {
       const config = this.resolver.raw(key);
-      if (config?.id != null && Long.isLong(config.id)) {
+      if (config?.id != null) {
         ids.push(config.id);
       }
     }
 
-    return maxLong(ids);
+    return maxBigIntId(ids);
   };
 
   private readonly notifyGlobalListeners = (): void => {
@@ -108,7 +107,7 @@ export class ConfigChangeNotifier {
    * Gets the last known total ID. Useful for debugging or specific checks.
    * @returns The last calculated total ID.
    */
-  public getLastTotalId = (): Long => {
+  public getLastTotalId = (): string => {
     return this.lastTotalId;
   };
 }

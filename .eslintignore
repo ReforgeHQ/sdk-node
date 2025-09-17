@@ -1,4 +1,2 @@
 dist/**/*
-src/proto.json
-src/proto.ts
 jest.config.ts

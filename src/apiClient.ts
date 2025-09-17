@@ -22,8 +22,8 @@ export const apiClient = (apiKey: string, fetchFunc: Fetch): InternalFetch => {
 
     const headers = makeHeaders(apiKey, {
       ...(opts["headers"] ?? {}),
-      "Content-Type": "application/x-protobuf",
-      Accept: "application/x-protobuf",
+      "Content-Type": "application/json",
+      Accept: "application/json",
     });
     const fullUrl = new URL(path, source).toString();
     return await fetchFunc(fullUrl, {
@@ -41,7 +41,7 @@ export type ApiClient = ReturnType<typeof apiClient>;
 const MAX_CACHE_ENTRIES = 10;
 const cache = new Map<
   string,
-  { data?: ArrayBuffer; etag?: string; expiresAt?: number }
+  { data?: any; etag?: string; expiresAt?: number }
 >();
 export function clearFetchCache(): void {
   cache.clear();
@@ -62,7 +62,7 @@ const fetchWithCache = async (
   ) {
     return {
       status: 200,
-      arrayBuffer: async () => {
+      json: async () => {
         if (cached.data === undefined) {
           throw new Error("Cached data is unexpectedly undefined");
         }
@@ -94,7 +94,7 @@ const fetchWithCache = async (
 
   // 🚀 **Handle 304 Not Modified**
   if (response.status === 304 && cached?.data !== undefined) {
-    return new Response(cached.data, {
+    return new Response(JSON.stringify(cached.data), {
       status: 200, // ✅ Convert 304 to 200 since we're serving cached data
       statusText: "OK",
       headers: new Headers({ ETag: cached.etag ?? "", "X-Cache": "HIT" }),
@@ -113,8 +113,8 @@ const fetchWithCache = async (
   const expiresAt = maxAge !== undefined ? now + maxAge : undefined;
 
   // 🔥 Read response body
-  const responseBuffer = await response.arrayBuffer();
-  cache.set(cacheKey, { data: responseBuffer, etag, expiresAt });
+  const responseJson = await response.json();
+  cache.set(cacheKey, { data: responseJson, etag, expiresAt });
 
   if (cache.size > MAX_CACHE_ENTRIES) {
     const leastUsedKey = cache.keys().next().value;
@@ -122,7 +122,8 @@ const fetchWithCache = async (
       cache.delete(leastUsedKey);
     }
   }
-  return new Response(responseBuffer, {
+
+  return new Response(JSON.stringify(responseJson), {
     status: response.status,
     statusText: response["statusText"],
     headers: response["headers"],

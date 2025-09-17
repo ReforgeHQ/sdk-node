@@ -1,4 +1,3 @@
-import Long from "long";
 import { Reforge } from "../../reforge";
 import { exampleContexts, stub } from "../../telemetry/exampleContexts";
 import type { Contexts } from "../../types";
@@ -119,7 +118,7 @@ describe("exampleContexts", () => {
           exampleContexts: {
             examples: [
               {
-                timestamp: Long.fromNumber(Date.now()),
+                timestamp: Date.now(),
                 contextSet: {
                   contexts: [
                     {
@@ -141,10 +140,10 @@ describe("exampleContexts", () => {
                           double: 11.5,
                         },
                         someArray: {
-                          stringList: { values: ["1", "2", "3", "4"] },
+                          string_list: { values: ["1", "2", "3", "4"] },
                         },
                         cars: {
-                          stringList: { values: ["Ford", "BMW", "Fiat"] },
+                          string_list: { values: ["Ford", "BMW", "Fiat"] },
                         },
                       },
                     },

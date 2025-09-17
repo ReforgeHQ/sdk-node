@@ -1,5 +1,5 @@
-import type { ConfigValue, StringList } from "./proto";
-import { Config_ValueType } from "./proto";
+import type { ConfigValue, StringList } from "./types";
+import { ConfigValueType } from "./types";
 
 type ConfigValueKey = keyof ConfigValue;
 
@@ -17,7 +17,7 @@ export const valueType = (value: unknown): ConfigValueKey => {
   }
 
   if (Array.isArray(value)) {
-    return "stringList";
+    return "string_list";
   }
 
   return "string";
@@ -27,15 +27,15 @@ export const wrap = (value: unknown): Record<string, ConfigValue> => {
   const type = valueType(value);
 
   if (Array.isArray(value)) {
-    if (type !== "stringList") {
-      throw new Error(`Expected stringList, got ${type}`);
+    if (type !== "string_list") {
+      throw new Error(`Expected string_list, got ${type}`);
     }
 
     const values: string[] = value.map((v) => v.toString());
     const stringList: StringList = { values };
 
     return {
-      stringList: stringList as ConfigValue,
+      string_list: stringList as ConfigValue,
     };
   }
 
@@ -46,24 +46,24 @@ export const wrap = (value: unknown): Record<string, ConfigValue> => {
 
 export const configValueType = (
   value: ConfigValue
-): Config_ValueType | undefined => {
+): ConfigValueType | undefined => {
   switch (Object.keys(value)[0]) {
     case "string":
-      return Config_ValueType.STRING;
+      return ConfigValueType.String;
     case "int":
-      return Config_ValueType.INT;
+      return ConfigValueType.Int;
     case "double":
-      return Config_ValueType.DOUBLE;
+      return ConfigValueType.Double;
     case "bool":
-      return Config_ValueType.BOOL;
-    case "stringList":
-      return Config_ValueType.STRING_LIST;
-    case "logLevel":
-      return Config_ValueType.LOG_LEVEL;
-    case "intRange":
-      return Config_ValueType.INT_RANGE;
+      return ConfigValueType.Bool;
+    case "string_list":
+      return ConfigValueType.StringList;
+    case "log_level":
+      return ConfigValueType.LogLevel;
+    case "int_range":
+      return ConfigValueType.IntRange;
     case "json":
-      return Config_ValueType.JSON;
+      return ConfigValueType.Json;
     default:
       return undefined;
   }

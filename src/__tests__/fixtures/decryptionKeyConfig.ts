@@ -1,9 +1,9 @@
-import type { Config } from "../../proto";
-import { ConfigType } from "../../proto";
-import { irrelevantLong } from "../testHelpers";
+import type { Config } from "../../types";
+import { ConfigValueType, ConfigType } from "../../types";
+import { irrelevantNumberAsString, irrelevantNumber } from "../testHelpers";
 
 export const decryptionKeyForSecret = (secret: Config): string => {
-  const decryptWith = secret.rows[0]?.values[0]?.value?.decryptWith;
+  const decryptWith = secret.rows[0]?.values[0]?.value?.decrypt_with;
 
   if (decryptWith === undefined) {
     throw new Error("decryptWith was undefined");
@@ -16,10 +16,10 @@ const config = (secret: Config, decryptionKey: string): Config => {
   const decryptWith = decryptionKeyForSecret(secret);
 
   return {
-    id: irrelevantLong,
-    projectId: irrelevantLong,
+    id: irrelevantNumberAsString,
+    project_id: irrelevantNumber,
     key: decryptWith,
-    changedBy: undefined,
+    changed_by: undefined,
     rows: [
       {
         properties: {},
@@ -34,10 +34,10 @@ const config = (secret: Config, decryptionKey: string): Config => {
         ],
       },
     ],
-    allowableValues: [],
-    configType: ConfigType.CONFIG,
-    valueType: 2,
-    sendToClientSdk: false,
+    allowable_values: [],
+    config_type: ConfigType.Config,
+    value_type: ConfigValueType.String,
+    send_to_client_sdk: false,
   };
 };
 
