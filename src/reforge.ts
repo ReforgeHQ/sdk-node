@@ -100,7 +100,7 @@ export interface Telemetry {
 }
 
 interface ConstructorProps {
-  apiKey: string;
+  sdkKey: string;
   sources?: string[];
   datafile?: string;
   enablePolling?: boolean;
@@ -118,7 +118,7 @@ interface ConstructorProps {
 }
 
 class Reforge implements ReforgeInterface {
-  private readonly apiKey: string;
+  private readonly sdkKey: string;
   readonly sources: Sources;
   private readonly datafile?: string;
   private readonly enableSSE: boolean;
@@ -143,7 +143,7 @@ class Reforge implements ReforgeInterface {
   private readonly configChangeNotifier: ConfigChangeNotifier;
 
   constructor({
-    apiKey,
+    sdkKey,
     sources,
     namespace,
     datafile,
@@ -159,7 +159,7 @@ class Reforge implements ReforgeInterface {
     collectEvaluationSummaries = true,
     onUpdate,
   }: ConstructorProps) {
-    this.apiKey = apiKey;
+    this.sdkKey = sdkKey;
 
     if (
       process.env["REFORGE_API_URL_OVERRIDE"] !== undefined &&
@@ -186,7 +186,7 @@ class Reforge implements ReforgeInterface {
 
     this.defaultLogLevel = defaultLogLevel ?? REFORGE_DEFAULT_LOG_LEVEL;
 
-    this.apiClient = apiClient(this.apiKey, fetch);
+    this.apiClient = apiClient(this.sdkKey, fetch);
 
     this.telemetry = {
       knownLoggers: knownLoggers(
@@ -360,7 +360,7 @@ class Reforge implements ReforgeInterface {
     requireResolver(this.resolver);
 
     this.sseConnection = new SSEConnection({
-      apiKey: this.apiKey,
+      apiKey: this.sdkKey,
       sources: this.sources.sseSources,
     });
 

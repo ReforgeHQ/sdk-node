@@ -15,12 +15,12 @@ Set up a Reforge Node.js client.
 ```js
 import { Reforge } from "@reforge-com/node";
 
-if (!process.env.REFORGE_API_KEY) {
-  throw new Error("REFORGE_API_KEY is not set");
+if (!process.env.REFORGE_SDK_KEY) {
+  throw new Error("REFORGE_SDK_KEY is not set");
 }
 
 const reforge = new Reforge({
-  apiKey: process.env.REFORGE_API_KEY,
+  sdkKey: process.env.REFORGE_SDK_KEY,
   enableSSE: true,
   enablePolling: true,
 });

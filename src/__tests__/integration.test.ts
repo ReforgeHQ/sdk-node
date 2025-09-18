@@ -22,9 +22,9 @@ const func = (
   }
 };
 
-const apiKey = process.env["REFORGE_INTEGRATION_TEST_SDK_KEY"];
+const sdkKey = process.env["REFORGE_INTEGRATION_TEST_SDK_KEY"];
 
-if (apiKey === undefined || apiKey.length === 0) {
+if (sdkKey === undefined || sdkKey.length === 0) {
   throw new Error("REFORGE_INTEGRATION_TEST_SDK_KEY is not set");
 }
 
@@ -67,7 +67,7 @@ describe("integration tests", () => {
 
       const options: ConstructorParameters<typeof Reforge>[0] = {
         ...defaultOptions,
-        apiKey,
+        sdkKey,
         contextUploadMode: "none",
         globalContext: test.contexts.global,
       };
@@ -121,7 +121,7 @@ describe("integration tests", () => {
   telemetryTests.forEach((test) => {
     it(test.name, async () => {
       const options: ConstructorParameters<typeof Reforge>[0] = {
-        apiKey,
+        sdkKey,
         sources: [
           "https://belt.staging-prefab.cloud",
           "https://suspenders.staging-prefab.cloud",

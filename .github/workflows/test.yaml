@@ -55,7 +55,7 @@ jobs:
         run: yarn test
         env:
           REFORGE_INTEGRATION_TEST_SDK_KEY: ${{ secrets.REFORGE_INTEGRATION_TEST_SDK_KEY }}
-          REFORGE_TEST_API_KEY: ${{ secrets.REFORGE_TEST_API_KEY }}
+          REFORGE_TEST_SDK_KEY: ${{ secrets.REFORGE_TEST_API_KEY }}
 
       - name: Validate cjs version
         run: node dist/reforge.cjs

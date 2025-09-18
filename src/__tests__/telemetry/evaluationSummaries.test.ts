@@ -330,7 +330,7 @@ describe("evaluationSummaries", () => {
   describe("integration tests", () => {
     it("records evaluation summaries by default", () => {
       const reforge = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
       });
       reforge.setConfig([basicConfig], projectEnvIdUnderTest, new Map());
 
@@ -348,7 +348,7 @@ describe("evaluationSummaries", () => {
 
     it("does not record evaluation summaries when collectEvaluationSummaries is false", () => {
       const reforge = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
         collectEvaluationSummaries: false,
       });
       reforge.setConfig([basicConfig], projectEnvIdUnderTest, new Map());
