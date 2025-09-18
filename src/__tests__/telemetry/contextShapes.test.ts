@@ -177,7 +177,7 @@ describe("contextShapes", () => {
 
     it("records context shapes when contextUploadMode=shapeOnly", () => {
       const reforge = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
         contextUploadMode: "shapeOnly",
       });
       reforge.setConfig([basicConfig], projectEnvIdUnderTest, new Map());
@@ -198,7 +198,7 @@ describe("contextShapes", () => {
 
     it("records context shapes by default", () => {
       const reforgeWithoutShapes = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
       });
       reforgeWithoutShapes.setConfig(
         [basicConfig],

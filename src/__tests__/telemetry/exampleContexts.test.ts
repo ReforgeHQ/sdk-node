@@ -215,7 +215,7 @@ describe("exampleContexts", () => {
   describe("integration tests", () => {
     it("records context examples by default", () => {
       const reforge = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
       });
       reforge.setConfig([basicConfig], projectEnvIdUnderTest, new Map());
 
@@ -228,7 +228,7 @@ describe("exampleContexts", () => {
 
     it("does not record context examples when contextUploadMode is not periodicExample", () => {
       const reforge = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
         contextUploadMode: "none",
       });
       reforge.setConfig([basicConfig], projectEnvIdUnderTest, new Map());

@@ -50,11 +50,11 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
-const validApiKey = process.env["REFORGE_TEST_API_KEY"];
+const validSdkKey = process.env["REFORGE_TEST_SDK_KEY"];
 
-if (validApiKey === undefined) {
+if (validSdkKey === undefined) {
   throw new Error(
-    "You must set the REFORGE_TEST_API_KEY environment variable to run these tests."
+    "You must set the REFORGE_TEST_SDK_KEY environment variable to run these tests."
   );
 }
 
@@ -74,12 +74,12 @@ describe("reforge", () => {
   });
 
   describe("init", () => {
-    const invalidApiKey = "this won't work";
+    const invalidSdkKey = "this won't work";
 
     it("can parse config from the CDN", async () => {
       const reforge = new Reforge({
         ...defaultOptions,
-        apiKey: validApiKey,
+        sdkKey: validSdkKey,
       });
       await reforge.init();
 
@@ -87,7 +87,7 @@ describe("reforge", () => {
     });
 
     it("throws a 401 if you have an invalid API key", async () => {
-      const reforge = new Reforge({ apiKey: invalidApiKey });
+      const reforge = new Reforge({ sdkKey: invalidSdkKey });
 
       const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation();
       const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
@@ -105,7 +105,7 @@ describe("reforge", () => {
     [mostlyDeletedConfig, deletedConfig].forEach((deletionConfig) => {
       it(`clobbers deleted config with ${deletionConfig.key}`, () => {
         const reforge = new Reforge({
-          apiKey: irrelevant,
+          sdkKey: irrelevant,
         });
 
         const missingValue = "_missing_";
@@ -149,7 +149,7 @@ describe("reforge", () => {
 
     it("allows overriding sources with REFORGE_API_URL_OVERRIDE env var", () => {
       const reforgeDefault = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
       });
 
       expect(reforgeDefault.sources.configSources).toEqual(DEFAULT_SOURCES);
@@ -157,7 +157,7 @@ describe("reforge", () => {
       process.env["REFORGE_API_URL_OVERRIDE"] = "https://example.com";
 
       const reforgeWithOverride = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
       });
 
       expect(reforgeWithOverride.sources.configSources).toEqual([
@@ -167,13 +167,13 @@ describe("reforge", () => {
 
     it("allows specifying sources", () => {
       const reforgeDefault = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
       });
 
       expect(reforgeDefault.sources.configSources).toEqual(DEFAULT_SOURCES);
 
       const reforgeWithOverride = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
         sources: ["https://example.com", "https://2.example.com"],
       });
 
@@ -189,7 +189,7 @@ describe("reforge", () => {
       const pollPromise = new Promise((resolve) => {
         const reforge = new Reforge({
           ...defaultOptions,
-          apiKey: validApiKey,
+          sdkKey: validSdkKey,
           enablePolling: true,
           pollInterval: 10,
           onUpdate: () => {
@@ -216,7 +216,7 @@ describe("reforge", () => {
     it("warns when called multiple times if enablePolling is set", async () => {
       const reforge = new Reforge({
         ...defaultOptions,
-        apiKey: validApiKey,
+        sdkKey: validSdkKey,
         enablePolling: true,
       });
 
@@ -237,7 +237,7 @@ describe("reforge", () => {
     it("warns when called multiple times if enableSSE is set", async () => {
       const reforge = new Reforge({
         ...defaultOptions,
-        apiKey: validApiKey,
+        sdkKey: validSdkKey,
         enableSSE: true,
       });
 
@@ -257,7 +257,7 @@ describe("reforge", () => {
 
     it("does not warn when init is called multiple times if enableSSE and enablePolling are false", async () => {
       const reforge = new Reforge({
-        apiKey: validApiKey,
+        sdkKey: validSdkKey,
         enableSSE: false,
         enablePolling: false,
       });
@@ -277,7 +277,7 @@ describe("reforge", () => {
       process.env["MY_ENV_VAR"] = "EXAMPLE";
 
       const reforge = new Reforge({
-        apiKey: validApiKey,
+        sdkKey: validSdkKey,
         collectLoggerCounts: false,
         contextUploadMode: "none",
       });
@@ -289,7 +289,7 @@ describe("reforge", () => {
 
     it("allows setting a run-time config", async () => {
       const reforge = new Reforge({
-        apiKey: validApiKey,
+        sdkKey: validSdkKey,
         collectLoggerCounts: false,
         contextUploadMode: "none",
       });
@@ -310,7 +310,7 @@ describe("reforge", () => {
         updatePromise = new Promise((resolveUpdate) => {
           reforge = new Reforge({
             ...defaultOptions,
-            apiKey: validApiKey,
+            sdkKey: validSdkKey,
             enablePolling: false,
             enableSSE: false,
             onUpdate: () => {
@@ -361,7 +361,7 @@ describe("reforge", () => {
         updatePromise = new Promise((resolveUpdate) => {
           reforge = new Reforge({
             ...defaultOptions,
-            apiKey: validApiKey,
+            sdkKey: validSdkKey,
             enablePolling: false,
             enableSSE: false,
             onUpdate: () => {
@@ -420,7 +420,7 @@ describe("reforge", () => {
         updatePromise = new Promise((resolveUpdate) => {
           reforge = new Reforge({
             ...defaultOptions,
-            apiKey: validApiKey,
+            sdkKey: validSdkKey,
             enablePolling: false,
             enableSSE: false,
             onUpdate: () => {
@@ -473,7 +473,7 @@ describe("reforge", () => {
     });
 
     it("withContext returns a resolver with the provided context", () => {
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig(configs, projectEnvIdUnderTest, new Map());
 
       // Create a resolver with US context
@@ -494,7 +494,7 @@ describe("reforge", () => {
   describe("get", () => {
     describe("when the key cannot be found", () => {
       it("throws if no default is provided and onNoDefault is `error`", () => {
-        const reforge = new Reforge({ apiKey: irrelevant });
+        const reforge = new Reforge({ sdkKey: irrelevant });
         reforge.setConfig([], projectEnvIdUnderTest, new Map());
 
         expect(() => {
@@ -504,7 +504,7 @@ describe("reforge", () => {
 
       it("warns if no default is provided and onNoDefault is `warn`", () => {
         const reforge = new Reforge({
-          apiKey: irrelevant,
+          sdkKey: irrelevant,
           onNoDefault: "warn",
         });
         reforge.setConfig([], projectEnvIdUnderTest, new Map());
@@ -520,7 +520,7 @@ describe("reforge", () => {
 
       it("returns undefined if no default is provided and onNoDefault is `ignore`", () => {
         const reforge = new Reforge({
-          apiKey: irrelevant,
+          sdkKey: irrelevant,
           onNoDefault: "warn",
         });
         reforge.setConfig([], projectEnvIdUnderTest, new Map());
@@ -532,7 +532,7 @@ describe("reforge", () => {
 
       it("returns the default if one is provided", () => {
         const reforge = new Reforge({
-          apiKey: irrelevant,
+          sdkKey: irrelevant,
           onNoDefault: "warn",
         });
         reforge.setConfig([], projectEnvIdUnderTest, new Map());
@@ -546,19 +546,19 @@ describe("reforge", () => {
     });
 
     it("returns a config value with no rules", () => {
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig(configs, projectEnvIdUnderTest, new Map());
       expect(reforge.get("basic.value")).toEqual(42);
     });
 
     it("returns a config value with no rules but an environment", () => {
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig(configs, projectEnvIdUnderTest, new Map());
       expect(reforge.get("basic.env")).toEqual(["a", "b", "c", "d"]);
     });
 
     it("returns a config value for a PROP_IS_ONE_OF match", () => {
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig(configs, projectEnvIdUnderTest, new Map());
 
       expect(reforge.get("prop.is.one.of")).toEqual("default");
@@ -572,7 +572,7 @@ describe("reforge", () => {
     });
 
     it("returns a config value for a PROP_IS_ONE_OF and PROP_ENDS_WITH_ONE_OF match", () => {
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig(configs, projectEnvIdUnderTest, new Map());
 
       expect(reforge.get("prop.is.one.of.and.ends.with")).toEqual("default");
@@ -594,7 +594,7 @@ describe("reforge", () => {
     });
 
     it("can use reforge default context as an override", () => {
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig(
         configs,
         projectEnvIdUnderTest,
@@ -620,7 +620,7 @@ describe("reforge", () => {
     });
 
     it("can use a Context object instead of a Context map", () => {
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig(configs, projectEnvIdUnderTest, new Map());
 
       expect(
@@ -638,7 +638,7 @@ describe("reforge", () => {
 
       const secret: Config = secretConfig(encrypted);
 
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig(
         [secret, decryptionKeyConfig(secret, decryptionKey)],
         projectEnvIdUnderTest,
@@ -650,7 +650,7 @@ describe("reforge", () => {
 
     it("can load from a datafile", async () => {
       const reforge = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
         datafile: path.resolve("./src/__tests__/fixtures/datafile.json"),
       });
 
@@ -661,7 +661,7 @@ describe("reforge", () => {
 
     it("can use a datafile and a run-time config", async () => {
       const reforge = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
         datafile: path.resolve("./src/__tests__/fixtures/datafile.json"),
       });
 
@@ -675,7 +675,7 @@ describe("reforge", () => {
   describe("isFeatureEnabled", () => {
     describe("when the key cannot be found", () => {
       it("throws if no default is provided and onNoDefault is `error`", () => {
-        const reforge = new Reforge({ apiKey: irrelevant });
+        const reforge = new Reforge({ sdkKey: irrelevant });
         reforge.setConfig([], projectEnvIdUnderTest, new Map());
 
         expect(() => {
@@ -685,7 +685,7 @@ describe("reforge", () => {
 
       it("returns false and warns if onNoDefault is `warn`", () => {
         const reforge = new Reforge({
-          apiKey: irrelevant,
+          sdkKey: irrelevant,
           onNoDefault: "warn",
         });
         reforge.setConfig([], projectEnvIdUnderTest, new Map());
@@ -701,7 +701,7 @@ describe("reforge", () => {
 
       it("returns false if onNoDefault is `ignore`", () => {
         const reforge = new Reforge({
-          apiKey: irrelevant,
+          sdkKey: irrelevant,
           onNoDefault: "warn",
         });
         reforge.setConfig([], projectEnvIdUnderTest, new Map());
@@ -713,13 +713,13 @@ describe("reforge", () => {
     });
 
     it("returns true when the flag matches", () => {
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig(configs, projectEnvIdUnderTest, new Map());
       expect(reforge.isFeatureEnabled("basic.flag")).toEqual(true);
     });
 
     it("returns a random value for a weighted flag with no context", () => {
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig(configs, projectEnvIdUnderTest, new Map());
 
       const results: Record<string, number> = { true: 0, false: 0 };
@@ -739,7 +739,7 @@ describe("reforge", () => {
     });
 
     it("returns a consistent value for a weighted flag with context", () => {
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig(configs, projectEnvIdUnderTest, new Map());
 
       const context = (trackingId: string): Contexts =>
@@ -761,7 +761,7 @@ describe("reforge", () => {
 
   describe("keys", () => {
     it("returns the keys of the known config", () => {
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig(configs, projectEnvIdUnderTest, new Map());
 
       expect(reforge.keys()).toStrictEqual([
@@ -777,7 +777,7 @@ describe("reforge", () => {
 
   describe("raw", () => {
     it("returns a raw config", () => {
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
 
       reforge.setConfig([], projectEnvIdUnderTest, new Map());
 
@@ -795,7 +795,7 @@ describe("reforge", () => {
     it("returns true if the resolved level is greater than or equal to the desired level", () => {
       const loggerName = "a.b.c.d";
 
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig(
         [levelAt(loggerName, "info")],
         projectEnvIdUnderTest,
@@ -819,7 +819,7 @@ describe("reforge", () => {
     it("returns false if the resolved level is lower than the desired level", () => {
       const loggerName = "a.b.c.d";
 
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig(
         [levelAt(loggerName, "info")],
         projectEnvIdUnderTest,
@@ -844,7 +844,7 @@ describe("reforge", () => {
       jest.spyOn(console, "warn").mockImplementation();
       const loggerName = "a.b.c.d";
 
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig(
         [levelAt(loggerName, "trace")],
         projectEnvIdUnderTest,
@@ -870,7 +870,7 @@ describe("reforge", () => {
 
       const loggerName = "a.b.c.d";
 
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig([], projectEnvIdUnderTest, new Map());
 
       expect(
@@ -910,7 +910,7 @@ describe("reforge", () => {
       const mockConsoleWarn = jest.spyOn(console, "warn").mockImplementation();
       const loggerName = "a.b.c.d";
 
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
 
       expect(
         reforge.shouldLog({
@@ -959,7 +959,7 @@ describe("reforge", () => {
       const loggerName = "a.b.c.d";
 
       const reforge = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
         collectLoggerCounts: false,
       });
       reforge.setConfig(
@@ -986,7 +986,7 @@ describe("reforge", () => {
       const loggerName = "a.b.c.d";
 
       const reforge = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
         collectLoggerCounts: false,
       });
 
@@ -1020,7 +1020,7 @@ describe("reforge", () => {
       const loggerName = "a.b.c.d";
 
       const reforge = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
         collectLoggerCounts: false,
       });
 
@@ -1103,7 +1103,7 @@ describe("reforge", () => {
       const loggerName = "a.b.c.d";
 
       const reforge = new Reforge({
-        apiKey: irrelevant,
+        sdkKey: irrelevant,
         collectLoggerCounts: false,
       });
 
@@ -1172,7 +1172,7 @@ describe("reforge", () => {
     const mock = jest.fn();
 
     const reforge = new Reforge({
-      apiKey: validApiKey,
+      sdkKey: validSdkKey,
       collectLoggerCounts: false,
       contextUploadMode: "none",
       onUpdate: mock,
@@ -1198,7 +1198,7 @@ describe("reforge", () => {
 
       const secret: Config = secretConfig(encrypted);
 
-      const reforge = new Reforge({ apiKey: irrelevant });
+      const reforge = new Reforge({ sdkKey: irrelevant });
       reforge.setConfig([secret], projectEnvIdUnderTest, new Map());
 
       reforge.set("reforge.secrets.encryption.key", { string: decryptionKey });
@@ -1220,7 +1220,7 @@ import { Reforge } from "../reforge";
 
 (async () => {
   const reforge = new Reforge({
-    apiKey: "${validApiKey}",
+    sdkKey: "${validSdkKey}",
   });
   await reforge.init();
   const value = reforge.get("abc");
@@ -1266,12 +1266,12 @@ import { Reforge } from "../reforge";
     let reforge: Reforge;
     beforeEach(() => {
       // No longer async
-      const apiKeyForTests =
+      const sdkKeyForTests =
         process.env["REFORGE_INTEGRATION_TEST_SDK_KEY"] ??
         "fallback-api-key-if-not-set";
       reforge = new Reforge({
         ...defaultOptions,
-        apiKey: apiKeyForTests,
+        sdkKey: sdkKeyForTests,
         enablePolling: false,
         enableSSE: false,
       });
