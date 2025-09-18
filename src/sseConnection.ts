@@ -20,7 +20,7 @@ class SSEConnection {
 
   start(resolver: Resolver, startAtId: string): void {
     const headers = makeHeaders(this.apiKey, {
-      "x-reforge-start-at-id": startAtId.toString(),
+      "Last-Event-ID": startAtId.toString(),
       Accept: "text/event-stream",
     });
 
