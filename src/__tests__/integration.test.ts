@@ -67,7 +67,7 @@ describe("integration tests", () => {
 
       const options: ConstructorParameters<typeof Reforge>[0] = {
         ...defaultOptions,
-          sdkKey,
+        sdkKey,
         contextUploadMode: "none",
         globalContext: test.contexts.global,
       };
