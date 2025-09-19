@@ -105,7 +105,7 @@ describe("evaluationSummaries", () => {
           new Map([
             ['["991",1,0,"string","correct",null]', 2],
             ['["991",4,0,"string","default",null]', 3],
-            ['["991",3,0,"string","*****cda9e",null]', 2],
+            ['["991",3,0,"string","*****d6627",null]', 2],
             ['["991",2,0,"string","*****b9002",null]', 1],
           ]),
         ],
@@ -135,7 +135,7 @@ describe("evaluationSummaries", () => {
           new Map([
             ['["991",1,0,"string","correct",null]', 2],
             ['["991",4,0,"string","default",null]', 4],
-            ['["991",3,0,"string","*****cda9e",null]', 3],
+            ['["991",3,0,"string","*****d6627",null]', 3],
             ['["991",2,0,"string","*****b9002",null]', 1],
           ]),
         ],

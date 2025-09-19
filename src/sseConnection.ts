@@ -1,6 +1,6 @@
 import { makeHeaders } from "./makeHeaders";
 import type { Resolver } from "./resolver";
-import EventSource from "eventsource";
+import { EventSource, type FetchLike } from "eventsource";
 import { parseConfigsFromJSONString } from "./jsonHelpers";
 
 interface ConstructorProps {
@@ -24,12 +24,21 @@ class SSEConnection {
       Accept: "text/event-stream",
     });
 
+    const customFetch: FetchLike = async (url, options): Promise<any> =>
+      await fetch(url, {
+        ...options,
+        headers: {
+          ...options.headers,
+          ...headers,
+        },
+      });
+
     const url = `${(this.sources[0] as string).replace(
       /(primary|secondary)\./,
       "stream."
     )}/api/v1/sse/config?format=json`;
 
-    this.channel = new EventSource(url, { headers });
+    this.channel = new EventSource(url, { fetch: customFetch });
 
     this.channel.onmessage = (message: any) => {
       const newConfigs = parseConfigsFromJSONString(message.data);

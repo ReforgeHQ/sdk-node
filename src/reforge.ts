@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import { apiClient, type ApiClient } from "./apiClient";
 import { loadConfig } from "./loadConfig";
 import { Resolver, type MinimumConfig, type ResolverAPI } from "./resolver";
@@ -25,7 +24,7 @@ import { knownLoggers } from "./telemetry/knownLoggers";
 import { contextShapes } from "./telemetry/contextShapes";
 import { exampleContexts } from "./telemetry/exampleContexts";
 import { evaluationSummaries } from "./telemetry/evaluationSummaries";
-import { encrypt, generateNewHexKey } from "./encryption";
+import { encrypt, generateNewHexKey, randomUUID } from "./encryption";
 import {
   ConfigChangeNotifier,
   type GlobalListenerCallback,
@@ -176,7 +175,7 @@ class Reforge implements ReforgeInterface {
     this.namespace = namespace;
     this.onNoDefault = onNoDefault ?? "error";
     this.pollInterval = pollInterval ?? DEFAULT_POLL_INTERVAL;
-    this.instanceHash = crypto.randomUUID();
+    this.instanceHash = randomUUID();
     this.onUpdate = onUpdate ?? (() => {});
     this.globalContext = globalContext;
 
@@ -330,12 +329,11 @@ class Reforge implements ReforgeInterface {
     return undefined;
   }
 
-  /* eslint-disable-next-line @typescript-eslint/promise-function-async */
-  updateNow(): Promise<void> {
+  async updateNow(): Promise<void> {
     requireResolver(this.resolver);
     this.loading = true;
 
-    return loadConfig({
+    await loadConfig({
       sources: this.sources.configSources,
       apiClient: this.apiClient,
       startAtId: this.startAtId,
