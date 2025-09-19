@@ -873,6 +873,77 @@ describe("evaluate", () => {
       `No value found for key '${decryptionKeyForSecret(secret)}'`
     );
   });
+
+  it("returns an evaluation for an ALWAYS_TRUE match", () => {
+    const alwaysTrueConfig: Config = {
+      id: "always-true-test",
+      project_id: projectEnvIdUnderTest,
+      key: "always.true.test",
+      changed_by: undefined,
+      rows: [
+        {
+          properties: {},
+          project_env_id: projectEnvIdUnderTest,
+          values: [
+            {
+              criteria: [
+                {
+                  property_name: "irrelevant.property",
+                  operator: Criterion_CriterionOperator.AlwaysTrue,
+                  value_to_match: undefined,
+                },
+              ],
+              value: {
+                string: "always-true-result",
+              },
+            },
+            {
+              criteria: [],
+              value: {
+                string: "default",
+              },
+            },
+          ],
+        },
+      ],
+      allowable_values: [],
+      config_type: ConfigType.Config,
+      value_type: ConfigValueType.String,
+      send_to_client_sdk: false,
+    };
+
+    const args = (contexts: Contexts): EvaluateArgs => ({
+      config: alwaysTrueConfig,
+      projectEnvId: projectEnvIdUnderTest,
+      namespace: noNamespace,
+      contexts,
+      resolver: simpleResolver,
+    });
+
+    expect(evaluate(args(emptyContexts))).toStrictEqual({
+      configId: alwaysTrueConfig.id,
+      configKey: alwaysTrueConfig.key,
+      configType: alwaysTrueConfig.config_type,
+      valueType: alwaysTrueConfig.value_type,
+      unwrappedValue: "always-true-result",
+      reportableValue: undefined,
+      configRowIndex: 0,
+      conditionalValueIndex: 0,
+      weightedValueIndex: undefined,
+    });
+
+    expect(evaluate(args(usContexts))).toStrictEqual({
+      configId: alwaysTrueConfig.id,
+      configKey: alwaysTrueConfig.key,
+      configType: alwaysTrueConfig.config_type,
+      valueType: alwaysTrueConfig.value_type,
+      unwrappedValue: "always-true-result",
+      reportableValue: undefined,
+      configRowIndex: 0,
+      conditionalValueIndex: 0,
+      weightedValueIndex: undefined,
+    });
+  });
 });
 
 describe.each([
