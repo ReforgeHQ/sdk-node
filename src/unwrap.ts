@@ -1,4 +1,3 @@
-import { createHash } from "crypto";
 import {
   ConfigValueType,
   type ConfigValue,
@@ -11,6 +10,7 @@ import { isNonNullable } from "./types";
 import type { MinimumConfig, Resolver } from "./resolver";
 import { decrypt } from "./encryption";
 import { durationToMilliseconds } from "./duration";
+import forge from "node-forge";
 
 import murmurhash from "murmurhash";
 import { isBigInt, jsonStringifyWithBigInt } from "./bigIntUtils";
@@ -18,9 +18,9 @@ import { isBigInt, jsonStringifyWithBigInt } from "./bigIntUtils";
 const CONFIDENTIAL_PREFIX = "*****";
 
 export const makeConfidential = (secret: string): string => {
-  const md5 = createHash("md5").update(secret).digest("hex");
+  const hash = forge.md.md5.create().update(secret).digest().toHex();
 
-  return `${CONFIDENTIAL_PREFIX}${md5.slice(-5)}`;
+  return `${CONFIDENTIAL_PREFIX}${hash.slice(-5)}`;
 };
 
 export type GetValue =

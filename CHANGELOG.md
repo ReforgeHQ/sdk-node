@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.0-pre.6 - 2025-09-18
+
+- Remove direct NodeJS crypto dependency in favor of `crypto-browserify` library to enable running
+  in NextJS serverless environments (https://nextjs.org/docs/messages/node-module-in-edge-runtime).
+
+## 0.0.0-pre.5 - 2025-09-18
+
+- apiKey -> sdkKey rename
+
 ## 0.0.0-pre.4 - 2025-09-15
 
 - Remove protobuf dependencies and use JSON API directly

@@ -93,7 +93,7 @@ const config: Config = {
           value: {
             decrypt_with: "reforge.secrets.encryption.key",
             string:
-              "8933c39f7f73b6e815dfbe--b3f5216809e719efd8803dad--b16761b9418d8145a98f88a631681298",
+              "9cf7cb1581853fb38e5ac3--9b5eb8e37fd79c52ef907b40--77cb8ca1fa2ef3e7714ad3b505f657d1",
           },
         },
         {

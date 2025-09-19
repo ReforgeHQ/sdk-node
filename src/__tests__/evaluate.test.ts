@@ -12,7 +12,7 @@ import { Resolver } from "../resolver";
 import type { EvaluateArgs } from "../evaluate";
 import { evaluate } from "../evaluate";
 import { emptyContexts, projectEnvIdUnderTest } from "./testHelpers";
-import { encrypt, generateNewHexKey } from "../../src/encryption";
+import { encrypt, generateNewHexKey } from "../encryption";
 import secretConfig from "./fixtures/secretConfig";
 import secretKeyConfig from "./fixtures/secretKeyConfig";
 import decryptionKeyConfig, {
@@ -284,7 +284,7 @@ describe("evaluate", () => {
       configType: propIsOneOf.config_type,
       valueType: propIsOneOf.value_type,
       unwrappedValue: "some-secret",
-      reportableValue: "*****cda9e",
+      reportableValue: "*****d6627",
       configRowIndex: 0,
       conditionalValueIndex: 3,
       weightedValueIndex: undefined,
