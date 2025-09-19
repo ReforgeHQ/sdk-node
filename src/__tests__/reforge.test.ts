@@ -93,7 +93,7 @@ describe("reforge", () => {
       const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
 
       await expect(reforge.init()).rejects.toThrow(
-        "Unauthorized. Check your Reforge SDK API key for https://suspenders.prefab.cloud/api/v1/configs/0"
+        "Unauthorized. Check your Reforge SDK API key for https://secondary.reforge.com/api/v1/configs/0"
       );
 
       expect(consoleWarnSpy).toHaveBeenCalled();

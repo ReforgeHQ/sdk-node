@@ -38,8 +38,8 @@ const defaultOptions = {
   contextUploadMode: "none" as const,
   collectEvaluationSummaries: false,
   sources: [
-    "https://belt.staging-prefab.cloud",
-    "https://suspenders.staging-prefab.cloud",
+    "https://primary.goatsofreforge.com",
+    "https://secondary.goatsofreforge.com",
   ],
 };
 
@@ -123,8 +123,8 @@ describe("integration tests", () => {
       const options: ConstructorParameters<typeof Reforge>[0] = {
         sdkKey,
         sources: [
-          "https://belt.staging-prefab.cloud",
-          "https://suspenders.staging-prefab.cloud",
+          "https://primary.goatsofreforge.com",
+          "https://secondary.goatsofreforge.com",
         ],
         ...test.customOptions,
       };

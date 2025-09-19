@@ -25,7 +25,7 @@ class SSEConnection {
     });
 
     const url = `${(this.sources[0] as string).replace(
-      /(belt|suspenders)\./,
+      /(primary|secondary)\./,
       "stream."
     )}/api/v1/sse/config?format=json`;
 
