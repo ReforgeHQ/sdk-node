@@ -367,6 +367,8 @@ const allCriteriaMatch = (
           contexts,
           (compareResult) => compareResult > 0
         );
+      case Criterion_CriterionOperator.AlwaysTrue:
+        return true;
       default:
         throw new Error(
           `Unexpected criteria ${jsonStringifyWithBigInt(criterion.operator)}`
