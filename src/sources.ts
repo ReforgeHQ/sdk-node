@@ -1,8 +1,8 @@
 import { jsonStringifyWithBigInt } from "./bigIntUtils";
 
 const DEFAULT_SOURCES = [
-  "https://belt.prefab.cloud",
-  "https://suspenders.prefab.cloud",
+  "https://primary.reforge.com",
+  "https://secondary.reforge.com",
 ];
 
 class Sources {
@@ -23,12 +23,12 @@ class Sources {
       .filter(
         (source) =>
           source.startsWith("https://") &&
-          (source.includes("belt.") ||
-            source.includes("suspenders.") ||
+          (source.includes("primary.") ||
+            source.includes("secondary.") ||
             source.includes("api."))
       )
       .map((source) =>
-        source.replace(/(belt|suspenders|api)\./, "telemetry.")
+        source.replace(/(primary|secondary|api)\./, "telemetry.")
       )[0];
 
     if (this.telemetrySource === undefined) {
