@@ -329,12 +329,11 @@ class Reforge implements ReforgeInterface {
     return undefined;
   }
 
-  /* eslint-disable-next-line @typescript-eslint/promise-function-async */
-  updateNow(): Promise<void> {
+  async updateNow(): Promise<void> {
     requireResolver(this.resolver);
     this.loading = true;
 
-    return loadConfig({
+    await loadConfig({
       sources: this.sources.configSources,
       apiClient: this.apiClient,
       startAtId: this.startAtId,
