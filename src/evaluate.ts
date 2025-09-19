@@ -393,7 +393,7 @@ const matchingConfigValue = (
       return;
     }
 
-    if (rows.values === undefined) {
+    if (row.values === undefined) {
       return;
     }
 
