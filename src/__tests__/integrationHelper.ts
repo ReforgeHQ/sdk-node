@@ -339,7 +339,7 @@ const aggregatorSpecificLogic = {
               counter.selectedValue as Record<string, unknown>
             )[0];
 
-            if (valueType === "string_list") {
+            if (valueType === "stringList") {
               valueType = "string_list";
             }
 

@@ -56,7 +56,7 @@ export async function loadConfig({
 }
 
 const extractDefaultContext = (
-  rawDefaultContext: Configs["default_context"]
+  rawDefaultContext: Configs["defaultContext"]
 ): Contexts => {
   const defaultContext: Contexts = new Map();
 
@@ -87,7 +87,7 @@ const loadConfigFromUrl = async ({
   apiClient: ApiClient;
   etag?: string;
 }): ReturnType<typeof loadConfig> => {
-  const path = `/api/v1/configs/${startAtId ?? "0"}`;
+  const path = `/api/v2/configs/${startAtId ?? "0"}`;
   const response = await fetchWithCache(apiClient, { source, path });
 
   if (response.status === 401) {
@@ -108,17 +108,17 @@ const loadConfigFromUrl = async ({
 };
 
 const parse = (parsed: Configs): Result => {
-  if (parsed.config_service_pointer?.project_env_id === undefined) {
+  if (parsed.configServicePointer?.projectEnvId === undefined) {
     throw new Error("No projectEnvId found in config.");
   }
 
   const configs = parsed.configs ?? [];
 
-  const defaultContext = extractDefaultContext(parsed.default_context);
+  const defaultContext = extractDefaultContext(parsed.defaultContext);
 
   return {
     configs,
-    projectEnvId: parsed.config_service_pointer.project_env_id,
+    projectEnvId: parsed.configServicePointer.projectEnvId,
     startAtId: maxBigIntId(configs.map((c) => c.id)),
     defaultContext,
   };

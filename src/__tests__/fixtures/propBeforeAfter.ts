@@ -15,9 +15,9 @@ function createConfig(
 ): Config {
   return {
     id: "999",
-    project_id: irrelevantNumber,
+    projectId: irrelevantNumber,
     key,
-    changed_by: undefined,
+    changedBy: undefined,
     rows: [
       {
         properties: {},
@@ -25,9 +25,9 @@ function createConfig(
           {
             criteria: [
               {
-                property_name: "user.createdAt",
+                propertyName: "user.createdAt",
                 operator,
-                value_to_match: valueToMatch, // Directly use the passed object
+                valueToMatch, // Directly use the passed object
               },
             ],
             value: {
@@ -43,10 +43,10 @@ function createConfig(
         ],
       },
     ],
-    allowable_values: [],
-    config_type: ConfigType.Config,
-    value_type: ConfigValueType.Bool,
-    send_to_client_sdk: false,
+    allowableValues: [],
+    configType: ConfigType.Config,
+    valueType: ConfigValueType.Bool,
+    sendToClientSdk: false,
   };
 }
 

@@ -137,8 +137,8 @@ export const evaluationSummaries = (
             selectedValue = {
               json: { json: jsonStringifyWithBigInt(unwrappedValue) },
             };
-          } else if (valueType === "string_list") {
-            selectedValue = { string_list: { values: unwrappedValue } };
+          } else if (valueType === "stringList") {
+            selectedValue = { stringList: { values: unwrappedValue } };
           } else {
             selectedValue = { [valueType]: unwrappedValue };
           }

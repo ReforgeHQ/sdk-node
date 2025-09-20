@@ -4,9 +4,9 @@ import { irrelevantNumber } from "../testHelpers";
 
 const config = (encryptedValue: string): Config => ({
   id: "51",
-  project_id: irrelevantNumber,
+  projectId: irrelevantNumber,
   key: "secret.config",
-  changed_by: undefined,
+  changedBy: undefined,
   rows: [
     {
       properties: {},
@@ -16,16 +16,16 @@ const config = (encryptedValue: string): Config => ({
           value: {
             string: encryptedValue,
             confidential: true,
-            decrypt_with: "reforge.secrets.encryption.key",
+            decryptWith: "reforge.secrets.encryption.key",
           },
         },
       ],
     },
   ],
-  allowable_values: [],
-  config_type: ConfigType.Config,
-  value_type: ConfigValueType.String,
-  send_to_client_sdk: false,
+  allowableValues: [],
+  configType: ConfigType.Config,
+  valueType: ConfigValueType.String,
+  sendToClientSdk: false,
 });
 
 export default config;

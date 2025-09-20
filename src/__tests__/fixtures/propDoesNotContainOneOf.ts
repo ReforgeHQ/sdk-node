@@ -12,14 +12,14 @@ import {
 
 const config: Config = {
   id: irrelevantNumberAsString,
-  project_id: irrelevantNumber,
+  projectId: irrelevantNumber,
 
   key: "prop.contains",
-  changed_by: undefined,
+  changedBy: undefined,
   rows: [
     {
       properties: {},
-      project_env_id: irrelevantNumber,
+      projectEnvId: irrelevantNumber,
       values: [
         {
           criteria: [],
@@ -31,15 +31,15 @@ const config: Config = {
     },
     {
       properties: {},
-      project_env_id: projectEnvIdUnderTest,
+      projectEnvId: projectEnvIdUnderTest,
       values: [
         {
           criteria: [
             {
-              property_name: "user.aka",
+              propertyName: "user.aka",
               operator: Criterion_CriterionOperator.PropDoesNotContainOneOf,
-              value_to_match: {
-                string_list: {
+              valueToMatch: {
+                stringList: {
                   values: ["one", "two"],
                 },
               },
@@ -58,7 +58,7 @@ const config: Config = {
       ],
     },
   ],
-  allowable_values: [
+  allowableValues: [
     {
       string: "wrong projectEnvId",
     },
@@ -66,8 +66,8 @@ const config: Config = {
       string: "default",
     },
   ],
-  config_type: ConfigType.Config,
-  value_type: ConfigValueType.String,
-  send_to_client_sdk: false,
+  configType: ConfigType.Config,
+  valueType: ConfigValueType.String,
+  sendToClientSdk: false,
 };
 export default config;

@@ -3,9 +3,9 @@ import { irrelevantNumber } from "../testHelpers";
 
 const config: Config = {
   id: "999",
-  project_id: irrelevantNumber,
+  projectId: irrelevantNumber,
   key: "basic.value",
-  changed_by: undefined,
+  changedBy: undefined,
   rows: [
     {
       properties: {},
@@ -19,10 +19,10 @@ const config: Config = {
       ],
     },
   ],
-  allowable_values: [],
-  config_type: ConfigType.Config,
-  value_type: ConfigValueType.Int,
-  send_to_client_sdk: false,
+  allowableValues: [],
+  configType: ConfigType.Config,
+  valueType: ConfigValueType.Int,
+  sendToClientSdk: false,
 };
 
 export default config;

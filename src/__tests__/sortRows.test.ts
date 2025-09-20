@@ -8,22 +8,22 @@ describe("sortRows", () => {
 
   it("should sort rows with matching projectEnvId first", () => {
     const rows: SortableRow[] = [
-      { project_env_id: projectEnvId2 },
-      { project_env_id: projectEnvId1 },
+      { projectEnvId: projectEnvId2 },
+      { projectEnvId: projectEnvId1 },
     ];
 
     const result = sortRows(rows, projectEnvId1);
 
     expect(result).toEqual([
-      { project_env_id: projectEnvId1 },
-      { project_env_id: projectEnvId2 },
+      { projectEnvId: projectEnvId1 },
+      { projectEnvId: projectEnvId2 },
     ]);
   });
 
   it("should keep the original order for non-matching rows", () => {
     const rows: SortableRow[] = [
-      { project_env_id: projectEnvId1 },
-      { project_env_id: projectEnvId2 },
+      { projectEnvId: projectEnvId1 },
+      { projectEnvId: projectEnvId2 },
     ];
 
     const result = sortRows(rows, 3);
@@ -33,17 +33,17 @@ describe("sortRows", () => {
 
   it("should handle rows with missing projectEnvId", () => {
     const rows: SortableRow[] = [
-      { project_env_id: projectEnvId1 },
+      { projectEnvId: projectEnvId1 },
       {},
-      { project_env_id: projectEnvId2 },
+      { projectEnvId: projectEnvId2 },
     ];
 
     const result = sortRows(rows, projectEnvId1);
 
     expect(result).toEqual([
-      { project_env_id: projectEnvId1 },
+      { projectEnvId: projectEnvId1 },
       {},
-      { project_env_id: projectEnvId2 },
+      { projectEnvId: projectEnvId2 },
     ]);
   });
 

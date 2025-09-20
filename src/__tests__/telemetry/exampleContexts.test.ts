@@ -140,10 +140,10 @@ describe("exampleContexts", () => {
                           double: 11.5,
                         },
                         someArray: {
-                          string_list: { values: ["1", "2", "3", "4"] },
+                          stringList: { values: ["1", "2", "3", "4"] },
                         },
                         cars: {
-                          string_list: { values: ["Ford", "BMW", "Fiat"] },
+                          stringList: { values: ["Ford", "BMW", "Fiat"] },
                         },
                       },
                     },

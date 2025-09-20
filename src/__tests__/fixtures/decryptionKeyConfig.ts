@@ -3,7 +3,7 @@ import { ConfigValueType, ConfigType } from "../../types";
 import { irrelevantNumberAsString, irrelevantNumber } from "../testHelpers";
 
 export const decryptionKeyForSecret = (secret: Config): string => {
-  const decryptWith = secret.rows[0]?.values[0]?.value?.decrypt_with;
+  const decryptWith = secret.rows[0]?.values[0]?.value?.decryptWith;
 
   if (decryptWith === undefined) {
     throw new Error("decryptWith was undefined");
@@ -17,9 +17,9 @@ const config = (secret: Config, decryptionKey: string): Config => {
 
   return {
     id: irrelevantNumberAsString,
-    project_id: irrelevantNumber,
+    projectId: irrelevantNumber,
     key: decryptWith,
-    changed_by: undefined,
+    changedBy: undefined,
     rows: [
       {
         properties: {},
@@ -34,10 +34,10 @@ const config = (secret: Config, decryptionKey: string): Config => {
         ],
       },
     ],
-    allowable_values: [],
-    config_type: ConfigType.Config,
-    value_type: ConfigValueType.String,
-    send_to_client_sdk: false,
+    allowableValues: [],
+    configType: ConfigType.Config,
+    valueType: ConfigValueType.String,
+    sendToClientSdk: false,
   };
 };
 

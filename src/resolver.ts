@@ -65,7 +65,7 @@ export interface ResolverAPI {
   ) => void;
 }
 
-type OptionalKeys = "id" | "project_id" | "changed_by" | "allowable_values";
+type OptionalKeys = "id" | "projectId" | "changedBy" | "allowableValues";
 
 export type MinimumConfig = {
   [K in keyof Config]: K extends OptionalKeys
@@ -172,7 +172,7 @@ class Resolver implements ResolverAPI {
   ): void {
     for (const config of configs) {
       if (
-        config.config_type === ConfigType.Deleted ||
+        config.configType === ConfigType.Deleted ||
         config.rows?.length === 0
       ) {
         this.config.delete(config.key);
@@ -206,14 +206,14 @@ class Resolver implements ResolverAPI {
 
     const config: MinimumConfig = {
       id: undefined,
-      project_id: undefined,
-      changed_by: undefined,
-      allowable_values: undefined,
+      projectId: undefined,
+      changedBy: undefined,
+      allowableValues: undefined,
       key,
       rows: [{ properties: {}, values: [{ value, criteria: [] }] }],
-      config_type: ConfigType.Config,
-      value_type: valueType,
-      send_to_client_sdk: false,
+      configType: ConfigType.Config,
+      valueType,
+      sendToClientSdk: false,
     };
 
     this.config.set(key, config);

@@ -17,9 +17,9 @@ describe("valueType", () => {
     expect(valueType(false)).toBe("bool");
   });
 
-  it('should return "string_list" for array values', () => {
-    expect(valueType(["apple", "banana"])).toBe("string_list");
-    expect(valueType([])).toBe("string_list");
+  it('should return "stringList" for array values', () => {
+    expect(valueType(["apple", "banana"])).toBe("stringList");
+    expect(valueType([])).toBe("stringList");
   });
 
   it('should return "string" for other values', () => {
@@ -36,7 +36,7 @@ describe("wrap", () => {
     expect(wrap(3.14)).toEqual({ double: 3.14 });
     expect(wrap(true)).toEqual({ bool: true });
     expect(wrap(["apple", "banana"])).toEqual({
-      string_list: {
+      stringList: {
         values: ["apple", "banana"],
       },
     });

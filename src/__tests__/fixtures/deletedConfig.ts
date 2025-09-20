@@ -4,14 +4,14 @@ import { irrelevantNumber } from "../testHelpers";
 
 const config: Config = {
   id: "999",
-  project_id: irrelevantNumber,
+  projectId: irrelevantNumber,
   key: "deleted.value",
-  changed_by: undefined,
+  changedBy: undefined,
   rows: [],
-  allowable_values: [],
-  config_type: ConfigType.Deleted,
-  value_type: ConfigValueType.Int,
-  send_to_client_sdk: false,
+  allowableValues: [],
+  configType: ConfigType.Deleted,
+  valueType: ConfigValueType.Int,
+  sendToClientSdk: false,
 };
 
 export default config;
