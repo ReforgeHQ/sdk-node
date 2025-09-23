@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.0-pre.8 - 2025-09-23
+
+- Properly type other key inputs to the reforge hooks
+
 ## 0.0.0-pre.7 - 2025-09-20
 
 - Upgrade to v2 of the Reforge JSON API.
