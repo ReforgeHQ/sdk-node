@@ -64,12 +64,15 @@ export type TypedNodeServerConfigurationAccessor =
       };
 
 export interface ReforgeInterface {
-  get: <T extends keyof TypedNodeServerConfigurationRaw>(
-    key: T,
+  get: <K extends keyof TypedNodeServerConfigurationRaw>(
+    key: K,
     contexts?: Contexts | ContextObj,
-    defaultValue?: TypedNodeServerConfigurationRaw[T]
-  ) => TypedNodeServerConfigurationRaw[T];
-  isFeatureEnabled: (key: string, contexts?: Contexts | ContextObj) => boolean;
+    defaultValue?: TypedNodeServerConfigurationRaw[K]
+  ) => TypedNodeServerConfigurationRaw[K];
+  isFeatureEnabled: <K extends keyof TypedNodeServerConfigurationRaw>(
+    key: K,
+    contexts?: Contexts | ContextObj
+  ) => boolean;
   logger: (
     loggerName: string,
     defaultLevel: LogLevel
