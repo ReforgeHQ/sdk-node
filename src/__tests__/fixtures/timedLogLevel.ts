@@ -9,9 +9,9 @@ import { irrelevantNumber } from "../testHelpers";
 
 const config = (start: number, end: number): Config => ({
   id: "33",
-  project_id: irrelevantNumber,
+  projectId: irrelevantNumber,
   key: "log-level.some.component.path",
-  changed_by: undefined,
+  changedBy: undefined,
   rows: [
     {
       properties: {},
@@ -19,29 +19,29 @@ const config = (start: number, end: number): Config => ({
         {
           criteria: [
             {
-              property_name: "reforge.current-time",
+              propertyName: "reforge.current-time",
               operator: Criterion_CriterionOperator.InIntRange,
-              value_to_match: {
-                int_range: {
+              valueToMatch: {
+                intRange: {
                   start: BigInt(start),
                   end: BigInt(end),
                 },
               },
             },
           ],
-          value: { log_level: LogLevel.Debug },
+          value: { logLevel: LogLevel.Debug },
         },
         {
           criteria: [],
-          value: { log_level: LogLevel.Info },
+          value: { logLevel: LogLevel.Info },
         },
       ],
     },
   ],
-  allowable_values: [],
-  config_type: ConfigType.LogLevel,
-  value_type: ConfigValueType.LogLevel,
-  send_to_client_sdk: false,
+  allowableValues: [],
+  configType: ConfigType.LogLevel,
+  valueType: ConfigValueType.LogLevel,
+  sendToClientSdk: false,
 });
 
 export default config;

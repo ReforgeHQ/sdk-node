@@ -8,14 +8,14 @@ import { irrelevantNumber, projectEnvIdUnderTest } from "../testHelpers";
 
 const config: Config = {
   id: "992",
-  project_id: irrelevantNumber,
+  projectId: irrelevantNumber,
 
   key: "prop.is.one.of.jsonValue",
-  changed_by: undefined,
+  changedBy: undefined,
   rows: [
     {
       properties: {},
-      project_env_id: irrelevantNumber,
+      projectEnvId: irrelevantNumber,
       values: [
         {
           criteria: [],
@@ -29,15 +29,15 @@ const config: Config = {
     },
     {
       properties: {},
-      project_env_id: projectEnvIdUnderTest,
+      projectEnvId: projectEnvIdUnderTest,
       values: [
         {
           criteria: [
             {
-              property_name: "reforge.user-id",
+              propertyName: "reforge.user-id",
               operator: Criterion_CriterionOperator.PropIsOneOf,
-              value_to_match: {
-                string_list: {
+              valueToMatch: {
+                stringList: {
                   values: ["4", "5"],
                 },
               },
@@ -52,10 +52,10 @@ const config: Config = {
         {
           criteria: [
             {
-              property_name: "user.country",
+              propertyName: "user.country",
               operator: Criterion_CriterionOperator.PropIsOneOf,
-              value_to_match: {
-                string_list: {
+              valueToMatch: {
+                stringList: {
                   values: ["US", "UK"],
                 },
               },
@@ -70,10 +70,10 @@ const config: Config = {
         {
           criteria: [
             {
-              property_name: "user.trackingId",
+              propertyName: "user.trackingId",
               operator: Criterion_CriterionOperator.PropIsOneOf,
-              value_to_match: {
-                string_list: {
+              valueToMatch: {
+                stringList: {
                   values: ["CONFIDENTIAL"],
                 },
               },
@@ -87,10 +87,10 @@ const config: Config = {
         {
           criteria: [
             {
-              property_name: "user.trackingId",
+              propertyName: "user.trackingId",
               operator: Criterion_CriterionOperator.PropIsOneOf,
-              value_to_match: {
-                string_list: {
+              valueToMatch: {
+                stringList: {
                   values: ["SECRET"],
                 },
               },
@@ -113,7 +113,7 @@ const config: Config = {
       ],
     },
   ],
-  allowable_values: [
+  allowableValues: [
     {
       json: {
         json: JSON.stringify({ result: "default" }),
@@ -140,8 +140,8 @@ const config: Config = {
       },
     },
   ],
-  config_type: ConfigType.Config,
-  value_type: ConfigValueType.Json,
-  send_to_client_sdk: false,
+  configType: ConfigType.Config,
+  valueType: ConfigValueType.Json,
+  sendToClientSdk: false,
 };
 export default config;

@@ -45,9 +45,9 @@ export enum LogLevel {
 }
 
 export interface ConfigServicePointer {
-  project_id: ProjectEnvId;
+  projectId: ProjectEnvId;
   startAtId: ProjectEnvId;
-  project_env_id: ProjectEnvId;
+  projectEnvId: ProjectEnvId;
 }
 
 export interface ConfigValue {
@@ -56,11 +56,11 @@ export interface ConfigValue {
   bytes?: Buffer | undefined;
   double?: number | undefined;
   bool?: boolean | undefined;
-  weighted_values?: WeightedValues | undefined;
-  limit_definition?: LimitDefinition | undefined;
-  log_level?: LogLevel | undefined;
-  string_list?: StringList | undefined;
-  int_range?: IntRange | undefined;
+  weightedValues?: WeightedValues | undefined;
+  limitDefinition?: LimitDefinition | undefined;
+  logLevel?: LogLevel | undefined;
+  stringList?: StringList | undefined;
+  intRange?: IntRange | undefined;
   provided?: Provided | undefined;
   duration?: IsoDuration | undefined;
   json?: Json | undefined;
@@ -68,7 +68,7 @@ export interface ConfigValue {
   /** don't log or telemetry this value */
   confidential?: boolean | undefined;
   /** key name to decrypt with */
-  decrypt_with?: string | undefined;
+  decryptWith?: string | undefined;
 }
 
 export interface Json {
@@ -104,8 +104,8 @@ export interface WeightedValue {
 }
 
 export interface WeightedValues {
-  weighted_values: WeightedValue[];
-  hash_by_property_name?: string | undefined;
+  weightedValues: WeightedValue[];
+  hashByPropertyName?: string | undefined;
 }
 
 export interface ApiKeyMetadata {
@@ -117,25 +117,25 @@ export interface ApiKeyMetadata {
 
 export interface Configs {
   configs: Config[];
-  config_service_pointer: ConfigServicePointer | undefined;
-  apikey_metadata?: ApiKeyMetadata | undefined;
-  default_context?: ContextSet | undefined;
-  keep_alive?: boolean | undefined;
+  configServicePointer: ConfigServicePointer | undefined;
+  apikeyMetadata?: ApiKeyMetadata | undefined;
+  defaultContext?: ContextSet | undefined;
+  keepAlive?: boolean | undefined;
 }
 
 export interface Config {
   id: ConfigId;
-  project_id: ProjectEnvId;
+  projectId: ProjectEnvId;
   key: string;
-  changed_by: ChangedBy | undefined;
+  changedBy: ChangedBy | undefined;
   rows: ConfigRow[];
-  allowable_values: ConfigValue[];
-  config_type: ConfigType;
-  draft_id?: number | undefined;
-  value_type: ConfigValueType;
+  allowableValues: ConfigValue[];
+  configType: ConfigType;
+  draftId?: number | undefined;
+  valueType: ConfigValueType;
   /** default value of a boolean in proto3 is false */
-  send_to_client_sdk: boolean;
-  schema_key?: string | undefined;
+  sendToClientSdk: boolean;
+  schemaKey?: string | undefined;
 }
 
 export enum ConfigValueType {
@@ -146,21 +146,21 @@ export enum ConfigValueType {
   Bool = "BOOL",
   LimitDefinition = "LIMIT_DEFINITION",
   LogLevel = "LOG_LEVEL",
-  StringList = "STRING_LIST",
+  StringList = "stringList",
   IntRange = "INT_RANGE",
   Duration = "DURATION",
   Json = "JSON",
 }
 
 export interface ChangedBy {
-  user_id: string;
+  userId: string;
   email: string;
-  api_key_id: string;
+  apiKeyId: string;
 }
 
 export interface ConfigRow {
-  /** one row per project_env_id */
-  project_env_id?: number | undefined;
+  /** one row per projectEnvId */
+  projectEnvId?: number | undefined;
   values: ConditionalValue[];
   /** can store "activated" */
   properties: Record<string, ConfigValue>;
@@ -178,9 +178,9 @@ export interface ConditionalValue {
 }
 
 export interface Criterion {
-  property_name: string;
+  propertyName: string;
   operator: Criterion_CriterionOperator;
-  value_to_match: ConfigValue | undefined;
+  valueToMatch: ConfigValue | undefined;
 }
 
 export enum Criterion_CriterionOperator {
@@ -295,12 +295,12 @@ export interface ClientConfigValue {
   string?: string | undefined;
   double?: number | undefined;
   bool?: boolean | undefined;
-  log_level?: LogLevel | undefined;
-  string_list?: StringList | undefined;
-  int_range?: IntRange | undefined;
+  logLevel?: LogLevel | undefined;
+  stringList?: StringList | undefined;
+  intRange?: IntRange | undefined;
   duration?: ClientDuration | undefined;
   json?: Json | undefined;
-  config_evaluation_metadata?: ConfigEvaluationMetaData | undefined;
+  configEvaluationMetadata?: ConfigEvaluationMetaData | undefined;
 }
 
 export interface ClientDuration {
@@ -312,8 +312,8 @@ export interface ClientDuration {
 
 export interface ConfigEvaluations {
   values: Record<string, ClientConfigValue>;
-  apikey_metadata?: ApiKeyMetadata | undefined;
-  default_context?: ContextSet | undefined;
+  apikeyMetadata?: ApiKeyMetadata | undefined;
+  defaultContext?: ContextSet | undefined;
 }
 
 export interface ConfigEvaluations_ValuesEntry {

@@ -1,8 +1,13 @@
 # Changelog
 
+## 0.0.0-pre.7 - 2025-09-20
+
+- Upgrade to v2 of the Reforge JSON API.
+
 ## 0.0.0-pre.6 - 2025-09-18
 
-- Remove direct NodeJS crypto dependency in favor of custom decrypt implementation in NextJS serverless environments (https://nextjs.org/docs/messages/node-module-in-edge-runtime).
+- Remove direct NodeJS crypto dependency in favor of custom decrypt implementation in NextJS
+  serverless environments (https://nextjs.org/docs/messages/node-module-in-edge-runtime).
 
 ## 0.0.0-pre.5 - 2025-09-18
 

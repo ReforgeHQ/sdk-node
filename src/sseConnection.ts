@@ -36,7 +36,7 @@ class SSEConnection {
     const url = `${(this.sources[0] as string).replace(
       /(primary|secondary)\./,
       "stream."
-    )}/api/v1/sse/config?format=json`;
+    )}/api/v2/sse/config?format=json`;
 
     this.channel = new EventSource(url, { fetch: customFetch });
 

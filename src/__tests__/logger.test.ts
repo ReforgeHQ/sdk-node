@@ -148,43 +148,43 @@ describe("shouldLog", () => {
 
     const config: Config = {
       id: irrelevantNumberAsString,
-      project_id: irrelevantNumber,
+      projectId: irrelevantNumber,
       key: `${PREFIX}${loggerName}`,
-      changed_by: undefined,
+      changedBy: undefined,
       rows: [
         {
           properties: {},
-          project_env_id: projectEnvIdUnderTest,
+          projectEnvId: projectEnvIdUnderTest,
           values: [
             {
               criteria: [
                 {
-                  property_name: "user.country",
+                  propertyName: "user.country",
                   operator: Criterion_CriterionOperator.PropIsOneOf,
-                  value_to_match: {
-                    string_list: {
+                  valueToMatch: {
+                    stringList: {
                       values: ["US", "UK"],
                     },
                   },
                 },
               ],
               value: {
-                log_level: LogLevel.Info,
+                logLevel: LogLevel.Info,
               },
             },
             {
               criteria: [],
               value: {
-                log_level: LogLevel.Warn,
+                logLevel: LogLevel.Warn,
               },
             },
           ],
         },
       ],
-      allowable_values: [],
-      config_type: ConfigType.LogLevel,
-      value_type: ConfigValueType.LogLevel,
-      send_to_client_sdk: false,
+      allowableValues: [],
+      configType: ConfigType.LogLevel,
+      valueType: ConfigValueType.LogLevel,
+      sendToClientSdk: false,
     };
 
     const resolver = getResolver([config]);

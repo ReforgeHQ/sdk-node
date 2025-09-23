@@ -17,9 +17,9 @@ export const irrelevantNumber = -1;
 export const levelAt = (path: string, level: LogLevelMethodName): Config => {
   return {
     id: irrelevantNumberAsString,
-    project_id: irrelevantNumber,
+    projectId: irrelevantNumber,
     key: `${PREFIX}${path}`,
-    changed_by: undefined,
+    changedBy: undefined,
     rows: [
       {
         properties: {},
@@ -27,16 +27,16 @@ export const levelAt = (path: string, level: LogLevelMethodName): Config => {
           {
             criteria: [],
             value: {
-              log_level: level.toUpperCase() as LogLevel,
+              logLevel: level.toUpperCase() as LogLevel,
             },
           },
         ],
       },
     ],
-    allowable_values: [],
-    config_type: ConfigType.LogLevel,
-    value_type: ConfigValueType.LogLevel,
-    send_to_client_sdk: true,
+    allowableValues: [],
+    configType: ConfigType.LogLevel,
+    valueType: ConfigValueType.LogLevel,
+    sendToClientSdk: true,
   };
 };
 
