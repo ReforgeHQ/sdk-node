@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.2 - 2025-10-02
+
+- fix: correct string list in config value types
+- feat: expose jsonStringifyWithBigInt in exports
+- feat: expose SchemaType in exports
+
 ## 0.0.1 - 2025-10-01
 
 - Official patch release

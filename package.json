@@ -1,7 +1,7 @@
 {
   "packageManager": "yarn@4.9.2",
   "name": "@reforge-com/node",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Feature Flags, Live Config, and Dynamic Log Levels",
   "main": "dist/reforge.cjs",
   "types": "dist/reforge.d.ts",
