@@ -146,7 +146,7 @@ export enum ConfigValueType {
   Bool = "BOOL",
   LimitDefinition = "LIMIT_DEFINITION",
   LogLevel = "LOG_LEVEL",
-  StringList = "stringList",
+  StringList = "STRING_LIST",
   IntRange = "INT_RANGE",
   Duration = "DURATION",
   Json = "JSON",
@@ -416,10 +416,10 @@ export interface ClientStats {
 
 export interface Schema {
   schema: string;
-  schemaType: Schema_SchemaType;
+  schemaType: SchemaType;
 }
 
-export enum Schema_SchemaType {
+export enum SchemaType {
   UNKNOWN = 0,
   ZOD = 1,
   JSON_SCHEMA = 2,

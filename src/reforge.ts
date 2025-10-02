@@ -2,6 +2,7 @@ import { apiClient, type ApiClient } from "./apiClient";
 import { loadConfig } from "./loadConfig";
 import { Resolver, type MinimumConfig, type ResolverAPI } from "./resolver";
 import { Sources } from "./sources";
+import { jsonStringifyWithBigInt } from "./bigIntUtils";
 import { ConfigType, ConfigValueType, LogLevel, ProvidedSource } from "./types";
 import type {
   ContextObj,
@@ -14,6 +15,7 @@ import type {
   ConfigValue,
   ConfigRow,
   Provided,
+  SchemaType,
 } from "./types";
 import { LOG_LEVEL_RANK_LOOKUP, type makeLogger } from "./logger";
 import { SSEConnection } from "./sseConnection";
@@ -529,6 +531,7 @@ const encryption = {
 };
 
 export {
+  jsonStringifyWithBigInt,
   ConfigType,
   ConfigValueType,
   LogLevel,
@@ -539,6 +542,7 @@ export {
   type ConfigRow,
   type ConfigValue,
   type Contexts,
+  type SchemaType,
   type Provided,
   type Resolver,
 };
