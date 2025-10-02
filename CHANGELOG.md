@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.4 - 2025-10-02
+
+- fix: properly import/export none-types to ensure build is valid
+
 ## 0.0.3 - 2025-10-02
 
 - fix: export SchemaType as object, not type
