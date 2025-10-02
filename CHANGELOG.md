@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.1 - 2025-10-01
+
+- Official patch release
+
 ## 0.0.0-pre.8 - 2025-09-23
 
 - Properly type other key inputs to the reforge hooks
