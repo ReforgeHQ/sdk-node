@@ -3,7 +3,13 @@ import { loadConfig } from "./loadConfig";
 import { Resolver, type MinimumConfig, type ResolverAPI } from "./resolver";
 import { Sources } from "./sources";
 import { jsonStringifyWithBigInt } from "./bigIntUtils";
-import { ConfigType, ConfigValueType, LogLevel, ProvidedSource } from "./types";
+import {
+  ConfigType,
+  ConfigValueType,
+  LogLevel,
+  ProvidedSource,
+  SchemaType,
+} from "./types";
 import type {
   ContextObj,
   Contexts,
@@ -15,7 +21,6 @@ import type {
   ConfigValue,
   ConfigRow,
   Provided,
-  SchemaType,
 } from "./types";
 import { LOG_LEVEL_RANK_LOOKUP, type makeLogger } from "./logger";
 import { SSEConnection } from "./sseConnection";
@@ -544,5 +549,5 @@ export {
   type Contexts,
   SchemaType,
   type Provided,
-  type Resolver,
+  Resolver,
 };
