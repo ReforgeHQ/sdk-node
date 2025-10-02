@@ -146,7 +146,7 @@ export enum ConfigValueType {
   Bool = "BOOL",
   LimitDefinition = "LIMIT_DEFINITION",
   LogLevel = "LOG_LEVEL",
-  StringList = "stringList",
+  StringList = "STRING_LIST",
   IntRange = "INT_RANGE",
   Duration = "DURATION",
   Json = "JSON",
