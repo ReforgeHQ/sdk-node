@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.3 - 2025-10-02
+
+- fix: export SchemaType as object, not type
+
 ## 0.0.2 - 2025-10-02
 
 - fix: correct string list in config value types
