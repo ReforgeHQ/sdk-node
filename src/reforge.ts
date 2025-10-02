@@ -2,6 +2,7 @@ import { apiClient, type ApiClient } from "./apiClient";
 import { loadConfig } from "./loadConfig";
 import { Resolver, type MinimumConfig, type ResolverAPI } from "./resolver";
 import { Sources } from "./sources";
+import { jsonStringifyWithBigInt } from "./bigIntUtils";
 import { ConfigType, ConfigValueType, LogLevel, ProvidedSource } from "./types";
 import type {
   ContextObj,
@@ -529,6 +530,7 @@ const encryption = {
 };
 
 export {
+  jsonStringifyWithBigInt,
   ConfigType,
   ConfigValueType,
   LogLevel,
