@@ -542,7 +542,7 @@ export {
   type ConfigRow,
   type ConfigValue,
   type Contexts,
-  type SchemaType,
+  SchemaType,
   type Provided,
   type Resolver,
 };
