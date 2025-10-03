@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.5 - 2025-10-03
+
+- fix: handle confidential values that are undefined
+
 ## 0.0.4 - 2025-10-02
 
 - fix: properly import/export none-types to ensure build is valid
