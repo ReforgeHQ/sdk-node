@@ -335,7 +335,7 @@ export const unwrap = ({
   return {
     ...unwrappedValue,
     reportableValue: shouldObscure
-      ? makeConfidential((value[kind] as string).toString())
+      ? makeConfidential(value?.[kind]?.toString() ?? "")
       : undefined,
   };
 };
