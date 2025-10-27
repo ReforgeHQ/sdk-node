@@ -39,6 +39,7 @@ import {
 
 const DEFAULT_POLL_INTERVAL = 60 * 1000;
 export const REFORGE_DEFAULT_LOG_LEVEL = LogLevel.Warn;
+export const DEFAULT_LOGGER_KEY = "log-levels.default";
 export const MULTIPLE_INIT_WARNING =
   "[reforge] init() called multiple times. This is generally not recommended as it can lead to multiple concurrent SSE connections and/or redundant polling. A Reforge instance is typically meant to be long-lived and exist outside of your request/response life-cycle. If you're using `init()` to change context, you're better off using `inContext` or setting per-request context to pass to your `get`/etc. calls.";
 
@@ -95,6 +96,7 @@ export interface ReforgeInterface {
     defaultLevel?: LogLevel;
     contexts?: Contexts | ContextObj;
   }) => boolean;
+  getLogLevel: (loggerName: string) => LogLevel;
   telemetry?: Telemetry;
   updateIfStalerThan: (durationInMs: number) => Promise<void> | undefined;
   withContext: (contexts: Contexts | ContextObj) => ResolverAPI;
@@ -120,6 +122,7 @@ interface ConstructorProps {
   pollInterval?: number;
   fetch?: Fetch;
   defaultLogLevel?: LogLevel;
+  loggerKey?: string;
   collectLoggerCounts?: boolean;
   contextUploadMode?: ContextUploadMode;
   collectEvaluationSummaries?: boolean;
@@ -138,6 +141,7 @@ class Reforge implements ReforgeInterface {
   private resolver: Resolver | undefined;
   private readonly apiClient: ApiClient;
   private readonly defaultLogLevel: LogLevel;
+  private readonly loggerKey?: string;
   private readonly instanceHash: string;
   private readonly onUpdate: (configs: Array<Config | MinimumConfig>) => void;
   private initCount: number = 0;
@@ -163,12 +167,14 @@ class Reforge implements ReforgeInterface {
     pollInterval,
     fetch = globalThis.fetch,
     defaultLogLevel = REFORGE_DEFAULT_LOG_LEVEL,
+    loggerKey = DEFAULT_LOGGER_KEY,
     collectLoggerCounts = true,
     contextUploadMode = "periodicExample",
     collectEvaluationSummaries = true,
     onUpdate,
   }: ConstructorProps) {
     this.sdkKey = sdkKey;
+    this.loggerKey = loggerKey;
 
     if (
       process.env["REFORGE_API_URL_OVERRIDE"] !== undefined &&
@@ -243,7 +249,8 @@ class Reforge implements ReforgeInterface {
       undefined,
       () => {},
       defaultContext,
-      this.globalContext
+      this.globalContext,
+      this.loggerKey
     );
 
     this.configChangeNotifier.init(tempResolver);
@@ -472,6 +479,12 @@ class Reforge implements ReforgeInterface {
     requireResolver(this.resolver);
 
     return this.resolver.isFeatureEnabled(key, contexts);
+  }
+
+  getLogLevel(loggerName: string): LogLevel {
+    requireResolver(this.resolver);
+
+    return this.resolver.getLogLevel(loggerName);
   }
 
   raw(key: string): MinimumConfig | undefined {
