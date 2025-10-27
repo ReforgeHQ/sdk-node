@@ -9,6 +9,7 @@ import {
   type ConfigValue,
   type LogLevel,
   ConfigType,
+  LogLevel as LogLevelEnum,
 } from "./types";
 import type { Telemetry, TypedNodeServerConfigurationRaw } from "./reforge";
 import { REFORGE_DEFAULT_LOG_LEVEL } from "./reforge";
@@ -29,6 +30,7 @@ export interface ResolverAPI {
   contexts?: Contexts;
   readonly telemetry: Telemetry | undefined;
   readonly defaultContext?: Contexts;
+  readonly loggerKey?: string;
   updateIfStalerThan:
     | ((durationInMs: number) => Promise<void> | undefined)
     | undefined;
@@ -60,6 +62,7 @@ export interface ResolverAPI {
     defaultLevel?: LogLevel;
     contexts?: Contexts | ContextObj;
   }) => boolean;
+  getLogLevel: (loggerName: string) => LogLevel;
   setOnUpdate: (
     onUpdate: (configs: Array<Config | MinimumConfig>) => void
   ) => void;
@@ -112,6 +115,7 @@ class Resolver implements ResolverAPI {
   private readonly globalContext?: Contexts;
   public id: number;
   public readonly defaultContext?: Contexts;
+  public readonly loggerKey?: string;
   public updateIfStalerThan: (
     durationInMs: number
   ) => Promise<void> | undefined;
@@ -126,7 +130,8 @@ class Resolver implements ResolverAPI {
     contexts?: Contexts | ContextObj,
     onInitialUpdate?: (configs: Array<Config | MinimumConfig>) => void,
     defaultContext?: Contexts,
-    globalContext?: Contexts
+    globalContext?: Contexts,
+    loggerKey?: string
   ) {
     id += 1;
     this.id = id;
@@ -136,6 +141,7 @@ class Resolver implements ResolverAPI {
     this.onUpdate = onInitialUpdate ?? (() => {});
     this.defaultContext = defaultContext ?? new Map();
     this.globalContext = globalContext ?? new Map();
+    this.loggerKey = loggerKey;
     this.contexts = mergeDefaultContexts(
       this.globalContext,
       mergeDefaultContexts(contexts ?? new Map(), defaultContext ?? new Map())
@@ -158,7 +164,8 @@ class Resolver implements ResolverAPI {
       contexts,
       this.onUpdate,
       this.defaultContext,
-      this.globalContext
+      this.globalContext,
+      this.loggerKey
     );
   }
 
@@ -333,6 +340,33 @@ class Resolver implements ResolverAPI {
       defaultLevel: defaultLevel ?? REFORGE_DEFAULT_LOG_LEVEL,
       resolver: this,
     });
+  }
+
+  getLogLevel(loggerName: string): LogLevel {
+    const key = this.loggerKey;
+
+    if (key === undefined) {
+      return LogLevelEnum.Debug;
+    }
+
+    const contexts: Contexts = new Map([
+      [
+        "reforge-sdk-logging",
+        new Map([
+          ["lang", "javascript"],
+          ["logger-path", loggerName],
+        ]),
+      ],
+    ]);
+
+    const result = this.get(key, contexts, LogLevelEnum.Debug, "ignore");
+
+    // Validate that the result is actually a LogLevel
+    if (typeof result === "string" && Object.values(LogLevelEnum).includes(result as LogLevel)) {
+      return result as LogLevel;
+    }
+
+    return LogLevelEnum.Debug;
   }
 
   public setOnUpdate(

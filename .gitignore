@@ -3,3 +3,6 @@ node_modules
 dist
 .envrc
 src/__tests__/temp-test.ts
+.idea/
+.claude/
+.yarn/
