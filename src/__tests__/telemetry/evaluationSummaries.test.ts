@@ -20,6 +20,7 @@ import basicLogLevel from "../fixtures/basicLogLevel";
 import rolloutFlag from "../fixtures/rolloutFlag";
 import propIsOneOfJsonValue from "../fixtures/propIsOneOfJsonValue";
 import envConfig from "../fixtures/envConfig";
+import durationConfig from "../fixtures/durationConfig";
 
 const instanceHash = "instance-hash";
 
@@ -387,5 +388,55 @@ describe("evaluationSummaries", () => {
       syncResult.dataSent.events[0].summaries?.summaries[0].counters[0];
     expect(counter?.configId?.toString()).toBe("17537369033474523");
     expect(counter?.configId).toEqual(largeConfigId);
+  });
+
+  it("converts duration values to ISO 8601 format for telemetry", async () => {
+    const aggregator = evaluationSummaries(
+      mockApiClient,
+      telemetrySource,
+      instanceHash,
+      true
+    );
+
+    // Push a duration evaluation (PT5S = 5 seconds = 5000 milliseconds)
+    aggregator.push(evaluationFor(durationConfig, usContexts));
+
+    const syncResult = await aggregator.sync();
+
+    if (syncResult === undefined) {
+      throw new Error("syncResult is undefined");
+    }
+
+    expect(syncResult.dataSent).toStrictEqual({
+      instanceHash: "instance-hash",
+      events: [
+        {
+          summaries: {
+            start: expect.any(Number),
+            end: expect.any(Number),
+            summaries: [
+              {
+                key: "timeout.duration",
+                type: "CONFIG",
+                counters: [
+                  {
+                    configId: "888",
+                    conditionalValueIndex: 0,
+                    configRowIndex: 0,
+                    selectedValue: {
+                      duration: {
+                        definition: "PT5S",
+                      },
+                    },
+                    count: 1,
+                    reason: 0,
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ],
+    });
   });
 });
