@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.6 - 2025-10-11
+
+- docs: use `REFORGE_BACKEND_SDK_KEY`, not `REFORGE_SDK_KEY` in docs
+
 ## 0.0.5 - 2025-10-03
 
 - fix: handle confidential values that are undefined
