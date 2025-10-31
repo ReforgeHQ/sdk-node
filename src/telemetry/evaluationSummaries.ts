@@ -139,6 +139,13 @@ export const evaluationSummaries = (
             };
           } else if (valueType === "stringList") {
             selectedValue = { stringList: { values: unwrappedValue } };
+          } else if (valueType === "duration") {
+            // Convert milliseconds to ISO 8601 duration format
+            const ms = typeof unwrappedValue === "number" ? unwrappedValue : 0;
+            const seconds = ms / 1000;
+            selectedValue = {
+              duration: { definition: `PT${seconds}S` },
+            };
           } else {
             selectedValue = { [valueType]: unwrappedValue };
           }
