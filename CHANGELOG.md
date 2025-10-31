@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.7 - 2025-10-31
+
+- fix: configs with duration would cause telemetry not to send
+
 ## 0.0.6 - 2025-10-11
 
 - docs: use `REFORGE_BACKEND_SDK_KEY`, not `REFORGE_SDK_KEY` in docs
