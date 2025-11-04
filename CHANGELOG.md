@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.0 - 2025-11-04
+
+### Features
+
+- feat: add LOG_LEVEL_V2 with `getLogLevel()` method for dynamic log level control
+- feat: add Pino logger integration (`createPinoLogger()`, `createPinoHook()`)
+- feat: add Winston logger integration (`createWinstonLogger()`, `createWinstonFormat()`)
+- feat: add `loggerKey` option to Reforge constructor (defaults to 'log-levels.default')
+- feat: add ConfigType.LogLevelV2 enum value
+- feat: support context-aware log level evaluation with `reforge-sdk-logging.logger-path`
+
+### Fixes
+
+- fix: add @types/node to devDependencies to satisfy ts-node peer dependency
+- fix: replace @ts-ignore with @ts-expect-error for better type safety in integrations
+
+### Documentation
+
+- docs: add INTEGRATIONS.md with complete logger integration examples
+- docs: update README.md with getLogLevel() usage and loggerKey option
+
 ## 0.0.7 - 2025-10-31
 
 - fix: configs with duration would cause telemetry not to send
