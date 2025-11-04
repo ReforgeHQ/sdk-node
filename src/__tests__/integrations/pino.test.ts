@@ -30,15 +30,21 @@ const mockPinoFn = jest.fn((options: any) => {
 
 // Mock the pino module using doMock with moduleFactory
 if (pinoInstalled) {
-  jest.doMock("pino", () => ({
-    default: mockPinoFn,
-  }), { virtual: true });
+  jest.doMock(
+    "pino",
+    () => ({
+      default: mockPinoFn,
+    }),
+    { virtual: true }
+  );
 }
 
 describe("Pino Integration", () => {
   beforeAll(() => {
     if (!pinoInstalled) {
-      console.log("Skipping Pino integration tests - pino not installed. Install with: npm install pino");
+      console.log(
+        "Skipping Pino integration tests - pino not installed. Install with: npm install pino"
+      );
     }
   });
   let reforge: Reforge;
@@ -88,23 +94,29 @@ describe("Pino Integration", () => {
   });
 
   describe("createPinoLogger", () => {
-    (pinoInstalled ? it : it.skip)("creates a Pino logger with the correct initial level", async () => {
-      const logger = await createPinoLogger(reforge, "my.app.component");
+    (pinoInstalled ? it : it.skip)(
+      "creates a Pino logger with the correct initial level",
+      async () => {
+        const logger = await createPinoLogger(reforge, "my.app.component");
 
-      expect(logger).toBeDefined();
-      expect(logger.level).toBe("debug");
-    });
+        expect(logger).toBeDefined();
+        expect(logger.level).toBe("debug");
+      }
+    );
 
-    (pinoInstalled ? it : it.skip)("includes the logger name in options", async () => {
-      await createPinoLogger(reforge, "my.app.component");
+    (pinoInstalled ? it : it.skip)(
+      "includes the logger name in options",
+      async () => {
+        await createPinoLogger(reforge, "my.app.component");
 
-      expect(mockPinoFn).toHaveBeenCalledWith(
-        expect.objectContaining({
-          name: "my.app.component",
-          level: "debug",
-        })
-      );
-    });
+        expect(mockPinoFn).toHaveBeenCalledWith(
+          expect.objectContaining({
+            name: "my.app.component",
+            level: "debug",
+          })
+        );
+      }
+    );
 
     (pinoInstalled ? it : it.skip)("merges custom Pino options", async () => {
       const customOptions = {
@@ -124,19 +136,79 @@ describe("Pino Integration", () => {
       );
     });
 
-    (pinoInstalled ? it : it.skip)("maps Reforge log levels to Pino levels correctly", async () => {
+    (pinoInstalled ? it : it.skip)(
+      "maps Reforge log levels to Pino levels correctly",
+      async () => {
+        const testCases = [
+          { reforge: LogLevel.Trace, pino: "trace" },
+          { reforge: LogLevel.Debug, pino: "debug" },
+          { reforge: LogLevel.Info, pino: "info" },
+          { reforge: LogLevel.Warn, pino: "warn" },
+          { reforge: LogLevel.Error, pino: "error" },
+          { reforge: LogLevel.Fatal, pino: "fatal" },
+        ];
 
-      const testCases = [
-        { reforge: LogLevel.Trace, pino: "trace" },
-        { reforge: LogLevel.Debug, pino: "debug" },
-        { reforge: LogLevel.Info, pino: "info" },
-        { reforge: LogLevel.Warn, pino: "warn" },
-        { reforge: LogLevel.Error, pino: "error" },
-        { reforge: LogLevel.Fatal, pino: "fatal" },
-      ];
+        for (const testCase of testCases) {
+          // Update config for each level
+          reforge.setConfig(
+            [
+              {
+                id: "1",
+                projectId: 1,
+                key: "my.logger.config",
+                changedBy: undefined,
+                rows: [
+                  {
+                    properties: {},
+                    projectEnvId: projectEnvIdUnderTest,
+                    values: [
+                      {
+                        criteria: [],
+                        value: {
+                          logLevel: testCase.reforge,
+                        },
+                      },
+                    ],
+                  },
+                ],
+                allowableValues: [],
+                configType: "LOG_LEVEL_V2" as any,
+                valueType: "LOG_LEVEL" as any,
+                sendToClientSdk: false,
+              },
+            ],
+            projectEnvIdUnderTest,
+            new Map()
+          );
 
-      for (const testCase of testCases) {
-        // Update config for each level
+          const logger = await createPinoLogger(reforge, "my.app.component");
+          expect(logger.level).toBe(testCase.pino);
+        }
+      }
+    );
+  });
+
+  describe("createPinoHook", () => {
+    (pinoInstalled ? it : it.skip)(
+      "returns a mixin function that includes the Reforge log level",
+      () => {
+        const mixin = createPinoHook(reforge, "my.app.component");
+        const result = mixin();
+
+        expect(result).toHaveProperty("reforgeLogLevel");
+        expect(result["reforgeLogLevel"]).toBe("debug");
+      }
+    );
+
+    (pinoInstalled ? it : it.skip)(
+      "updates when Reforge log level changes",
+      () => {
+        const mixin = createPinoHook(reforge, "my.app.component");
+
+        let result = mixin();
+        expect(result["reforgeLogLevel"]).toBe("debug");
+
+        // Update the config
         reforge.setConfig(
           [
             {
@@ -152,7 +224,7 @@ describe("Pino Integration", () => {
                     {
                       criteria: [],
                       value: {
-                        logLevel: testCase.reforge,
+                        logLevel: LogLevel.Error,
                       },
                     },
                   ],
@@ -168,61 +240,9 @@ describe("Pino Integration", () => {
           new Map()
         );
 
-        const logger = await createPinoLogger(reforge, "my.app.component");
-        expect(logger.level).toBe(testCase.pino);
+        result = mixin();
+        expect(result["reforgeLogLevel"]).toBe("error");
       }
-    });
-  });
-
-  describe("createPinoHook", () => {
-    (pinoInstalled ? it : it.skip)("returns a mixin function that includes the Reforge log level", () => {
-      const mixin = createPinoHook(reforge, "my.app.component");
-      const result = mixin();
-
-      expect(result).toHaveProperty("reforgeLogLevel");
-      expect(result["reforgeLogLevel"]).toBe("debug");
-    });
-
-    (pinoInstalled ? it : it.skip)("updates when Reforge log level changes", () => {
-      const mixin = createPinoHook(reforge, "my.app.component");
-
-      let result = mixin();
-      expect(result["reforgeLogLevel"]).toBe("debug");
-
-      // Update the config
-      reforge.setConfig(
-        [
-          {
-            id: "1",
-            projectId: 1,
-            key: "my.logger.config",
-            changedBy: undefined,
-            rows: [
-              {
-                properties: {},
-                projectEnvId: projectEnvIdUnderTest,
-                values: [
-                  {
-                    criteria: [],
-                    value: {
-                      logLevel: LogLevel.Error,
-                    },
-                  },
-                ],
-              },
-            ],
-            allowableValues: [],
-            configType: "LOG_LEVEL_V2" as any,
-            valueType: "LOG_LEVEL" as any,
-            sendToClientSdk: false,
-          },
-        ],
-        projectEnvIdUnderTest,
-        new Map()
-      );
-
-      result = mixin();
-      expect(result["reforgeLogLevel"]).toBe("error");
-    });
+    );
   });
 });

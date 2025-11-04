@@ -82,9 +82,15 @@ export async function createWinstonLogger(
         // Update level before each log call
         if (
           typeof prop === "string" &&
-          ["error", "warn", "info", "http", "verbose", "debug", "silly"].includes(
-            prop
-          )
+          [
+            "error",
+            "warn",
+            "info",
+            "http",
+            "verbose",
+            "debug",
+            "silly",
+          ].includes(prop)
         ) {
           updateLevel();
         }

@@ -362,7 +362,10 @@ class Resolver implements ResolverAPI {
     const result = this.get(key, contexts, LogLevelEnum.Debug, "ignore");
 
     // Validate that the result is actually a LogLevel
-    if (typeof result === "string" && Object.values(LogLevelEnum).includes(result as LogLevel)) {
+    if (
+      typeof result === "string" &&
+      Object.values(LogLevelEnum).includes(result as LogLevel)
+    ) {
       return result as LogLevel;
     }
 
