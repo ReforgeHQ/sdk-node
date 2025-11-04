@@ -942,6 +942,14 @@ __metadata:
     ts-node: "npm:^10.9.1"
     typescript: "npm:^5.0.4"
     yaml: "npm:^2.2.2"
+  peerDependencies:
+    pino: ">=7.0.0"
+    winston: ">=3.0.0"
+  peerDependenciesMeta:
+    pino:
+      optional: true
+    winston:
+      optional: true
   languageName: unknown
   linkType: soft
 
