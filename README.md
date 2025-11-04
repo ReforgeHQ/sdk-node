@@ -2,6 +2,8 @@
 
 Reforge Node.js client
 
+📚 **[Full Documentation](https://docs.reforge.com/docs/sdks/node)**
+
 ---
 
 Install the client
