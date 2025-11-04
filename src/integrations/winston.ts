@@ -38,7 +38,7 @@ export async function createWinstonLogger(
 ): Promise<any | undefined> {
   try {
     // Dynamically import winston only if it's available
-    // @ts-ignore - winston is an optional peer dependency
+    // @ts-expect-error - winston is an optional peer dependency
     const winston = await import("winston");
 
     // Map Reforge LogLevel to Winston level names
@@ -130,7 +130,7 @@ export async function createWinstonFormat(
   loggerName: string
 ): Promise<any | undefined> {
   try {
-    // @ts-ignore - winston is an optional peer dependency
+    // @ts-expect-error - winston is an optional peer dependency
     const winston = await import("winston");
 
     const levelMap: Record<LogLevel, string> = {

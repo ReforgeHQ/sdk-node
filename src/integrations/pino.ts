@@ -38,7 +38,7 @@ export async function createPinoLogger(
 ): Promise<any | undefined> {
   try {
     // Dynamically import pino only if it's available
-    // @ts-ignore - pino is an optional peer dependency
+    // @ts-expect-error - pino is an optional peer dependency
     const pino = await import("pino");
 
     // Map Reforge LogLevel to Pino level names
