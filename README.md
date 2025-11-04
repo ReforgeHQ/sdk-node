@@ -2,6 +2,8 @@
 
 Reforge Node.js client
 
+📚 **[Full Documentation](https://docs.reforge.com/docs/sdks/node)**
+
 ---
 
 Install the client
@@ -33,6 +35,7 @@ After the init completes you can use
 - `reforge.get('some.config.name')` returns a raw value
 - `reforge.isFeatureEnabled('some.feature.name')` returns true or false
 - `reforge.shouldLog({loggerName, desiredLevel, defaultLevel, contexts})` returns true or false
+- `reforge.getLogLevel(loggerName)` returns the configured log level for a logger name
 
 Reforge supports [context](https://docs.prefab.cloud/docs/explanations/concepts/context) for
 intelligent rule-based evaluation of `get` and `isFeatureEnabled` based on the current
@@ -91,6 +94,15 @@ Note that you can also provide Context as an object instead of a Map, e.g.:
 }
 ```
 
+## Logger Integrations
+
+Reforge provides optional integrations with popular Node.js logging frameworks (Pino, Winston) for dynamic log level control.
+
+See [INTEGRATIONS.md](INTEGRATIONS.md) for detailed documentation on:
+- Setting up Pino or Winston with dynamic log levels
+- Using `getLogLevel()` with any logging framework
+- Configuration and examples
+
 #### Option Definitions
 
 Besides `apiKey`, you can initialize `new Reforge(...)` with the following options
@@ -101,6 +113,7 @@ Besides `apiKey`, you can initialize `new Reforge(...)` with the following optio
 | collectLoggerCounts        | Send counts of logger usage back to Reforge to power log-levels configuration screen                                                   | true              |
 | contextUploadMode          | Upload either context "shapes" (the names and data types your app uses in reforge contexts) or periodically send full example contexts | "periodicExample" |
 | defaultLevel               | Level to be used as the min-verbosity for a `loggerPath` if no value is configured in Reforge                                          | "warn"            |
+| loggerKey                  | Config key for LOG_LEVEL_V2 to use with `getLogLevel()` method                                                                        | "log-levels.default" |
 | enableSSE                  | Whether or not we should listen for live changes from Reforge                                                                          | true              |
 | enablePolling              | Whether or not we should poll for changes from Reforge                                                                                 | false             |
 

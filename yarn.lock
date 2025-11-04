@@ -922,6 +922,7 @@ __metadata:
   resolution: "@reforge-com/node@workspace:."
   dependencies:
     "@types/jest": "npm:^29.5.1"
+    "@types/node": "npm:^24.10.0"
     "@types/node-forge": "npm:^1"
     "@types/yaml": "npm:^1.9.7"
     "@typescript-eslint/eslint-plugin": "npm:^5.59.2"
@@ -942,6 +943,14 @@ __metadata:
     ts-node: "npm:^10.9.1"
     typescript: "npm:^5.0.4"
     yaml: "npm:^2.2.2"
+  peerDependencies:
+    pino: ">=7.0.0"
+    winston: ">=3.0.0"
+  peerDependenciesMeta:
+    pino:
+      optional: true
+    winston:
+      optional: true
   languageName: unknown
   linkType: soft
 
@@ -1119,6 +1128,15 @@ __metadata:
   dependencies:
     undici-types: "npm:~7.10.0"
   checksum: 10c0/96bdeca01f690338957c2dcc92cb9f76c262c10398f8d91860865464412b0f9d309c24d9b03d0bdd26dd47fa7ee3f8227893d5c89bc2009d919a525a22512030
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^24.10.0":
+  version: 24.10.0
+  resolution: "@types/node@npm:24.10.0"
+  dependencies:
+    undici-types: "npm:~7.16.0"
+  checksum: 10c0/f82ed7194e16f5590ef7afdc20c6d09068c76d50278b485ede8f0c5749683536e3064ffa8def8db76915196afb3724b854aa5723c64d6571b890b14492943b46
   languageName: node
   linkType: hard
 
@@ -5714,6 +5732,13 @@ __metadata:
   version: 7.10.0
   resolution: "undici-types@npm:7.10.0"
   checksum: 10c0/8b00ce50e235fe3cc601307f148b5e8fb427092ee3b23e8118ec0a5d7f68eca8cee468c8fc9f15cbb2cf2a3797945ebceb1cbd9732306a1d00e0a9b6afa0f635
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~7.16.0":
+  version: 7.16.0
+  resolution: "undici-types@npm:7.16.0"
+  checksum: 10c0/3033e2f2b5c9f1504bdc5934646cb54e37ecaca0f9249c983f7b1fc2e87c6d18399ebb05dc7fd5419e02b2e915f734d872a65da2e3eeed1813951c427d33cc9a
   languageName: node
   linkType: hard
 

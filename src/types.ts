@@ -29,6 +29,7 @@ export enum ConfigType {
   Config = "CONFIG",
   FeatureFlag = "FEATURE_FLAG",
   LogLevel = "LOG_LEVEL",
+  LogLevelV2 = "LOG_LEVEL_V2",
   Segment = "SEGMENT",
   LimitDefinition = "LIMIT_DEFINITION",
   Deleted = "DELETED",
