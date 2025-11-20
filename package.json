@@ -1,5 +1,5 @@
 {
-  "packageManager": "yarn@4.9.2",
+  "packageManager": "yarn@4.11.0",
   "name": "@reforge-com/node",
   "version": "0.1.0",
   "description": "Feature Flags, Live Config, and Dynamic Log Levels",
