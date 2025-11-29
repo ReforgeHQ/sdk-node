@@ -1,3 +1,9 @@
+import { decrypt } from "./encryption";
+import { durationToMilliseconds } from "./duration";
+import forge from "node-forge";
+
+import murmurhash from "murmurhash";
+import { isBigInt, jsonStringifyWithBigInt } from "./bigIntUtils";
 import {
   ConfigValueType,
   type ConfigValue,
@@ -7,13 +13,16 @@ import {
   type HashByPropertyValue,
 } from "./types";
 import { isNonNullable } from "./types";
-import type { MinimumConfig, Resolver } from "./resolver";
-import { decrypt } from "./encryption";
-import { durationToMilliseconds } from "./duration";
-import forge from "node-forge";
+import type { MinimumConfig } from "./resolver";
 
-import murmurhash from "murmurhash";
-import { isBigInt, jsonStringifyWithBigInt } from "./bigIntUtils";
+/**
+ * Minimal interface for resolving configuration values during unwrapping.
+ * This interface is used internally to decouple unwrap.ts from the full Resolver.
+ * @internal
+ */
+interface ConfigResolver {
+  get(key: string): unknown;
+}
 
 const CONFIDENTIAL_PREFIX = "*****";
 
@@ -204,7 +213,7 @@ export const unwrapValue = ({
   hashByPropertyValue: HashByPropertyValue;
   primitivesOnly: boolean;
   config?: MinimumConfig;
-  resolver?: Resolver;
+  resolver?: ConfigResolver;
 }): Omit<UnwrappedValue, "reportableValue"> => {
   if (primitivesOnly) {
     if (isNonNullable(value.provided) || isNonNullable(value.decryptWith)) {
@@ -307,7 +316,7 @@ export const unwrap = ({
   hashByPropertyValue?: HashByPropertyValue;
   primitivesOnly?: boolean;
   config?: MinimumConfig;
-  resolver?: Resolver;
+  resolver?: ConfigResolver;
 }): UnwrappedValue => {
   if (value === undefined) {
     return NULL_UNWRAPPED_VALUE;

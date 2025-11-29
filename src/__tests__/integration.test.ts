@@ -1,6 +1,6 @@
 import { jsonStringifyWithBigInt } from "../bigIntUtils";
 import { Reforge } from "../reforge";
-import type { ReforgeInterface } from "../reforge";
+import type { ReforgeInterface } from "../types";
 import type { ResolverAPI } from "../resolver";
 import type { GetValue } from "../unwrap";
 import { tests } from "./integrationHelper";

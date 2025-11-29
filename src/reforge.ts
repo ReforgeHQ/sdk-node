@@ -1,6 +1,6 @@
 import { apiClient, type ApiClient } from "./apiClient";
 import { loadConfig } from "./loadConfig";
-import { Resolver, type MinimumConfig, type ResolverAPI } from "./resolver";
+import { Resolver, type MinimumConfig } from "./resolver";
 import { Sources } from "./sources";
 import { jsonStringifyWithBigInt } from "./bigIntUtils";
 import {
@@ -21,10 +21,14 @@ import type {
   ConfigValue,
   ConfigRow,
   Provided,
+  TypedNodeServerConfigurationRaw,
+  Telemetry,
+  ReforgeInterface,
 } from "./types";
 import { LOG_LEVEL_RANK_LOOKUP, type makeLogger } from "./logger";
 import { SSEConnection } from "./sseConnection";
 import { TelemetryReporter } from "./telemetry/reporter";
+import { ReforgeClient } from "./reforgeClient";
 
 import type { ContextUploadMode } from "./telemetry/types";
 import { knownLoggers } from "./telemetry/knownLoggers";
@@ -49,65 +53,6 @@ function requireResolver(
   if (resolver === undefined) {
     throw new Error("reforge.resolver is undefined. Did you call init()?");
   }
-}
-
-// @reforge-com/cli#generate will create interfaces into this namespace for Node to consume
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface NodeServerConfigurationRaw {}
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface NodeServerConfigurationAccessor {}
-
-export type TypedNodeServerConfigurationRaw =
-  keyof NodeServerConfigurationRaw extends never
-    ? Record<string, unknown>
-    : {
-        [TypedFlagKey in keyof NodeServerConfigurationRaw]: NodeServerConfigurationRaw[TypedFlagKey];
-      };
-
-export type TypedNodeServerConfigurationAccessor =
-  keyof NodeServerConfigurationAccessor extends never
-    ? Record<string, unknown>
-    : {
-        [TypedFlagKey in keyof NodeServerConfigurationAccessor]: NodeServerConfigurationAccessor[TypedFlagKey];
-      };
-
-export interface ReforgeInterface {
-  get: <K extends keyof TypedNodeServerConfigurationRaw>(
-    key: K,
-    contexts?: Contexts | ContextObj,
-    defaultValue?: TypedNodeServerConfigurationRaw[K]
-  ) => TypedNodeServerConfigurationRaw[K];
-  isFeatureEnabled: <K extends keyof TypedNodeServerConfigurationRaw>(
-    key: K,
-    contexts?: Contexts | ContextObj
-  ) => boolean;
-  logger: (
-    loggerName: string,
-    defaultLevel: LogLevel
-  ) => ReturnType<typeof makeLogger>;
-  shouldLog: ({
-    loggerName,
-    desiredLevel,
-    defaultLevel,
-    contexts,
-  }: {
-    loggerName: string;
-    desiredLevel: LogLevel;
-    defaultLevel?: LogLevel;
-    contexts?: Contexts | ContextObj;
-  }) => boolean;
-  getLogLevel: (loggerName: string) => LogLevel;
-  telemetry?: Telemetry;
-  updateIfStalerThan: (durationInMs: number) => Promise<void> | undefined;
-  withContext: (contexts: Contexts | ContextObj) => ResolverAPI;
-  addConfigChangeListener: (callback: GlobalListenerCallback) => () => void;
-}
-
-export interface Telemetry {
-  knownLoggers: ReturnType<typeof knownLoggers>;
-  contextShapes: ReturnType<typeof contextShapes>;
-  exampleContexts: ReturnType<typeof exampleContexts>;
-  evaluationSummaries: ReturnType<typeof evaluationSummaries>;
 }
 
 interface ConstructorProps {
@@ -411,17 +356,17 @@ class Reforge implements ReforgeInterface {
 
   inContext<T>(
     contexts: Contexts | ContextObj,
-    func: (reforge: Resolver) => T
+    func: (reforge: ReforgeInterface) => T
   ): T {
     requireResolver(this.resolver);
 
-    return func(this.resolver.cloneWithContext(contexts));
+    return func(new ReforgeClient(this, contexts));
   }
 
-  withContext(contexts: Contexts | ContextObj): ResolverAPI {
+  withContext(contexts: Contexts | ContextObj): ReforgeInterface {
     requireResolver(this.resolver);
 
-    return this.resolver.cloneWithContext(contexts);
+    return new ReforgeClient(this, contexts);
   }
 
   get<K extends keyof TypedNodeServerConfigurationRaw>(
@@ -562,5 +507,4 @@ export {
   type Contexts,
   SchemaType,
   type Provided,
-  Resolver,
 };

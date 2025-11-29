@@ -10,13 +10,23 @@ import {
   type HashByPropertyValue,
   type ProjectEnvId,
 } from "./types";
-import type { MinimumConfig, Resolver } from "./resolver";
+import type { MinimumConfig } from "./resolver";
 
 import { type GetValue, unwrap } from "./unwrap";
 import { contextLookup } from "./contextLookup";
 import { sortRows } from "./sortRows";
 import SemanticVersion from "./semanticversion";
 import { isBigInt, jsonStringifyWithBigInt } from "./bigIntUtils";
+
+/**
+ * Minimal interface for resolving segments and encryption keys during evaluation.
+ * This interface is used internally to decouple evaluate.ts from the full Resolver.
+ * @internal
+ */
+interface SegmentResolver {
+  raw(key: string): MinimumConfig | undefined;
+  get(key: string, contexts?: Contexts): unknown;
+}
 
 const getHashByPropertyValue = (
   value: ConfigValue | undefined,
@@ -102,7 +112,7 @@ const propContainsOneOf = (
 const inSegment = (
   criterion: Criterion,
   contexts: Contexts,
-  resolver: Resolver
+  resolver: SegmentResolver
 ): boolean => {
   const segmentKey = criterion.valueToMatch?.string;
 
@@ -282,7 +292,7 @@ const allCriteriaMatch = (
   value: ConditionalValue,
   namespace: string | undefined,
   contexts: Contexts,
-  resolver: Resolver
+  resolver: SegmentResolver
 ): boolean => {
   if (value.criteria === undefined) {
     return true;
@@ -380,7 +390,7 @@ const matchingConfigValue = (
   projectEnvId: ProjectEnvId,
   namespace: string | undefined,
   contexts: Contexts,
-  resolver: Resolver
+  resolver: SegmentResolver
 ): [number, number, ConfigValue | undefined] => {
   let match: ConfigValue | undefined;
   let conditionalValueIndex: number = -1;
@@ -413,7 +423,7 @@ export interface EvaluateArgs {
   projectEnvId: ProjectEnvId;
   namespace: string | undefined;
   contexts: Contexts;
-  resolver: Resolver;
+  resolver: SegmentResolver;
 }
 
 export interface Evaluation {

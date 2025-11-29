@@ -429,3 +429,69 @@ export enum SchemaType {
 export const isNonNullable = <T>(value: T): value is NonNullable<T> => {
   return value !== null && value !== undefined;
 };
+
+// Reforge public interface types
+
+// @reforge-com/cli#generate will create interfaces into this namespace for Node to consume
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface NodeServerConfigurationRaw {}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface NodeServerConfigurationAccessor {}
+
+export type TypedNodeServerConfigurationRaw =
+  keyof NodeServerConfigurationRaw extends never
+    ? Record<string, unknown>
+    : {
+        [TypedFlagKey in keyof NodeServerConfigurationRaw]: NodeServerConfigurationRaw[TypedFlagKey];
+      };
+
+export type TypedNodeServerConfigurationAccessor =
+  keyof NodeServerConfigurationAccessor extends never
+    ? Record<string, unknown>
+    : {
+        [TypedFlagKey in keyof NodeServerConfigurationAccessor]: NodeServerConfigurationAccessor[TypedFlagKey];
+      };
+
+export interface Telemetry {
+  knownLoggers: any; // Runtime value from telemetry/knownLoggers
+  contextShapes: any; // Runtime value from telemetry/contextShapes
+  exampleContexts: any; // Runtime value from telemetry/exampleContexts
+  evaluationSummaries: any; // Runtime value from telemetry/evaluationSummaries
+}
+
+export interface ReforgeInterface {
+  get: <K extends keyof TypedNodeServerConfigurationRaw>(
+    key: K,
+    contexts?: Contexts | ContextObj,
+    defaultValue?: TypedNodeServerConfigurationRaw[K]
+  ) => TypedNodeServerConfigurationRaw[K];
+  isFeatureEnabled: <K extends keyof TypedNodeServerConfigurationRaw>(
+    key: K,
+    contexts?: Contexts | ContextObj
+  ) => boolean;
+  logger: (
+    loggerName: string,
+    defaultLevel?: LogLevel,
+    contexts?: Contexts | ContextObj
+  ) => any; // ReturnType<typeof makeLogger>
+  shouldLog: ({
+    loggerName,
+    desiredLevel,
+    defaultLevel,
+    contexts,
+  }: {
+    loggerName: string;
+    desiredLevel: LogLevel;
+    defaultLevel?: LogLevel;
+    contexts?: Contexts | ContextObj;
+  }) => boolean;
+  getLogLevel: (loggerName: string) => LogLevel;
+  telemetry?: Telemetry;
+  updateIfStalerThan: (durationInMs: number) => Promise<void> | undefined;
+  withContext: (contexts: Contexts | ContextObj) => ReforgeInterface;
+  inContext: <T>(
+    contexts: Contexts | ContextObj,
+    func: (reforge: ReforgeInterface) => T
+  ) => T;
+  addConfigChangeListener: (callback: any) => () => void; // GlobalListenerCallback
+}

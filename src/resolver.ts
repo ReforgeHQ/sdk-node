@@ -8,10 +8,11 @@ import {
   type Config,
   type ConfigValue,
   type LogLevel,
+  type Telemetry,
+  type TypedNodeServerConfigurationRaw,
   ConfigType,
   LogLevel as LogLevelEnum,
 } from "./types";
-import type { Telemetry, TypedNodeServerConfigurationRaw } from "./reforge";
 import { REFORGE_DEFAULT_LOG_LEVEL } from "./reforge";
 
 import { mergeContexts, contextObjToMap } from "./mergeContexts";
@@ -24,45 +25,68 @@ const emptyContexts: Contexts = new Map<string, MapContext>();
 
 export const NOT_PROVIDED = Symbol("NOT_PROVIDED");
 
-// Interface for Resolver's public API
+/**
+ * Internal resolver API.
+ * This interface is used internally by Reforge and should not be used by external consumers.
+ * Use the ReforgeInterface instead for public-facing operations.
+ * @internal
+ */
 export interface ResolverAPI {
+  /** @internal */
   id: number;
+  /** @internal */
   contexts?: Contexts;
+  /** @internal */
   readonly telemetry: Telemetry | undefined;
+  /** @internal */
   readonly defaultContext?: Contexts;
+  /** @internal */
   readonly loggerKey?: string;
+  /** @internal */
   updateIfStalerThan:
     | ((durationInMs: number) => Promise<void> | undefined)
     | undefined;
 
+  /** @internal - Create resolver with additional context (cloning pattern) */
   cloneWithContext: (contexts: Contexts | ContextObj) => ResolverAPI;
+  /** @internal - Alias for cloneWithContext */
   withContext: (contexts: Contexts | ContextObj) => ResolverAPI;
+  /** @internal - Update configs in place */
   update: (
     configs: Array<Config | MinimumConfig>,
     defaultContext?: Contexts
   ) => void;
+  /** @internal - Get raw config without evaluation */
   raw: (key: string) => MinimumConfig | undefined;
+  /** @internal - Set runtime config value */
   set: (key: string, value: ConfigValue) => void;
+  /** @internal - Evaluate config with context */
   get: <K extends keyof TypedNodeServerConfigurationRaw>(
     key: K,
     localContexts?: Contexts | ContextObj,
     defaultValue?: TypedNodeServerConfigurationRaw[K],
     onNoDefault?: OnNoDefault
   ) => TypedNodeServerConfigurationRaw[K];
+  /** @internal - Check if feature is enabled */
   isFeatureEnabled: (key: string, contexts?: Contexts | ContextObj) => boolean;
+  /** @internal - List all config keys */
   keys: () => string[];
+  /** @internal - Create logger for namespace */
   logger: (
     loggerName: string,
     defaultLevel: LogLevel,
     contexts?: Contexts | ContextObj
   ) => ReturnType<typeof makeLogger>;
+  /** @internal - Check if log level should produce output */
   shouldLog: (args: {
     loggerName: string;
     desiredLevel: LogLevel;
     defaultLevel?: LogLevel;
     contexts?: Contexts | ContextObj;
   }) => boolean;
+  /** @internal - Get current log level for logger */
   getLogLevel: (loggerName: string) => LogLevel;
+  /** @internal - Set callback for config updates */
   setOnUpdate: (
     onUpdate: (configs: Array<Config | MinimumConfig>) => void
   ) => void;
@@ -103,6 +127,13 @@ const mergeDefaultContexts = (
 
 let id = 0;
 
+/**
+ * Internal resolver for evaluating configurations.
+ * This class is used internally by Reforge to resolve feature flags and configurations.
+ * It should not be instantiated or used directly by external consumers.
+ * Use the Reforge class and ReforgeInterface instead.
+ * @internal
+ */
 class Resolver implements ResolverAPI {
   // Implement the new interface
   private readonly config = new Map<string, MinimumConfig>();
@@ -379,4 +410,7 @@ class Resolver implements ResolverAPI {
   }
 }
 
+/**
+ * @internal - This is for internal use only. Use ReforgeInterface instead.
+ */
 export { Resolver };
